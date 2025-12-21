@@ -4,28 +4,45 @@
 
 Dependencies:
 
-```bash
 - @tailwindcss/vite — npm install @tailwindcss/vite@^4.1.18
+
+```bash
 npm install @tailwindcss/vite
+```
 
 - axios — npm install axios@^1.13.2
+
+```bash
 npm install axios
+```
 
 - clsx — npm install clsx@^2.1.1
+
+```bash
 npm install clsx
+```
 
 - react-dom — npm install react-dom@^19.2.3
+
+```bash
 npm install react-dom
+```
 
 - react-router-dom — npm install react-router-dom@^7.11.0
+
+```bash
 npm install react-router-dom
+```
 
 - recharts — npm install recharts@^3.6.0
+
+```bash
 npm install recharts
 ```
 
 ## Cây thư mục (đã format lại, không đổi nội dung)
 
+```
 frontend/
 ├── public/
 │ └── favicon.svg
@@ -115,7 +132,4 @@ frontend/
 ├── index.html
 ├── package.json
 └── README.md
-
-```
-
 ```
