@@ -1,1 +1,89 @@
 @import "tailwindcss";
+:root {
+  /* Colors */
+  --primary-green-color: #2fd53a;
+  --secondary-green-color: #43e44d;
+  --primary-blue-color: #252ed6;
+  --secondary-blue-color: #575ee4;
+  /* Fonts */
+  --font-family-base: "Poppins", sans-serif;
+}
+html,
+body {
+  font-family: var(--font-family-base);
+}
+/* background */
+.bg-header {
+  background-image: linear-gradient(
+    to right,
+    var(--secondary-blue-color),
+    var(--secondary-green-color)
+  );
+}
+.bg-body {
+  background-image: linear-gradient(to left, #e2ffe0, #dee9fe);
+}
+.bg-footer {
+  background-image: linear-gradient(to right, #000445, #004e92);
+}
+
+/* Buttons */
+.btn-login-header {
+  background: #ffffff;
+  border: 2px solid var(--primary-blue-color);
+  color: var(--primary-blue-color);
+}
+.btn-login-header:hover {
+  background: var(--primary-blue-color);
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+.btn-get-started {
+  background-image: linear-gradient(
+    to right,
+    var(--primary-blue-color),
+    var(--primary-green-color)
+  );
+  color: #ffffff;
+}
+.btn-get-started:hover {
+  background-image: linear-gradient(
+    to right,
+    var(--secondary-blue-color),
+    var(--secondary-green-color)
+  );
+  color: #ffffff;
+}
+.btn-login-form {
+  background: var(--primary-green-color);
+  color: #ffffff;
+}
+.btn-login-form:hover {
+  background: var(--secondary-green-color);
+  color: #ffffff;
+}
+.btn-register-form {
+  background: var(--primary-blue-color);
+  color: #ffffff;
+}
+.btn-register-form:hover {
+  background: var(--secondary-blue-color);
+  color: #ffffff;
+}
+
+/* text color */
+.text-body {
+  color: #111827; /* Tailwind's gray-600 */
+}
+.text-h1 {
+  /* gradient text */
+  background: linear-gradient(
+    to right,
+    var(--primary-blue-color),
+    var(--primary-green-color)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent; /* Safari */
+  color: transparent;
+}

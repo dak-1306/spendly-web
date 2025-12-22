@@ -1,0 +1,49 @@
+/* Floating label inputs */
+.floating {
+  position: relative;
+}
+
+/* ẩn placeholder văn bản (Tailwind vẫn giữ padding) */
+.floating input::placeholder {
+  color: transparent; /* hide visible placeholder text */
+}
+
+/* transition nhẹ cho border / shadow */
+.floating input {
+  transition: border-color 150ms ease, box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+
+/* focus: đổi màu border + ring glow */
+.floating input:focus,
+.floating input:focus-visible {
+  border-color: var(--primary-blue-color) !important;
+  box-shadow: 0 0 0 6px rgba(37, 46, 214, 0.12); /* soft glow */
+  outline: none;
+}
+
+/* label giữa input, chuyển lên trên khi input có giá trị hoặc focus */
+.floating label {
+  position: absolute;
+  left: 0.75rem; /* align to left (match input padding) */
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #6b7280; /* gray-500 */
+  transition: top 150ms ease, transform 150ms ease, color 150ms ease,
+    font-size 150ms ease;
+  background: transparent;
+  padding: 0 0.25rem;
+  z-index: 10;
+}
+
+/* khi focus hoặc có nội dung => label lên trên ở phía trái và đổi màu */
+.floating input:focus + label,
+.floating input:not(:placeholder-shown) + label {
+  top: -0.5rem;
+  left: 0.75rem;
+  transform: translateY(0) scale(0.92);
+  color: var(--primary-blue-color);
+  font-size: 0.75rem;
+  background: white; /* che phần input phía sau label */
+}
