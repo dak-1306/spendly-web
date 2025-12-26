@@ -1,9 +1,13 @@
-import { LOGO_COLOR, GOOGLE, FACEBOOK, EYE } from "../../utils/constants";
+import { ICONS } from "../../assets/index";
 import { Link } from "react-router-dom";
 import Button from "../common/Button";
 import "../../styles/auth.css";
 function AuthForm({ variant = "login" }) {
   const isLogin = variant === "login";
+  const LOGO_COLOR = ICONS.logo_color;
+  const GOOGLE = ICONS.icon_google;
+  const FACEBOOK = ICONS.icon_facebook;
+  const EYE = ICONS.icon_eye;
 
   return (
     <div className="w-full max-w-xl mx-auto bg-white p-8 rounded shadow">

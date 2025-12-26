@@ -26,6 +26,9 @@ body {
 .bg-footer {
   background-image: linear-gradient(to right, #000445, #004e92);
 }
+.bg-navbar {
+  background-image: linear-gradient(to left, #aaaeff, #b3ffb9);
+}
 
 /* Buttons */
 .btn-login-header {
