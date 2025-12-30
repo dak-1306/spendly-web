@@ -1,10 +1,11 @@
 @import "tailwindcss";
 :root {
   /* Colors */
-  --primary-green-color: #2fd53a;
+  --primary-green-color: #19ae0b;
   --secondary-green-color: #43e44d;
   --primary-blue-color: #252ed6;
   --secondary-blue-color: #575ee4;
+  --red-color: #ff4d4f;
   /* Fonts */
   --font-family-base: "Poppins", sans-serif;
 }
@@ -68,6 +69,14 @@ body {
 }
 .btn-green:hover {
   background: var(--secondary-green-color);
+  color: #ffffff;
+}
+.btn-red {
+  background: var(--red-color);
+  color: #ffffff;
+}
+.btn-red:hover {
+  background: #ff7875;
   color: #ffffff;
 }
 

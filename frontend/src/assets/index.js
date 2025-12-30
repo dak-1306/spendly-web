@@ -16,6 +16,7 @@ import icon_arrow_down from "../assets/icons/icon_arrow_down.svg";
 import icon_trash from "../assets/icons/icon_trash.svg";
 import icon_edit from "../assets/icons/icon_edit.svg";
 import icon_search from "../assets/icons/icon_search.svg";
+import icon_delete from "../assets/icons/icon_delete.svg";
 
 const ICONS = {
   dashboard: {
@@ -125,6 +126,12 @@ const ICONS = {
     alt: "Search Icon",
     width: 20,
     height: 20,
+  },
+  icon_delete: {
+    src: icon_delete,
+    alt: "Delete Icon",
+    width: 15,
+    height: 15,
   },
 };
 export { ICONS };

@@ -10,6 +10,7 @@ const variantStyles = {
   blue: "btn-blue",
   green: "btn-green",
   getStarted: "btn-get-started",
+  red: "btn-red",
 
   edit: "bg-white text-blue-600  hover:bg-blue-50",
   delete: "bg-white text-red-600 hover:bg-red-50",
