@@ -29,17 +29,22 @@ body {
 .bg-navbar {
   background-image: linear-gradient(to left, #aaaeff, #b3ffb9);
 }
+.bg-linear-color {
+  background-image: linear-gradient(
+    to right,
+    var(--primary-blue-color),
+    var(--primary-green-color)
+  );
+}
 
 /* Buttons */
-.btn-login-header {
-  background: #ffffff;
-  border: 2px solid var(--primary-blue-color);
-  color: var(--primary-blue-color);
-}
-.btn-login-header:hover {
+.btn-blue {
   background: var(--primary-blue-color);
   color: #ffffff;
-  border: 2px solid #ffffff;
+}
+.btn-blue:hover {
+  background: var(--secondary-blue-color);
+  color: #ffffff;
 }
 .btn-get-started {
   background-image: linear-gradient(
@@ -57,20 +62,12 @@ body {
   );
   color: #ffffff;
 }
-.btn-login-form {
+.btn-green {
   background: var(--primary-green-color);
   color: #ffffff;
 }
-.btn-login-form:hover {
+.btn-green:hover {
   background: var(--secondary-green-color);
-  color: #ffffff;
-}
-.btn-register-form {
-  background: var(--primary-blue-color);
-  color: #ffffff;
-}
-.btn-register-form:hover {
-  background: var(--secondary-blue-color);
   color: #ffffff;
 }
 

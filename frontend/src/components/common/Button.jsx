@@ -4,11 +4,15 @@ const baseStyles =
 
 // 🔧 MỖI VARIANT = 1 STYLE
 const variantStyles = {
-  primary: "bg-blue-600 text-white hover:bg-blue-700",
-  loginHeader: "btn-login-header",
+  primary:
+    "bg-white text-[var(--primary-blue-color)] hover:bg-blue-200  border border-blue-600",
+  secondary: "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300",
+  blue: "btn-blue",
+  green: "btn-green",
   getStarted: "btn-get-started",
-  loginForm: "btn-login-form",
-  registerForm: "btn-register-form",
+
+  edit: "bg-white text-blue-600  hover:bg-blue-50",
+  delete: "bg-white text-red-600 hover:bg-red-50",
 };
 
 // 🔧 MỖI SIZE = padding + font-size

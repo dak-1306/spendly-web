@@ -15,7 +15,7 @@ function Header({ auth }) {
         <div className="space-x-4">
           {!auth && (
             <Link to="/login">
-              <Button variant="loginHeader">Login</Button>
+              <Button variant="blue">Login</Button>
             </Link>
           )}
         </div>

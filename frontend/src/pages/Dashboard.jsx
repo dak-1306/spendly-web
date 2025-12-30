@@ -1,14 +1,17 @@
 import MainLayout from "../components/layout/MainLayout";
+import { useState } from "react";
 import sampleData from "../data/sampleData";
 import CardDashboard from "../components/dashboard/CardDashboard";
 import SpendingCard from "../components/dashboard/SpendingCard";
 import SpendingBarChart from "../components/dashboard/SpendingBarChart";
 import SpendingPieChart from "../components/dashboard/SpendingPieChart";
 import Card from "../components/common/Card";
+import Button from "../components/common/Button";
+import ChangeDate from "../components/common/ChangeDate";
 import { ICONS } from "../assets/index";
 
 function Dashboard() {
-  const month = "2025-12";
+  const [month, setMonth] = useState("2025-12");
   const monthData = sampleData.find((m) => m.month === month) ?? {
     incomes: [],
     expenses: [],
@@ -43,9 +46,34 @@ function Dashboard() {
   const arrowUp = ICONS.icon_arrow_up;
   const arrowDown = ICONS.icon_arrow_down;
 
+  // handlers tách ra để truyền vào ChangeDate
+  const handlePrevMonth = () => {
+    const [y, m] = month.split("-").map(Number);
+    const d = new Date(y, m - 2);
+    setMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
+  };
+
+  const handleNextMonth = () => {
+    const [y, m] = month.split("-").map(Number);
+    const d = new Date(y, m);
+    setMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
+  };
+
   return (
     <MainLayout navbarBottom={true} auth={true} title="Dashboard">
-      <div className="p-4 grid grid-cols-4 gap-4 w-3/4 mx-auto mb-6">
+      <Card className="mb-4 flex items-center gap-3 mx-auto">
+        <ChangeDate
+          month={month}
+          setMonth={setMonth}
+          onPrev={handlePrevMonth}
+          onNext={handleNextMonth}
+        />
+
+        <div className="ml-auto font-semibold text-lg text-h1">
+          Tổng quan tháng {month}
+        </div>
+      </Card>
+      <div className="grid grid-cols-4 gap-4 mx-auto mb-6">
         <CardDashboard
           type="income"
           title="Thu nhập"
@@ -75,7 +103,7 @@ function Dashboard() {
           icon={percentChange >= 0 ? arrowUp : arrowDown}
         />
       </div>
-      <div className="mt-8 px-4 grid grid-cols-3 gap-4 w-3/4 mx-auto">
+      <div className="mt-8 grid grid-cols-3 gap-4 mx-auto">
         <Card className="col-span-2">
           <h2 className="text-xl font-semibold mb-4 text-[var(--primary-blue-color)]">
             Phân bổ chi tiêu theo danh mục
@@ -91,7 +119,7 @@ function Dashboard() {
           <SpendingCard current={totalExpense} limit={totalIncome} />
         </Card>
       </div>
-      <Card className="w-3/4 mx-auto mt-6 mb-8">
+      <Card className="mx-auto mt-6 mb-8">
         <h2 className="text-xl font-semibold mb-4 text-[var(--primary-blue-color)]">
           Chi tiêu theo ngày
         </h2>

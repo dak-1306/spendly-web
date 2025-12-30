@@ -17,8 +17,8 @@ function AuthForm({ variant = "login" }) {
         <div
           className={`text-2xl font-bold ${
             isLogin
-              ? "text-[var(--primary-green-color)]"
-              : "text-[var(--primary-blue-color)]"
+              ? "text-[var(--primary-blue-color)]"
+              : "text-[var(--primary-green-color)]"
           }`}
         >
           <img
@@ -95,7 +95,7 @@ function AuthForm({ variant = "login" }) {
 
         {/* Submit button */}
         <Button
-          variant={isLogin ? "loginForm" : "registerForm"}
+          variant={isLogin ? "blue" : "green"}
           size="lg"
           className="w-full"
           type="submit"

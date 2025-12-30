@@ -13,6 +13,9 @@ import icon_spend from "../assets/icons/icon_spend.svg";
 import icon_bag_money from "../assets/icons/icon_bag_money.svg";
 import icon_arrow_up from "../assets/icons/icon_arrow_up.svg";
 import icon_arrow_down from "../assets/icons/icon_arrow_down.svg";
+import icon_trash from "../assets/icons/icon_trash.svg";
+import icon_edit from "../assets/icons/icon_edit.svg";
+import icon_search from "../assets/icons/icon_search.svg";
 
 const ICONS = {
   dashboard: {
@@ -104,6 +107,24 @@ const ICONS = {
     alt: "Arrow Down Icon",
     width: 30,
     height: 30,
+  },
+  icon_trash: {
+    src: icon_trash,
+    alt: "Trash Icon",
+    width: 20,
+    height: 20,
+  },
+  icon_edit: {
+    src: icon_edit,
+    alt: "Edit Icon",
+    width: 20,
+    height: 20,
+  },
+  icon_search: {
+    src: icon_search,
+    alt: "Search Icon",
+    width: 20,
+    height: 20,
   },
 };
 export { ICONS };
