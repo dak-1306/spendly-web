@@ -17,6 +17,8 @@ import icon_trash from "../assets/icons/icon_trash.svg";
 import icon_edit from "../assets/icons/icon_edit.svg";
 import icon_search from "../assets/icons/icon_search.svg";
 import icon_delete from "../assets/icons/icon_delete.svg";
+import icon_robot_color from "../assets/icons/icon_robot_color.svg";
+import icon_submit from "../assets/icons/icon_submit.svg";
 
 const ICONS = {
   dashboard: {
@@ -132,6 +134,18 @@ const ICONS = {
     alt: "Delete Icon",
     width: 15,
     height: 15,
+  },
+  icon_robot_color: {
+    src: icon_robot_color,
+    alt: "Robot Color Icon",
+    width: 40,
+    height: 30,
+  },
+  icon_submit: {
+    src: icon_submit,
+    alt: "Submit Icon",
+    width: 20,
+    height: 20,
   },
 };
 export { ICONS };

@@ -43,7 +43,7 @@ function Home() {
               </ol>
             </Card>
           </div>
-          <Button variant="getStarted" size="lg">
+          <Button variant="gradient" size="lg">
             {HOME.textButton}
           </Button>
         </div>

@@ -9,7 +9,7 @@ const variantStyles = {
   secondary: "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300",
   blue: "btn-blue",
   green: "btn-green",
-  getStarted: "btn-get-started",
+  gradient: "btn-gradient",
   red: "btn-red",
 
   edit: "bg-white text-blue-600  hover:bg-blue-50",

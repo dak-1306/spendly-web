@@ -47,7 +47,7 @@ body {
   background: var(--secondary-blue-color);
   color: #ffffff;
 }
-.btn-get-started {
+.btn-gradient {
   background-image: linear-gradient(
     to right,
     var(--primary-blue-color),
@@ -55,7 +55,7 @@ body {
   );
   color: #ffffff;
 }
-.btn-get-started:hover {
+.btn-gradient:hover {
   background-image: linear-gradient(
     to right,
     var(--secondary-blue-color),
