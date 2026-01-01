@@ -19,7 +19,43 @@ import icon_search from "../assets/icons/icon_search.svg";
 import icon_delete from "../assets/icons/icon_delete.svg";
 import icon_robot_color from "../assets/icons/icon_robot_color.svg";
 import icon_submit from "../assets/icons/icon_submit.svg";
+import icon_user from "../assets/icons/icon_user.svg";
+import icon_email from "../assets/icons/icon_email.svg";
+import icon_avatar_empty from "../assets/icons/icon_avatar_empty.svg";
+import icon_key from "../assets/icons/icon_key.svg";
+import icon_out from "../assets/icons/icon_out.svg";
 
+import dashboard_img from "../assets/images/dashboard_img.png";
+import expense_img from "../assets/images/expense_img.png";
+import AI_img from "../assets/images/AI_img.png";
+import profile_img from "../assets/images/profile_img.png";
+
+const IMAGES = {
+  dashboard_image: {
+    src: dashboard_img,
+    alt: "Dashboard Image",
+    width: 600,
+    height: 400,
+  },
+  expense_image: {
+    src: expense_img,
+    alt: "Expense Image",
+    width: 600,
+    height: 400,
+  },
+  AI_image: {
+    src: AI_img,
+    alt: "AI Image",
+    width: 600,
+    height: 400,
+  },
+  profile_image: {
+    src: profile_img,
+    alt: "Profile Image",
+    width: 600,
+    height: 400,
+  },
+};
 const ICONS = {
   dashboard: {
     src: icon_dashboard,
@@ -147,5 +183,35 @@ const ICONS = {
     width: 20,
     height: 20,
   },
+  icon_user: {
+    src: icon_user,
+    alt: "User Icon",
+    width: 30,
+    height: 30,
+  },
+  icon_email: {
+    src: icon_email,
+    alt: "Email Icon",
+    width: 30,
+    height: 30,
+  },
+  icon_key: {
+    src: icon_key,
+    alt: "Key Icon",
+    width: 20,
+    height: 20,
+  },
+  icon_avatar_empty: {
+    src: icon_avatar_empty,
+    alt: "Empty Avatar Icon",
+    width: 150,
+    height: 150,
+  },
+  icon_out: {
+    src: icon_out,
+    alt: "Logout Icon",
+    width: 20,
+    height: 20,
+  },
 };
-export { ICONS };
+export { ICONS, IMAGES };
