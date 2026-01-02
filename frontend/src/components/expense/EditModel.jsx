@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Button from "../common/Button";
-import { ICONS } from "../../assets/index";
+import {X} from "lucide-react";
 
 const incomeCategories = ["Lương", "Freelance", "Khác"];
 const expenseCategories = [
@@ -20,7 +20,9 @@ export default function EditModel({
 }) {
   const isIncome = role === "income";
 
-  const deleteIcon = ICONS.icon_delete;
+  const deleteIcon = (
+    <X className="w-6 h-6 text-white" />
+  );
 
   const todayDate = () => {
     const d = new Date();
@@ -94,16 +96,7 @@ export default function EditModel({
             aria-label="Close"
             className="text-white text-xl leading-none bg-transparent border-0"
           >
-            {deleteIcon ? (
-              <img
-                src={deleteIcon.src}
-                alt={deleteIcon.alt}
-                width={deleteIcon.width}
-                height={deleteIcon.height}
-              />
-            ) : (
-              "×"
-            )}
+            {deleteIcon}
           </button>
         </div>
 

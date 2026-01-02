@@ -1,5 +1,6 @@
 import React from "react";
 import Button from "../common/Button";
+import { Search } from "lucide-react";
 
 export default function FilterExpense({
   expenseCategories = [],
@@ -11,10 +12,13 @@ export default function FilterExpense({
   selectedAmountRange,
   setSelectedAmountRange,
   resetFilters,
-  searchIcon,
+
   searchTerm,
   setSearchTerm,
 }) {
+  const searchIcon = (
+    <Search className="w-5 h-5 text-[var(--primary-blue-color)]" />
+  );
   return (
     <div className="flex justify-between items-center mb-4">
       <div className="flex gap-3 items-center">
@@ -68,16 +72,7 @@ export default function FilterExpense({
           className="border border-gray-300 rounded-md px-4 py-2 ml-auto"
         />
         <Button variant="primary" className="ml-2">
-          {searchIcon ? (
-            <img
-              src={searchIcon.src}
-              alt={searchIcon.alt}
-              width={searchIcon.width}
-              height={searchIcon.height}
-            />
-          ) : (
-            "Tìm"
-          )}
+          {searchIcon}
         </Button>
       </form>
     </div>

@@ -1,11 +1,12 @@
 import { ICONS } from "../../assets/index.js";
 import Button from "../common/Button.jsx";
 import LineColor from "../common/LineColor.jsx";
+import { X } from "lucide-react";
 import { useState } from "react";
 function Chat({ open, onClose, option }) {
   const ROBOT_ICON = ICONS.icon_robot_color;
   const SUBMIT_ICON = ICONS.icon_submit;
-  const CLOSE_ICON = ICONS.icon_delete;
+  const CLOSE_ICON = <X className="w-5 h-5 text-white" />;
   const [inputValue, setInputValue] = useState("");
   const [answerList, setAnswerList] = useState([]);
   const handleInputChange = (e) => {
@@ -41,12 +42,7 @@ function Chat({ open, onClose, option }) {
             <span className="font-medium">AI Assistant</span>
           </div>
           <Button onClick={onClose} variant="red" size="sm">
-            <img
-              src={CLOSE_ICON.src}
-              alt={CLOSE_ICON.alt}
-              width={CLOSE_ICON.width}
-              height={CLOSE_ICON.height}
-            />
+            {CLOSE_ICON}
           </Button>
         </div>
         <LineColor />

@@ -24,15 +24,9 @@ function CardDashboard({ type, title, amount = 0, currency = "VND", icon }) {
 
   return (
     <div
-      className={`flex items-center space-x-4 p-4 ${bgColor} rounded-lg shadow-md`}
+      className={`flex items-center space-x-4 p-4 ${bgColor} rounded-lg shadow-md hover:scale-105 transition-transform`}
     >
-      {icon && (
-        <img
-          src={icon.src}
-          alt={icon.alt}
-          className={`w-[${icon.width}px] h-[${icon.height}px]`}
-        />
-      )}
+      {icon}
       <div>
         <p className="text-lg font-semibold text-white">{formatted}</p>
         <p className="text-sm text-white/80">{title}</p>

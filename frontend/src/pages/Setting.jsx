@@ -1,46 +1,78 @@
 import MainLayout from "../components/layout/MainLayout";
 import Button from "../components/common/Button";
 import Card from "../components/common/Card";
-import { ICONS } from "../assets/index.js";
-function Setting() {
-  const USER_ICON = ICONS.icon_user;
-  const EMAIL_ICON = ICONS.icon_email;
-  const TRASH_ICON = ICONS.icon_trash;
-  const AVATAR_EMPTY_ICON = ICONS.icon_avatar_empty;
-  const KEY_ICON = ICONS.icon_key;
-  const LOGOUT_ICON = ICONS.icon_out;
+import ChangePassword from "../components/setting/ChangePassword";
+import DeleteConfirm from "../components/common/DeleteConfirm";
+import { useState } from "react";
+import { User, Mail, Trash2, Image, Key, LogOut } from "lucide-react";
+
+export default function Setting() {
+  const USER_ICON = (
+    <User className="w-6 h-6 text-[var(--primary-blue-color)]" />
+  );
+  const EMAIL_ICON = (
+    <Mail className="w-6 h-6 text-[var(--primary-green-color)]" />
+  );
+  const TRASH_ICON = <Trash2 className="w-6 h-6 text-[var(--red-color)]" />;
+  const AVATAR_EMPTY_ICON = (
+    <Image className="w-24 h-24 text-[var(--primary-blue-color)]" />
+  );
+  const KEY_ICON = (
+    <Key className="w-6 h-6 text-[var(--primary-green-color)]" />
+  );
+  const LOGOUT_ICON = (
+    <LogOut className="w-6 h-6 text-[var(--primary-blue-color)]" />
+  );
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteMode, setDeleteMode] = useState(null); // "account" | "logout" | null
+
+  const handleOpenChangePassword = () => setChangePasswordOpen(true);
+  const handleCloseChangePassword = () => setChangePasswordOpen(false);
+
+  const openDeleteAccount = () => {
+    setDeleteMode("account");
+    setDeleteOpen(true);
+  };
+  const openLogoutConfirm = () => {
+    setDeleteMode("logout");
+    setDeleteOpen(true);
+  };
+  const closeDelete = () => {
+    setDeleteOpen(false);
+    setDeleteMode(null);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteMode === "logout") {
+      // thực hiện logout (thay bằng logic thực tế)
+      console.log("Đã xác nhận đăng xuất");
+    } else if (deleteMode === "account") {
+      // thực hiện xóa tài khoản (thay bằng API call)
+      console.log("Đã xác nhận xóa tài khoản");
+    }
+  };
+
   return (
     <MainLayout auth={true} navbarBottom={true} title="Settings và Profile">
       <div className="flex gap-6 justify-center md:flex-row flex-col">
         <Card className="flex flex-col gap-6 justify-center items-center px-8 py-6">
           <div className="w-[150px] h-[150px] rounded-full border border-[var(--secondary-blue-color)] shadow-lg">
-            <img
-              src={AVATAR_EMPTY_ICON.src}
-              alt={AVATAR_EMPTY_ICON.alt}
-              className="w-full h-full rounded-full object-cover"
-            />
+            <div className="w-full h-full rounded-full flex items-center justify-center bg-gray-50">
+              {AVATAR_EMPTY_ICON}
+            </div>
           </div>
           <div>
             <h2 className="text-xl font-semibold">Thông tin cá nhân</h2>
             <div className="flex items-center space-x-4 mt-4">
-              <img
-                src={USER_ICON.src}
-                alt={USER_ICON.alt}
-                width={USER_ICON.width}
-                height={USER_ICON.height}
-              />
+              {USER_ICON}
               <div>
                 <p className="font-medium">Nguyễn Văn A</p>
                 <p className="text-sm text-gray-600">Người dùng Spendly</p>
               </div>
             </div>
             <div className="flex items-center space-x-4 mt-4">
-              <img
-                src={EMAIL_ICON.src}
-                alt={EMAIL_ICON.alt}
-                width={EMAIL_ICON.width}
-                height={EMAIL_ICON.height}
-              />
+              {EMAIL_ICON}
               <div>
                 <p className="font-medium">email@example.com</p>
                 <p className="text-sm text-gray-600">Email liên hệ</p>
@@ -55,12 +87,7 @@ function Setting() {
             <div className="space-y-4">
               <div className="flex items-center justify-between bg-white/5 rounded">
                 <div className="flex items-center justify-between space-x-4">
-                  <img
-                    src={LOGOUT_ICON.src}
-                    alt={LOGOUT_ICON.alt}
-                    width={LOGOUT_ICON.width}
-                    height={LOGOUT_ICON.height}
-                  />
+                  {LOGOUT_ICON}
                   <div>
                     <p className="font-medium">Đăng xuất</p>
                     <p className="text-sm text-gray-600">
@@ -68,19 +95,14 @@ function Setting() {
                     </p>
                   </div>
                 </div>
-                <Button variant="red" size="sm">
+                <Button variant="red" size="sm" onClick={openLogoutConfirm}>
                   Đăng xuất
                 </Button>
               </div>
 
               <div className="flex items-center justify-between gap-4 bg-white/5 rounded-md">
                 <div className="flex items-center space-x-4">
-                  <img
-                    src={KEY_ICON.src}
-                    alt={KEY_ICON.alt}
-                    width={KEY_ICON.width}
-                    height={KEY_ICON.height}
-                  />
+                  {KEY_ICON}
                   <div>
                     <p className="font-medium">Đổi mật khẩu</p>
                     <p className="text-sm text-gray-600">
@@ -88,20 +110,18 @@ function Setting() {
                     </p>
                   </div>
                 </div>
-                <Button variant="primary" size="sm">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleOpenChangePassword}
+                >
                   Đổi mật khẩu
                 </Button>
               </div>
 
               <div className="flex items-center justify-between bg-white/5 rounded">
                 <div className="flex items-center space-x-4">
-                  <img
-                    src={TRASH_ICON.src}
-                    alt={TRASH_ICON.alt}
-                    width={TRASH_ICON.width}
-                    height={TRASH_ICON.height}
-                    className="text-red-600"
-                  />
+                  {TRASH_ICON}
                   <div>
                     <p className="font-medium">Xóa tài khoản</p>
                     <p className="text-sm text-gray-600">
@@ -109,7 +129,11 @@ function Setting() {
                     </p>
                   </div>
                 </div>
-                <Button variant="secondary" size="sm">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={openDeleteAccount}
+                >
                   Xóa
                 </Button>
               </div>
@@ -164,8 +188,27 @@ function Setting() {
             </div>
           </div>
         </Card>
+        <ChangePassword
+          open={changePasswordOpen}
+          onClose={handleCloseChangePassword}
+        />
+
+        <DeleteConfirm
+          open={deleteOpen}
+          onClose={closeDelete}
+          title={deleteMode === "account" ? "Xóa tài khoản" : "Đăng xuất"}
+          description={
+            deleteMode === "account"
+              ? "Xóa tài khoản sẽ xóa vĩnh viễn dữ liệu của bạn. Bạn có chắc?"
+              : "Bạn sẽ đăng xuất khỏi phiên hiện tại. Tiếp tục?"
+          }
+          confirmLabel={
+            deleteMode === "account" ? "Xóa tài khoản" : "Đăng xuất"
+          }
+          confirmVariant={deleteMode === "account" ? "red" : "blue"}
+          onConfirm={handleDeleteConfirm}
+        />
       </div>
     </MainLayout>
   );
 }
-export default Setting;

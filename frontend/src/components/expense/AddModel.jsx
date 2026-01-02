@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Button from "../common/Button";
-import { ICONS } from "../../assets/index";
+import {X} from "lucide-react";
 
 const incomeCategories = ["Salary", "Freelance", "Other"];
 const expenseCategories = ["Food", "Transport", "Shopping", "Rent", "Other"];
@@ -14,7 +14,9 @@ export default function AddModel({
   const isIncome = role === "income";
   const headerColor = isIncome ? "bg-green-600" : "bg-blue-600";
 
-  const deleteIcon = ICONS.icon_delete;
+  const deleteIcon = (
+    <X className="w-6 h-6 text-white" />
+  );
 
   const todayDate = () => {
     const d = new Date();
@@ -81,14 +83,8 @@ export default function AddModel({
             aria-label="Close"
             className="bg-transparent border-0 text-white text-xl leading-none"
           >
-            {deleteIcon && (
-              <img
-                src={deleteIcon.src}
-                alt={deleteIcon.alt}
-                width={deleteIcon.width}
-                height={deleteIcon.height}
-              />
-            )}
+            {deleteIcon}
+              
           </button>
         </div>
 

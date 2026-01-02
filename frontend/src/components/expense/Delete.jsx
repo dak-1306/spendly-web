@@ -1,6 +1,5 @@
-import React from "react";
-import Button from "../common/Button";
-import { ICONS } from "../../assets/index";
+import Button from "../common/Button.jsx";
+import { X } from "lucide-react";
 
 export default function DeleteModel({
   open = false,
@@ -11,7 +10,7 @@ export default function DeleteModel({
 }) {
   if (!open) return null;
 
-  const deleteIcon = ICONS.icon_delete;
+  const deleteIcon = <X className="w-6 h-6 text-white" />;
 
   const isIncome = role === "income";
   const title = item?.title ?? item?.source ?? item?.category ?? "Mục";
@@ -45,16 +44,7 @@ export default function DeleteModel({
             onClick={onClose}
             className="text-white text-xl leading-none bg-transparent border-0"
           >
-            {deleteIcon ? (
-              <img
-                src={deleteIcon.src}
-                alt={deleteIcon.alt}
-                width={deleteIcon.width}
-                height={deleteIcon.height}
-              />
-            ) : (
-              "×"
-            )}
+            {deleteIcon}
           </button>
         </div>
 

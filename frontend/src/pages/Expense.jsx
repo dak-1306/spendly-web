@@ -8,14 +8,15 @@ import EditModel from "../components/expense/EditModel.jsx";
 import DeleteModel from "../components/expense/Delete.jsx";
 import FilterExpense from "../components/expense/FilterExpense.jsx";
 import sampleData from "../data/sampleData.js";
-import { ICONS } from "../assets/index.js";
+import { Trash2, Edit2 } from "lucide-react";
 import { useState } from "react";
 
 export default function Expense() {
   const month = "2025-07";
-  const trashIcon = ICONS.icon_trash;
-  const editIcon = ICONS.icon_edit;
-  const searchIcon = ICONS.icon_search;
+  const trashIcon = <Trash2 className="w-5 h-5 text-[var(--red-color)]" />;
+  const editIcon = (
+    <Edit2 className="w-5 h-5 text-[var(--primary-blue-color)]" />
+  );
 
   const monthData = sampleData.find((m) => m.month === month) ?? {
     incomes: [],
@@ -247,23 +248,13 @@ export default function Expense() {
                 </span>
                 <div className="flex gap-2">
                   <Button variant="edit" onClick={() => openEditIncome(income)}>
-                    <img
-                      src={editIcon.src}
-                      alt={editIcon.alt}
-                      width={editIcon.width}
-                      height={editIcon.height}
-                    />
+                    {editIcon}
                   </Button>
                   <Button
                     variant="delete"
                     onClick={() => openDelete(income, "income")}
                   >
-                    <img
-                      src={trashIcon.src}
-                      alt={trashIcon.alt}
-                      width={trashIcon.width}
-                      height={trashIcon.height}
-                    />
+                    {trashIcon}
                   </Button>
                 </div>
               </li>
@@ -281,7 +272,6 @@ export default function Expense() {
             selectedAmountRange={selectedAmountRange}
             setSelectedAmountRange={setSelectedAmountRange}
             resetFilters={resetFilters}
-            searchIcon={searchIcon}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />
@@ -315,24 +305,14 @@ export default function Expense() {
                         className=""
                         onClick={() => openEdit(expense)}
                       >
-                        <img
-                          src={editIcon.src}
-                          alt={editIcon.alt}
-                          width={editIcon.width}
-                          height={editIcon.height}
-                        />
+                        {editIcon}
                       </Button>
                       <Button
                         variant="delete"
                         className=""
                         onClick={() => openDelete(expense, "expense")}
                       >
-                        <img
-                          src={trashIcon.src}
-                          alt={trashIcon.alt}
-                          width={trashIcon.width}
-                          height={trashIcon.height}
-                        />
+                        {trashIcon}
                       </Button>
                     </td>
                   </tr>

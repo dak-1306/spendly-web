@@ -1,4 +1,5 @@
 import { ICONS } from "../../assets/index";
+import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import Button from "../common/Button";
 import "../../styles/auth.css";
@@ -7,7 +8,9 @@ function AuthForm({ variant = "login" }) {
   const LOGO_COLOR = ICONS.logo_color;
   const GOOGLE = ICONS.icon_google;
   const FACEBOOK = ICONS.icon_facebook;
-  const EYE = ICONS.icon_eye;
+  const EYE = (
+    <Eye className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer" />
+  );
 
   return (
     <div className="w-full max-w-xl mx-auto bg-white p-8 rounded shadow">
@@ -64,13 +67,8 @@ function AuthForm({ variant = "login" }) {
           />
 
           <label htmlFor="password">Password</label>
-          <img
-            src={EYE.src}
-            alt={EYE.alt}
-            width={EYE.width}
-            height={EYE.height}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-          />
+
+          {EYE}
         </div>
 
         {/* Confirm password (register only) */}
@@ -83,13 +81,8 @@ function AuthForm({ variant = "login" }) {
             />
 
             <label htmlFor="confirmPassword">Confirm password</label>
-            <img
-              src={EYE.src}
-              alt={EYE.alt}
-              width={EYE.width}
-              height={EYE.height}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-            />
+            {EYE}
+            
           </div>
         )}
 

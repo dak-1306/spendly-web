@@ -6,9 +6,14 @@ import SpendingCard from "../components/dashboard/SpendingCard";
 import SpendingBarChart from "../components/dashboard/SpendingBarChart";
 import SpendingPieChart from "../components/dashboard/SpendingPieChart";
 import Card from "../components/common/Card";
-import Button from "../components/common/Button";
 import ChangeDate from "../components/common/ChangeDate";
-import { ICONS } from "../assets/index";
+import {
+  DollarSign,
+  CreditCard,
+  Wallet,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 
 function Dashboard() {
   const [month, setMonth] = useState("2025-12");
@@ -40,11 +45,12 @@ function Dashboard() {
     percentChange = ((totalExpense - prevExpense) / prevExpense) * 100;
   }
 
-  const income = ICONS.income;
-  const expense = ICONS.icon_spend;
-  const balanceIcon = ICONS.icon_bag_money;
-  const arrowUp = ICONS.icon_arrow_up;
-  const arrowDown = ICONS.icon_arrow_down;
+  // lucide icons as React elements
+  const income = <DollarSign className="w-6 h-6 text-white" />;
+  const expense = <CreditCard className="w-6 h-6 text-white" />;
+  const balanceIcon = <Wallet className="w-6 h-6 text-white" />;
+  const arrowUp = <ArrowUp className="w-6 h-6 text-white" />;
+  const arrowDown = <ArrowDown className="w-6 h-6 text-white" />;
 
   // handlers tách ra để truyền vào ChangeDate
   const handlePrevMonth = () => {
