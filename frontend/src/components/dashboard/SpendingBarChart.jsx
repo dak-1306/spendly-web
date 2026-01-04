@@ -9,6 +9,7 @@ import React, { useMemo } from "react";
  */
 function SpendingBarChart({
   month,
+  title,
   expenses = [],
   width = 1000,
   height = 240,
@@ -64,6 +65,7 @@ function SpendingBarChart({
 
   return (
     <div className="w-full overflow-auto">
+      <h2 className="text-xl font-semibold mb-4 text-[var(--primary-blue-color)]">{title}</h2>
       <svg
         viewBox={`0 0 ${width} ${height}`}
         width="100%"

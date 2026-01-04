@@ -1,20 +1,42 @@
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import MainLayout from "../components/layout/MainLayout.jsx";
 import BorderLinearColor from "../components/ai/BorderLinearColor.jsx";
 import Card from "../components/common/Card.jsx";
 import Chat from "../components/ai/Chat.jsx";
-import { ICONS } from "../assets/index.js";
-function AI() {
-  const [chatOpen, setChatOpen] = useState(false);
-  const ROBOT_ICON = ICONS.icon_robot_color;
+import { AI_CONSTANTS } from "../utils/constants.js";
 
-  const option = [
-    "Tại sao chi tiêu của tôi lại tăng trong tháng này?",
-    "Tôi có thể làm gì để giảm chi tiêu không cần thiết?",
-    "Bạn có thể cung cấp cho tôi một số mẹo tiết kiệm tiền không?",
-  ];
+/*
+  AI.jsx
+  - Trang trợ lý AI: hiển thị tổng quan + nút mở chat
+  - Mục tiêu: sạch, dễ đọc, dùng constants và component ref từ utils/constants
+  - Ghi chú: Robot icon là component (lucide), không dùng <img> từ assets
+*/
+
+export default function AI() {
+  // trạng thái modal chat
+  const [chatOpen, setChatOpen] = useState(false);
+
+  // lấy component icon từ constants (component ref)
+  const RobotIconComp = AI_CONSTANTS.ICON;
+
+  // memoize JSX icon để tránh recreate mỗi render
+  const RobotIcon = useMemo(
+    () => (
+      <RobotIconComp className="w-7 h-7 text-[var(--primary-blue-color)]" />
+    ),
+    [RobotIconComp]
+  );
+
+  // quick options từ constants
+  const quickOptions = AI_CONSTANTS.QUICK_OPTIONS;
+
   return (
-    <MainLayout auth={true} navbarBottom={true} title="Trợ lý AI - Spendly">
+    <MainLayout
+      auth={true}
+      navbarBottom={true}
+      title={AI_CONSTANTS.PAGE_TITLE.vi}
+    >
+      {/* Nội dung chính: các thẻ tổng quan */}
       <div className="space-y-6 mx-10">
         <Card>
           <BorderLinearColor
@@ -52,26 +74,22 @@ function AI() {
           />
         </Card>
       </div>
+
+      {/* Nút mở chat: dùng RobotIcon component, có aria-label cho accessibility */}
       <button
         onClick={() => setChatOpen(true)}
+        aria-label="Mở chat trợ lý AI"
         className="fixed bottom-24 right-10 p-[1px] bg-linear-color rounded-full shadow-lg hover:scale-105 transition-transform cursor-pointer"
       >
-        <div className="px-4 py-5 bg-white rounded-full">
-          <img
-            src={ROBOT_ICON.src}
-            alt={ROBOT_ICON.alt}
-            width={ROBOT_ICON.width}
-            height={ROBOT_ICON.height}
-          />
-        </div>
+        <div className="px-4 py-5 bg-white rounded-full">{RobotIcon}</div>
       </button>
 
+      {/* Chat modal */}
       <Chat
         open={chatOpen}
         onClose={() => setChatOpen(false)}
-        option={option}
+        option={quickOptions}
       />
     </MainLayout>
   );
 }
-export default AI;

@@ -1,3 +1,4 @@
+import React, { useState, useMemo, useCallback } from "react";
 import MainLayout from "../components/layout/MainLayout.jsx";
 import LineColor from "../components/common/LineColor.jsx";
 import Card from "../components/common/Card.jsx";
@@ -8,42 +9,65 @@ import EditModel from "../components/expense/EditModel.jsx";
 import DeleteModel from "../components/expense/Delete.jsx";
 import FilterExpense from "../components/expense/FilterExpense.jsx";
 import sampleData from "../data/sampleData.js";
-import { Trash2, Edit2 } from "lucide-react";
-import { useState } from "react";
+import { EXPENSE } from "../utils/constants";
+
+/*
+  Expense.jsx
+  - Trang quản lý chi tiêu & thu nhập
+  - Mục tiêu: code rõ ràng, dễ bảo trì, chú thích tiếng Việt
+  - Nguyên tắc: giữ state sạch, memoize dữ liệu suy ra, callbacks ổn định
+*/
 
 export default function Expense() {
-  const month = "2025-07";
-  const trashIcon = <Trash2 className="w-5 h-5 text-[var(--red-color)]" />;
-  const editIcon = (
-    <Edit2 className="w-5 h-5 text-[var(--primary-blue-color)]" />
+  /* ---------- State: tháng đang hiển thị ---------- */
+  const [month, setMonth] = useState(EXPENSE.DEFAULT_MONTH);
+
+  /* ---------- Icon components (từ constants) ---------- */
+  const { TRASH: TrashIconComp, EDIT: EditIconComp } = EXPENSE.ICONS;
+  const trashIcon = useMemo(
+    () => <TrashIconComp className="w-5 h-5 text-[var(--red-color)]" />,
+    [TrashIconComp]
+  );
+  const editIcon = useMemo(
+    () => <EditIconComp className="w-5 h-5 text-[var(--primary-blue-color)]" />,
+    [EditIconComp]
   );
 
-  const monthData = sampleData.find((m) => m.month === month) ?? {
-    incomes: [],
-    expenses: [],
-  };
+  /* ---------- Dữ liệu cơ bản cho tháng (sample / API trong thực tế) ----------
+     Memoize để tránh tìm/ghi lại khi không cần thiết.
+  */
+  const monthData = useMemo(
+    () =>
+      sampleData.find((m) => m.month === month) ?? {
+        incomes: [],
+        expenses: [],
+      },
+    [month]
+  );
 
+  /* ---------- Modal / UI state ---------- */
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isAddIncomeOpen, setIsAddIncomeOpen] = useState(false);
 
-  // new: edit modal state (expense existing)
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
 
-  // new: edit modal state for income
   const [isEditIncomeOpen, setIsEditIncomeOpen] = useState(false);
   const [editingIncome, setEditingIncome] = useState(null);
 
-  // delete modal state (shared for expense & income)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
-  const [deletingRole, setDeletingRole] = useState("expense");
+  const [deletingRole, setDeletingRole] = useState("expense"); // "expense" | "income"
 
-  // local state để lưu và hiển thị sau khi thêm
+  /* ---------- Local lists (tạm lưu, trong app thực dùng store/API) ---------- */
   const [expenses, setExpenses] = useState(monthData.expenses);
   const [incomes, setIncomes] = useState(monthData.incomes);
 
-  const handleAddExpenseSubmit = (payload) => {
+  /* ---------- CRUD handlers (thêm/sửa/xóa) ----------
+     - Các handler sử dụng useCallback để giữ reference ổn định khi truyền xuống modal
+     - Sau submit, modal sẽ đóng và list được cập nhật local
+  */
+  const handleAddExpenseSubmit = useCallback((payload) => {
     const newItem = {
       id: Date.now(),
       title: payload.note || payload.category || "Chi tiêu",
@@ -53,21 +77,21 @@ export default function Expense() {
     };
     setExpenses((s) => [newItem, ...s]);
     setIsAddExpenseOpen(false);
-  };
+  }, []);
 
-  const handleAddIncomeSubmit = (payload) => {
+  const handleAddIncomeSubmit = useCallback((payload) => {
     const newItem = {
       id: Date.now(),
       source: payload.category || "Other",
       date: payload.date,
       amount: payload.amount,
+      title: payload.title || "Thu nhập",
     };
     setIncomes((s) => [newItem, ...s]);
     setIsAddIncomeOpen(false);
-  };
+  }, []);
 
-  // new: handle edit submit (expense existing)
-  const handleEditSubmit = (payload) => {
+  const handleEditSubmit = useCallback((payload) => {
     setExpenses((s) =>
       s.map((it) =>
         it.id === payload.id
@@ -83,16 +107,14 @@ export default function Expense() {
     );
     setIsEditOpen(false);
     setEditingExpense(null);
-  };
+  }, []);
 
-  // new: handle edit submit for income
-  const handleEditIncomeSubmit = (payload) => {
+  const handleEditIncomeSubmit = useCallback((payload) => {
     setIncomes((s) =>
       s.map((it) =>
         it.id === payload.id
           ? {
               ...it,
-              // map payload fields to income shape (source/title may vary in your data)
               source: payload.category || it.source,
               title: payload.title || it.title,
               date: payload.date,
@@ -103,71 +125,63 @@ export default function Expense() {
     );
     setIsEditIncomeOpen(false);
     setEditingIncome(null);
-  };
+  }, []);
 
-  // helper to open edit modal
-  const openEdit = (expense) => {
+  /* ---------- Helpers mở modal (giữ code rõ ràng) ---------- */
+  const openEdit = useCallback((expense) => {
     setEditingExpense(expense);
     setIsEditOpen(true);
-  };
+  }, []);
 
-  // helper to open edit modal for income
-  const openEditIncome = (income) => {
+  const openEditIncome = useCallback((income) => {
     setEditingIncome(income);
     setIsEditIncomeOpen(true);
-  };
+  }, []);
 
-  const openDelete = (item, role = "expense") => {
+  const openDelete = useCallback((item, role = "expense") => {
     setDeletingItem(item);
     setDeletingRole(role);
     setIsDeleteOpen(true);
-  };
+  }, []);
 
-  const handleDeleteConfirm = ({ id, role }) => {
+  /* ---------- Xác nhận xóa: cập nhật list tương ứng ---------- */
+  const handleDeleteConfirm = useCallback(({ id, role }) => {
     if (role === "expense") {
       setExpenses((s) => s.filter((it) => it.id !== id));
     } else {
       setIncomes((s) => s.filter((it) => it.id !== id));
     }
-  };
+    // Đóng modal do component DeleteModel sẽ gọi onClose
+  }, []);
 
-  // --- Filter UI / state ---
-  const expenseCategories = [
-    "Nhà thuê",
-    "Ăn uống",
-    "Siêu thị",
-    "Di chuyển",
-    "Giải trí",
-    "Tiện ích",
-    "Khác",
-  ];
-  const amountRanges = [
-    { id: "lt100", label: "< 100,000", min: 0, max: 100000 },
-    { id: "100-500", label: "100,000 - 500,000", min: 100000, max: 500000 },
-    { id: "500-1M", label: "500,000 - 1,000,000", min: 500000, max: 1000000 },
-    { id: "gt1M", label: "> 1,000,000", min: 1000000, max: Infinity },
-  ];
+  /* ---------- Filter state & logic ----------
+     - Các options lấy từ EXPENSE constants để tránh hard-code
+     - Lọc, sắp xếp, tìm kiếm được memoize trong filteredExpenses
+  */
+  const expenseCategories = EXPENSE.CATEGORIES;
+  const amountRanges = EXPENSE.AMOUNT_RANGES;
 
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [dateSort, setDateSort] = useState(""); // asc | desc | ""
+  const [dateSort, setDateSort] = useState(""); // "asc" | "desc" | ""
   const [selectedAmountRange, setSelectedAmountRange] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setSelectedCategory("");
     setDateSort("");
     setSelectedAmountRange("");
     setSearchTerm("");
-  };
+  }, []);
 
-  // compute filtered + sorted expenses
-  const getFilteredExpenses = () => {
+  const filteredExpenses = useMemo(() => {
     let result = [...expenses];
 
+    // lọc theo danh mục nếu chọn
     if (selectedCategory) {
       result = result.filter((e) => e.category === selectedCategory);
     }
 
+    // lọc theo khoảng tiền nếu chọn
     if (selectedAmountRange) {
       const range = amountRanges.find((r) => r.id === selectedAmountRange);
       if (range) {
@@ -177,6 +191,7 @@ export default function Expense() {
       }
     }
 
+    // sắp xếp theo ngày nếu có yêu cầu
     if (dateSort) {
       result.sort((a, b) => {
         const da = new Date(a.date).getTime();
@@ -185,6 +200,7 @@ export default function Expense() {
       });
     }
 
+    // tìm kiếm theo tiêu đề/danh mục
     if (searchTerm && searchTerm.trim()) {
       const q = searchTerm.trim().toLowerCase();
       result = result.filter(
@@ -195,10 +211,16 @@ export default function Expense() {
     }
 
     return result;
-  };
+  }, [
+    expenses,
+    selectedCategory,
+    selectedAmountRange,
+    dateSort,
+    searchTerm,
+    amountRanges,
+  ]);
 
-  const filteredExpenses = getFilteredExpenses();
-
+  /* ---------- Render ---------- */
   return (
     <MainLayout
       auth={true}
@@ -206,45 +228,46 @@ export default function Expense() {
       title="Quản lý chi tiêu và thu nhập"
     >
       <div className="space-y-4">
+        {/* Header: chọn tháng + nút hành động */}
         <Card className="flex justify-between items-center mx-auto">
-          <ChangeDate month={month} setMonth={() => {}} />
+          <ChangeDate month={month} setMonth={setMonth} />
           <div className="flex">
             <Button
               variant="blue"
               className="mr-4"
               onClick={() => setIsAddExpenseOpen(true)}
             >
-              Thêm chi tiêu
+              {EXPENSE.BUTTONS.ADD_EXPENSE}
             </Button>
             <Button variant="green" onClick={() => setIsAddIncomeOpen(true)}>
-              Thêm thu nhập
+              {EXPENSE.BUTTONS.ADD_INCOME}
             </Button>
           </div>
         </Card>
 
+        {/* Danh sách thu nhập (mục tóm tắt) */}
         <Card className="flex flex-col">
           <h2 className="text-xl font-semibold mb-4 text-[var(--primary-blue-color)]">
             Thu nhập tháng {month}
           </h2>
+
+          {/* empty state khi chưa có thu nhập */}
           <ul>
             {incomes.length === 0 && (
               <li className="text-gray-500">Chưa có thu nhập nào.</li>
             )}
             {incomes.map((income) => (
-              <li className="py-2 border-b border-gray-300 flex justify-between items-center">
+              <li
+                key={income.id}
+                className="py-2 border-b border-gray-300 flex justify-between items-center"
+              >
                 <p className="flex items-center gap-2">
-                  <span className="text-body">
-                    {income && income.source ? income.source : "Lương"}
-                  </span>
-                  <span className="text-gray-500">
-                    {income && income.title ? income.title : ""}
-                  </span>
-                  <span className="text-gray-500">
-                    {income && income.date ? income.date : ""}
-                  </span>
+                  <span className="text-body">{income.source ?? "Lương"}</span>
+                  <span className="text-gray-500">{income.title ?? ""}</span>
+                  <span className="text-gray-500">{income.date ?? ""}</span>
                 </p>
                 <span className="font-semibold text-[var(--primary-green-color)]">
-                  {income ? income.amount.toLocaleString() : 0} VND
+                  {income.amount?.toLocaleString() ?? 0} VND
                 </span>
                 <div className="flex gap-2">
                   <Button variant="edit" onClick={() => openEditIncome(income)}>
@@ -261,6 +284,8 @@ export default function Expense() {
             ))}
           </ul>
         </Card>
+
+        {/* Bộ lọc + bảng chi tiêu */}
         <Card>
           <FilterExpense
             expenseCategories={expenseCategories}
@@ -275,7 +300,9 @@ export default function Expense() {
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />
+
           <LineColor />
+
           <div className="overflow-x-auto">
             <table className="w-full mt-4 table-auto">
               <thead>
@@ -297,19 +324,14 @@ export default function Expense() {
                     <td className="px-4 py-4">{expense.title}</td>
                     <td className="px-4 py-4">{expense.date}</td>
                     <td className="px-4 py-4 font-semibold text-[var(--red-color)]">
-                      {expense.amount.toLocaleString()} VND
+                      {expense.amount?.toLocaleString() ?? 0} VND
                     </td>
                     <td className="px-4 py-4 flex gap-2">
-                      <Button
-                        variant="edit"
-                        className=""
-                        onClick={() => openEdit(expense)}
-                      >
+                      <Button variant="edit" onClick={() => openEdit(expense)}>
                         {editIcon}
                       </Button>
                       <Button
                         variant="delete"
-                        className=""
                         onClick={() => openDelete(expense, "expense")}
                       >
                         {trashIcon}
@@ -322,7 +344,7 @@ export default function Expense() {
           </div>
         </Card>
 
-        {/* AddModel components */}
+        {/* ---------- Modals: Thêm / Sửa / Xóa ---------- */}
         <AddModel
           open={isAddExpenseOpen}
           onClose={() => setIsAddExpenseOpen(false)}
@@ -347,7 +369,6 @@ export default function Expense() {
           onSubmit={handleEditSubmit}
         />
 
-        {/* Edit modal for income */}
         <EditModel
           open={isEditIncomeOpen}
           onClose={() => {
@@ -355,11 +376,10 @@ export default function Expense() {
             setEditingIncome(null);
           }}
           role="income"
-          expense={editingIncome} // EditModel prop name is `expense` — pass income object
+          expense={editingIncome}
           onSubmit={handleEditIncomeSubmit}
         />
 
-        {/* Shared delete modal for expense & income */}
         <DeleteModel
           open={isDeleteOpen}
           onClose={() => {

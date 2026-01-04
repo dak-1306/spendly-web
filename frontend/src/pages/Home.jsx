@@ -1,40 +1,66 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import MainLayout from "../components/layout/MainLayout.jsx";
 import Card from "../components/common/Card.jsx";
 import Button from "../components/common/Button.jsx";
-import { useNavigate } from "react-router-dom";
 import { IMAGES } from "../assets/index.js";
 import { HOME } from "../utils/constants.js";
-function Home() {
+
+/*
+  Home.jsx
+  - Trang landing / giới thiệu các khu vực chính của app
+*/
+
+export default function Home() {
   const navigate = useNavigate();
-  const { dashboard_image, expense_image, AI_image, profile_image } = IMAGES;
-  const images = [dashboard_image, expense_image, AI_image, profile_image];
 
-  // short descriptions shown at the bottom of each image inside the card
-  const captions = [
-    "Dashboard — tổng quan thu chi, biểu đồ và số liệu quan trọng.",
-    "Expenses — quản lý chi tiêu, danh mục và lịch sử giao dịch.",
-    "AI Insights — đề xuất thông minh và phân tích tự động.",
-    "Profile — cấu hình người dùng và thiết lập cá nhân.",
-  ];
+  // Images lấy từ asset map (memo để tránh recreate khi render lại)
+  const images = useMemo(
+    () => [
+      IMAGES.dashboard_image,
+      IMAGES.expense_image,
+      IMAGES.AI_image,
+      IMAGES.profile_image,
+    ],
+    []
+  );
 
+  // Mô tả ngắn bên dưới mỗi ảnh (tách ra để dễ sửa / i18n)
+  const captions = useMemo(
+    () => [
+      "Dashboard — tổng quan thu chi, biểu đồ và số liệu quan trọng.",
+      "Expenses — quản lý chi tiêu, danh mục và lịch sử giao dịch.",
+      "AI Insights — đề xuất thông minh và phân tích tự động.",
+      "Profile — cấu hình người dùng và thiết lập cá nhân.",
+    ],
+    []
+  );
+
+  // Slider index hiện tại
   const [active, setActive] = useState(0);
 
+  // Tự động chuyển ảnh: setInterval + cleanup
   useEffect(() => {
     const id = setInterval(() => {
       setActive((s) => (s + 1) % images.length);
-    }, 5000); // chuyển mỗi 5 giây
+    }, 5000); // chuyển mỗi 5s
     return () => clearInterval(id);
-  }, []);
+  }, [images.length]);
+
+  // Handler điều hướng (useCallback giữ ref ổn định nếu truyền xuống con)
+  const goDashboard = useCallback(() => navigate("/dashboard"), [navigate]);
 
   return (
     <MainLayout title={false}>
       <div className="grid grid-cols-2 gap-4">
+        {/* Left: slider ảnh giới thiệu */}
         <Card className="m-8 flex items-center justify-center">
           <div className="relative w-full h-[450px] p-2 overflow-hidden">
+            {/* wrapper chuyển translateX dựa trên active */}
             <div
               className="flex h-full transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${active * 100}%)` }}
+              aria-live="polite"
             >
               {images.map((img, i) => (
                 <div
@@ -56,9 +82,12 @@ function Home() {
             </div>
           </div>
         </Card>
+
+        {/* Right: giới thiệu, tính năng và CTA */}
         <div className="flex flex-col justify-center items-center p-8 space-y-6">
           <h1 className="text-h1 text-3xl font-bold">{HOME.welcomeMessage}</h1>
           <p className="text-body">{HOME.text}</p>
+
           <Card className="flex flex-col items-start space-y-4">
             {HOME.description.map((desc, index) => (
               <p key={index} className="text-center text-lg text-body">
@@ -67,7 +96,7 @@ function Home() {
             ))}
           </Card>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 w-full">
             <Card>
               <h2 className="text-[var(--primary-blue-color)] text-xl font-semibold mb-2">
                 {HOME.featureHighlightsTitle}
@@ -78,6 +107,7 @@ function Home() {
                 ))}
               </ul>
             </Card>
+
             <Card>
               <h2 className="text-[var(--primary-green-color)] text-xl font-semibold mb-2">
                 {HOME.howItWorksTitle}
@@ -89,13 +119,8 @@ function Home() {
               </ol>
             </Card>
           </div>
-          <Button
-            variant="gradient"
-            size="lg"
-            onClick={() => {
-              navigate("/dashboard");
-            }}
-          >
+
+          <Button variant="gradient" size="lg" onClick={goDashboard}>
             {HOME.textButton}
           </Button>
         </div>
@@ -103,4 +128,3 @@ function Home() {
     </MainLayout>
   );
 }
-export default Home;

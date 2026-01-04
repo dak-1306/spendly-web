@@ -1,112 +1,174 @@
+import React, { useState, useMemo, useCallback } from "react";
 import MainLayout from "../components/layout/MainLayout";
 import Button from "../components/common/Button";
 import Card from "../components/common/Card";
 import ChangePassword from "../components/setting/ChangePassword";
 import DeleteConfirm from "../components/common/DeleteConfirm";
-import { useState } from "react";
-import { User, Mail, Trash2, Image, Key, LogOut } from "lucide-react";
+import { SETTINGS } from "../utils/constants";
+
+/*
+  Setting.jsx
+  - Cleaned: tách component icon refs, memoize JSX icons
+  - Chú thích tiếng Việt, callbacks ổn định (useCallback)
+  - Dữ liệu cứng lấy từ SETTINGS (utils/constants)
+*/
 
 export default function Setting() {
-  const USER_ICON = (
-    <User className="w-6 h-6 text-[var(--primary-blue-color)]" />
+  // constants từ file chung -> dễ bảo trì / i18n
+  const { PAGE_TITLE, HEADINGS, USER_INFO, UI_SETTINGS, TEXTS, ICONS } =
+    SETTINGS;
+
+  /* ---------- Icon component refs (từ constants) ----------
+     - ICONS chứa các component React (lucide)
+     - map sang tên rõ ràng và memoize JSX để tránh recreate mỗi render
+  */
+  const {
+    USER: UserIconComp,
+    EMAIL: EmailIconComp,
+    TRASH: TrashIconComp,
+    AVATAR_EMPTY: AvatarIconComp,
+    KEY: KeyIconComp,
+    LOGOUT: LogoutIconComp,
+  } = ICONS;
+
+  const AvatarIcon = useMemo(
+    () => (
+      <AvatarIconComp className="w-24 h-24 text-[var(--primary-blue-color)]" />
+    ),
+    [AvatarIconComp]
   );
-  const EMAIL_ICON = (
-    <Mail className="w-6 h-6 text-[var(--primary-green-color)]" />
+  const UserIcon = useMemo(
+    () => <UserIconComp className="w-6 h-6 text-[var(--primary-blue-color)]" />,
+    [UserIconComp]
   );
-  const TRASH_ICON = <Trash2 className="w-6 h-6 text-[var(--red-color)]" />;
-  const AVATAR_EMPTY_ICON = (
-    <Image className="w-24 h-24 text-[var(--primary-blue-color)]" />
+  const EmailIcon = useMemo(
+    () => (
+      <EmailIconComp className="w-6 h-6 text-[var(--primary-green-color)]" />
+    ),
+    [EmailIconComp]
   );
-  const KEY_ICON = (
-    <Key className="w-6 h-6 text-[var(--primary-green-color)]" />
+  const KeyIcon = useMemo(
+    () => <KeyIconComp className="w-6 h-6 text-[var(--primary-green-color)]" />,
+    [KeyIconComp]
   );
-  const LOGOUT_ICON = (
-    <LogOut className="w-6 h-6 text-[var(--primary-blue-color)]" />
+  const TrashIcon = useMemo(
+    () => <TrashIconComp className="w-6 h-6 text-[var(--red-color)]" />,
+    [TrashIconComp]
   );
+  const LogoutIcon = useMemo(
+    () => (
+      <LogoutIconComp className="w-6 h-6 text-[var(--primary-blue-color)]" />
+    ),
+    [LogoutIconComp]
+  );
+
+  /* ---------- Modal state (đơn giản, dễ hiểu) ---------- */
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteMode, setDeleteMode] = useState(null); // "account" | "logout" | null
 
-  const handleOpenChangePassword = () => setChangePasswordOpen(true);
-  const handleCloseChangePassword = () => setChangePasswordOpen(false);
+  /* ---------- Callbacks mở/đóng modal (useCallback để stable refs) ---------- */
+  const handleOpenChangePassword = useCallback(
+    () => setChangePasswordOpen(true),
+    []
+  );
+  const handleCloseChangePassword = useCallback(
+    () => setChangePasswordOpen(false),
+    []
+  );
 
-  const openDeleteAccount = () => {
+  const openDeleteAccount = useCallback(() => {
     setDeleteMode("account");
     setDeleteOpen(true);
-  };
-  const openLogoutConfirm = () => {
+  }, []);
+
+  const openLogoutConfirm = useCallback(() => {
     setDeleteMode("logout");
     setDeleteOpen(true);
-  };
-  const closeDelete = () => {
+  }, []);
+
+  const closeDelete = useCallback(() => {
     setDeleteOpen(false);
     setDeleteMode(null);
-  };
+  }, []);
 
-  const handleDeleteConfirm = () => {
+  /* ---------- Xử lý khi xác nhận (thực thi action thực tế ở đây) ---------- */
+  const handleDeleteConfirm = useCallback(() => {
     if (deleteMode === "logout") {
-      // thực hiện logout (thay bằng logic thực tế)
+      // TODO: gọi hàm logout thật (clear token, redirect...)
       console.log("Đã xác nhận đăng xuất");
     } else if (deleteMode === "account") {
-      // thực hiện xóa tài khoản (thay bằng API call)
+      // TODO: gọi API xóa tài khoản, show spinner / error handling
       console.log("Đã xác nhận xóa tài khoản");
     }
-  };
+    // đóng modal sau khi xử lý
+    closeDelete();
+  }, [deleteMode, closeDelete]);
 
   return (
-    <MainLayout auth={true} navbarBottom={true} title="Settings và Profile">
+    <MainLayout auth={true} navbarBottom={true} title={PAGE_TITLE.vi}>
       <div className="flex gap-6 justify-center md:flex-row flex-col">
+        {/* Left: profile card */}
         <Card className="flex flex-col gap-6 justify-center items-center px-8 py-6">
           <div className="w-[150px] h-[150px] rounded-full border border-[var(--secondary-blue-color)] shadow-lg">
             <div className="w-full h-full rounded-full flex items-center justify-center bg-gray-50">
-              {AVATAR_EMPTY_ICON}
+              {AvatarIcon}
             </div>
           </div>
+
           <div>
-            <h2 className="text-xl font-semibold">Thông tin cá nhân</h2>
+            <h2 className="text-xl font-semibold">{HEADINGS.PROFILE}</h2>
+
+            {/* Tên & vai trò */}
             <div className="flex items-center space-x-4 mt-4">
-              {USER_ICON}
+              {UserIcon}
               <div>
-                <p className="font-medium">Nguyễn Văn A</p>
-                <p className="text-sm text-gray-600">Người dùng Spendly</p>
+                <p className="font-medium">{USER_INFO.NAME}</p>
+                <p className="text-sm text-gray-600">{USER_INFO.ROLE}</p>
               </div>
             </div>
+
+            {/* Email */}
             <div className="flex items-center space-x-4 mt-4">
-              {EMAIL_ICON}
+              {EmailIcon}
               <div>
-                <p className="font-medium">email@example.com</p>
-                <p className="text-sm text-gray-600">Email liên hệ</p>
+                <p className="font-medium">{USER_INFO.EMAIL}</p>
+                <p className="text-sm text-gray-600">{USER_INFO.EMAIL_LABEL}</p>
               </div>
             </div>
           </div>
         </Card>
+
+        {/* Right: settings */}
         <Card className=" p-6">
           <div className="flex flex-col space-y-4">
-            <h2 className="text-xl font-semibold">Cài đặt tài khoản</h2>
+            <h2 className="text-xl font-semibold">
+              {HEADINGS.SETTINGS_SECTION}
+            </h2>
 
             <div className="space-y-4">
+              {/* Đăng xuất */}
               <div className="flex items-center justify-between bg-white/5 rounded">
                 <div className="flex items-center justify-between space-x-4">
-                  {LOGOUT_ICON}
+                  {LogoutIcon}
                   <div>
-                    <p className="font-medium">Đăng xuất</p>
-                    <p className="text-sm text-gray-600">
-                      Đăng xuất khỏi tài khoản hiện tại
-                    </p>
+                    <p className="font-medium">{TEXTS.LOGOUT_TITLE}</p>
+                    <p className="text-sm text-gray-600">{TEXTS.LOGOUT_DESC}</p>
                   </div>
                 </div>
                 <Button variant="red" size="sm" onClick={openLogoutConfirm}>
-                  Đăng xuất
+                  {TEXTS.LOGOUT_TITLE}
                 </Button>
               </div>
 
+              {/* Đổi mật khẩu */}
               <div className="flex items-center justify-between gap-4 bg-white/5 rounded-md">
                 <div className="flex items-center space-x-4">
-                  {KEY_ICON}
+                  {KeyIcon}
                   <div>
-                    <p className="font-medium">Đổi mật khẩu</p>
+                    <p className="font-medium">{TEXTS.CHANGE_PASSWORD_TITLE}</p>
                     <p className="text-sm text-gray-600">
-                      Thay đổi mật khẩu đăng nhập
+                      {TEXTS.CHANGE_PASSWORD_DESC}
                     </p>
                   </div>
                 </div>
@@ -115,17 +177,18 @@ export default function Setting() {
                   size="sm"
                   onClick={handleOpenChangePassword}
                 >
-                  Đổi mật khẩu
+                  {TEXTS.CHANGE_PASSWORD_TITLE}
                 </Button>
               </div>
 
+              {/* Xóa tài khoản */}
               <div className="flex items-center justify-between bg-white/5 rounded">
                 <div className="flex items-center space-x-4">
-                  {TRASH_ICON}
+                  {TrashIcon}
                   <div>
-                    <p className="font-medium">Xóa tài khoản</p>
+                    <p className="font-medium">{TEXTS.DELETE_ACCOUNT_TITLE}</p>
                     <p className="text-sm text-gray-600">
-                      Xóa vĩnh viễn dữ liệu tài khoản
+                      {TEXTS.DELETE_ACCOUNT_DESC}
                     </p>
                   </div>
                 </div>
@@ -134,17 +197,18 @@ export default function Setting() {
                   size="sm"
                   onClick={openDeleteAccount}
                 >
-                  Xóa
+                  {TEXTS.BUTTON_DELETE}
                 </Button>
               </div>
             </div>
 
+            {/* UI settings: theme / language / currency */}
             <div className="border-t border-gray-200/10">
               <div className="flex items-center justify-between mt-4">
                 <div>
-                  <p className="font-medium">Giao diện</p>
+                  <p className="font-medium">{UI_SETTINGS.THEME.LABEL}</p>
                   <p className="text-sm text-gray-600">
-                    Chuyển giữa sáng và tối
+                    {UI_SETTINGS.THEME.DESC}
                   </p>
                 </div>
                 <label className="flex items-center cursor-pointer">
@@ -155,55 +219,68 @@ export default function Setting() {
 
               <div className="mt-4 flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Ngôn ngữ</p>
+                  <p className="font-medium">{UI_SETTINGS.LANGUAGE.LABEL}</p>
                   <p className="text-sm text-gray-600">
-                    Chọn ngôn ngữ hiển thị
+                    {UI_SETTINGS.LANGUAGE.DESC}
                   </p>
                 </div>
                 <select
                   defaultValue="vi"
                   className="bg-transparent border border-gray-300 rounded px-3 py-1"
                 >
-                  <option value="vi">Tiếng Việt</option>
-                  <option value="en">English</option>
+                  {UI_SETTINGS.LANGUAGE.OPTIONS.map((lang) => (
+                    <option key={lang.value} value={lang.value}>
+                      {lang.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="mt-4 flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Đơn vị tiền tệ</p>
+                  <p className="font-medium">{UI_SETTINGS.CURRENCY.LABEL}</p>
                   <p className="text-sm text-gray-600">
-                    Chọn định dạng tiền tệ
+                    {UI_SETTINGS.CURRENCY.DESC}
                   </p>
                 </div>
                 <select
                   defaultValue="vnd"
                   className="bg-transparent border border-gray-300 rounded px-3 py-1"
                 >
-                  <option value="vnd">VND (₫)</option>
-                  <option value="usd">USD ($)</option>
-                  <option value="eur">EUR (€)</option>
+                  {UI_SETTINGS.CURRENCY.OPTIONS.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
           </div>
         </Card>
+        {/* ------------Modal------------ */}
+        {/* Modal for changing password */}
         <ChangePassword
           open={changePasswordOpen}
           onClose={handleCloseChangePassword}
         />
-
+        {/* Modal for delete confirmation (for logout or delete account) */}
         <DeleteConfirm
           open={deleteOpen}
           onClose={closeDelete}
-          title={deleteMode === "account" ? "Xóa tài khoản" : "Đăng xuất"}
+          title={
+            deleteMode === "account"
+              ? TEXTS.DELETE_ACCOUNT_TITLE
+              : TEXTS.LOGOUT_TITLE
+          }
           description={
             deleteMode === "account"
-              ? "Xóa tài khoản sẽ xóa vĩnh viễn dữ liệu của bạn. Bạn có chắc?"
-              : "Bạn sẽ đăng xuất khỏi phiên hiện tại. Tiếp tục?"
+              ? TEXTS.DELETE_ACCOUNT_DESC
+              : TEXTS.LOGOUT_DESC
           }
           confirmLabel={
-            deleteMode === "account" ? "Xóa tài khoản" : "Đăng xuất"
+            deleteMode === "account"
+              ? TEXTS.DELETE_ACCOUNT_TITLE
+              : TEXTS.LOGOUT_TITLE
           }
           confirmVariant={deleteMode === "account" ? "red" : "blue"}
           onConfirm={handleDeleteConfirm}
