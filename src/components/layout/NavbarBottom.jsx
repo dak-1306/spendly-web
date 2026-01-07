@@ -34,7 +34,7 @@ function NavbarBottom() {
                 <Link to="/dashboard">{DashboardIcon}</Link>
               </li>
               <li className="navbar-item bg-white rounded-full p-2 shadow-md hover:scale-105 transition-transform">
-                <Link to="/expense">{IncomeIcon}</Link>
+                <Link to="/transaction">{IncomeIcon}</Link>
               </li>
             </div>
             <div className="flex space-x-8 mr-8">

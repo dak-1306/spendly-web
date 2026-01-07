@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Dashboard from "./pages/Dashboard";
-import Expense from "./pages/Expense";
+import Transaction from "./pages/Transaction";
 import Setting from "./pages/Setting";
 import AI from "./pages/AI";
 function AppRoutes() {
@@ -14,7 +14,7 @@ function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/expense" element={<Expense />} />
+        <Route path="/transaction" element={<Transaction />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/ai" element={<AI />} />
       </Routes>

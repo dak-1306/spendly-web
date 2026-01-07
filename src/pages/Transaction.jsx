@@ -4,12 +4,12 @@ import LineColor from "../components/common/LineColor.jsx";
 import Card from "../components/common/Card.jsx";
 import Button from "../components/common/Button.jsx";
 import ChangeDate from "../components/common/ChangeDate.jsx";
-import AddModel from "../components/expense/AddModel.jsx";
-import EditModel from "../components/expense/EditModel.jsx";
-import DeleteModel from "../components/expense/Delete.jsx";
-import FilterExpense from "../components/expense/FilterExpense.jsx";
+import AddModel from "../components/transaction/AddModel.jsx";
+import EditModel from "../components/transaction/EditModel.jsx";
+import DeleteModel from "../components/transaction/Delete.jsx";
+import FilterExpense from "../components/transaction/FilterExpense.jsx";
 import sampleData from "../data/sampleData.js";
-import { EXPENSE } from "../utils/constants";
+import { EXPENSE } from "../utils/constants.js";
 
 /*
   Expense.jsx
@@ -18,7 +18,7 @@ import { EXPENSE } from "../utils/constants";
   - Nguyên tắc: giữ state sạch, memoize dữ liệu suy ra, callbacks ổn định
 */
 
-export default function Expense() {
+export default function Transaction() {
   /* ---------- State: tháng đang hiển thị ---------- */
   const [month, setMonth] = useState(EXPENSE.DEFAULT_MONTH);
 
