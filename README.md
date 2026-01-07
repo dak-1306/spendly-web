@@ -1,68 +1,135 @@
-# Spendly - web quản lý tài chính cá nhân
+# frontend
 
-## Mô tả
+## Các thư viện đã cài đặt
 
-Spendly là ứng dụng web giúp người dùng theo dõi thu chi, quản lý ngân sách, phân loại chi tiêu và nhận gợi ý/insight bằng AI.
+Dependencies:
 
-## Tính năng chính
+- @tailwindcss/vite — npm install @tailwindcss/vite@^4.1.18
 
-- Quản lý thu nhập và chi tiêu.
-- Phân loại chi tiêu theo danh mục.
-- Bảng điều khiển (dashboard) với biểu đồ/ thống kê.
-- Quản lý ngân sách và cảnh báo vượt ngân sách.
-- Xác thực người dùng (đăng ký/đăng nhập).
-- Tích hợp AI để gợi ý tối ưu chi tiêu.
+```bash
+npm install @tailwindcss/vite
+```
 
-## Kiến trúc dự án
+- axios — npm install axios@^1.13.2
 
-- frontend/
-  - ứng dụng React (Vite + Tailwind).
-  - Xem chi tiết: [frontend/README.md](frontend/README.md)
-- backend/
-  - API Node/Express (models, controllers, routes).
-  - Xem chi tiết: [backend/README.md](backend/README.md)
+```bash
+npm install axios
+```
 
-## Công nghệ
+- clsx — npm install clsx@^2.1.1
 
-- Frontend: React, Vite, Tailwind CSS, react-router, recharts
-- Backend: Node.js, Express, MongoDB (hoặc DB bạn chọn), JWT cho auth
-- Các thư viện khác: axios, clsx
+```bash
+npm install clsx
+```
 
-## Bắt đầu
+- react-dom — npm install react-dom@^19.2.3
 
-Yêu cầu:
+```bash
+npm install react-dom
+```
 
-- Node.js >= 18, npm hoặc pnpm/yarn
-- MongoDB (hoặc chuỗi kết nối DB)
+- react-router-dom — npm install react-router-dom@^7.11.0
 
-1. Cài đặt
+```bash
+npm install react-router-dom
+```
 
-- Frontend:
-  ```sh
-  cd frontend
-  npm install
-  ```
-- Backend:
-  ```sh
-  cd backend
-  npm install
-  ```
+- recharts — npm install recharts@^3.6.0
 
-2. Biến môi trường
+```bash
+npm install recharts
+```
 
-- Backend: tạo file `.env` tương tự [backend/.env](backend/.env) (ví dụ: MONGO_URI, JWT_SECRET, PORT)
-- Frontend: nếu cần, tạo `.env` trong `frontend/` (ví dụ: VITE_API_BASE_URL)
+## Cây thư mục (đã format lại, không đổi nội dung)
 
-3. Chạy ứng dụng
-
-- Backend (development):
-  ```sh
-  cd backend
-  npm run dev
-  ```
-- Frontend (development):
-  ```sh
-  cd frontend
-  npm run dev
-  ```
-# spendly-web
+```
+frontend/
+├── public/
+│ └── favicon.svg
+│
+├── src/
+│ ├── assets/
+│ │ ├── icons/
+│ │ └── images/
+│
+│ ├── components/
+│ │ ├── common/
+│ │ │ ├── Button.jsx
+│ │ │ ├── Input.jsx
+│ │ │ ├── Modal.jsx
+│ │ │ ├── Card.jsx
+│ │ │ └── Loader.jsx
+│ │ │
+│ │ ├── layout/
+│ │ │ ├── Header.jsx
+│ │ │ ├── FooterNav.jsx # thanh công cụ footer
+│ │ │ └── ProtectedLayout.jsx
+│ │ │
+│ │ ├── charts/
+│ │ │ ├── CashFlowChart.jsx
+│ │ │ ├── ExpensePie.jsx
+│ │ │ └── BudgetUsedBar.jsx
+│ │ │
+│ │ └── ai/
+│ │ ├── AIInsightCard.jsx
+│ │ └── AISuggestionBox.jsx
+│
+│ ├── pages/
+│ │ ├── Home/
+│ │ │ └── Home.jsx
+│ │ │
+│ │ ├── Auth/
+│ │ │ ├── Login.jsx
+│ │ │ └── Register.jsx
+│ │ │
+│ │ ├── Dashboard/
+│ │ │ └── Dashboard.jsx
+│ │ │
+│ │ ├── Expenses/
+│ │ │ ├── ExpensePage.jsx
+│ │ │ ├── CategoryCard.jsx
+│ │ │ └── ExpenseList.jsx
+│ │ │
+│ │ ├── AI/
+│ │ │ └── AIAnalysis.jsx
+│ │ │
+│ │ └── Settings/
+│ │ └── Settings.jsx
+│
+│ ├── canvas/
+│ │ └── AnimatedGradient.jsx # canvas gradient động
+│
+│ ├── hooks/
+│ │ ├── useAuth.js
+│ │ ├── useTheme.js
+│ │ └── useExpenses.js
+│
+│ ├── context/
+│ │ ├── AuthContext.jsx
+│ │ ├── ThemeContext.jsx
+│ │ └── FinanceContext.jsx
+│
+│ ├── services/
+│ │ ├── api.js
+│ │ ├── auth.service.js
+│ │ ├── expense.service.js
+│ │ └── ai.service.js
+│
+│ ├── utils/
+│ │ ├── formatCurrency.js
+│ │ ├── date.js
+│ │ └── constants.js
+│
+│ ├── styles/
+│ │ └── index.css
+│
+│ ├── App.jsx
+│ ├── main.jsx
+│ └── routes.jsx
+│
+├── tailwind.config.js
+├── postcss.config.js
+├── index.html
+├── package.json
+└── README.md
+```
