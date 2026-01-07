@@ -3,7 +3,6 @@ import {
   User,
   Mail,
   Trash2,
-  Image,
   Key,
   LogOut,
   Edit2,
@@ -97,7 +96,6 @@ export const SETTINGS = {
   ICONS: {
     USER: User,
     EMAIL: Mail,
-    AVATAR_EMPTY: Image,
     KEY: Key,
     LOGOUT: LogOut,
     TRASH: Trash2,

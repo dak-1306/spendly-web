@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../common/Button";
 import "../../styles/auth.css";
 import { useState } from "react";
-// import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth"; // <-- sửa đường dẫn import hook
 
 function AuthForm({ variant = "login" }) {
   const isLogin = variant === "login";
@@ -12,7 +12,7 @@ function AuthForm({ variant = "login" }) {
   const GOOGLE = ICONS.icon_google;
   const FACEBOOK = ICONS.icon_facebook;
 
-  // const { login, register } = useAuth();
+  const { login, register, loginWithGoogle } = useAuth(); // <-- use auth context
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -43,19 +43,32 @@ function AuthForm({ variant = "login" }) {
     try {
       const payload = isLogin ? { email, password } : { name, email, password };
 
-      // const res = isLogin ? await login(payload) : await register(payload);
-      // TEMP: mocked response for local testing while authContext is disabled
-      const res = { user: { email } };
+      const res = isLogin ? await login(payload) : await register(payload); // <-- call context
 
       if (res?.user) {
-        navigate("/", { replace: true });
+        navigate("/dashboard", { replace: true });
       } else if (res?.error) {
         setError(res.error);
       } else {
         setError("Lỗi không xác định. Vui lòng thử lại.");
       }
     } catch (err) {
-      setError(err?.error || err?.message || "Không thể kết nối đến server.");
+      setError(err?.message || "Không thể kết nối đến server.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogle = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await loginWithGoogle();
+      if (res?.user) navigate("/dashboard", { replace: true });
+      else if (res?.error) setError(res.error);
+      else setError("Lỗi đăng nhập bằng Google.");
+    } catch (err) {
+      setError(err?.message || "Lỗi đăng nhập bằng Google.");
     } finally {
       setLoading(false);
     }
@@ -188,7 +201,12 @@ function AuthForm({ variant = "login" }) {
       {/* Social login (login only) */}
       {isLogin && (
         <div className="mt-6 space-y-3">
-          <button className="w-full flex justify-center py-2 items-center border space-x-2 rounded">
+          <button
+            type="button"
+            onClick={handleGoogle}
+            className="w-full flex justify-center py-2 items-center border space-x-2 rounded cursor-pointer"
+            disabled={loading}
+          >
             <img
               src={GOOGLE.src}
               alt={GOOGLE.alt}
@@ -197,7 +215,12 @@ function AuthForm({ variant = "login" }) {
             />
             <p> Login with Google</p>
           </button>
-          <button className="w-full flex justify-center py-2 items-center border space-x-2 rounded">
+          <button
+            type="button"
+            className="w-full flex justify-center py-2 items-center border space-x-2 rounded cursor-pointer"
+            disabled
+            title="Facebook login not implemented"
+          >
             <img
               src={FACEBOOK.src}
               alt={FACEBOOK.alt}

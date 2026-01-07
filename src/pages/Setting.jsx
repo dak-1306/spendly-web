@@ -4,39 +4,28 @@ import Button from "../components/common/Button";
 import Card from "../components/common/Card";
 import ChangePassword from "../components/setting/ChangePassword";
 import DeleteConfirm from "../components/common/DeleteConfirm";
+import Avatar from "../components/setting/Avatar"; // <-- added
 import { SETTINGS } from "../utils/constants";
+import { useAuth } from "../hooks/useAuth"; // <-- use auth hook
+import { useNavigate } from "react-router-dom";
 
 /*
   Setting.jsx
-  - Cleaned: tách component icon refs, memoize JSX icons
-  - Chú thích tiếng Việt, callbacks ổn định (useCallback)
-  - Dữ liệu cứng lấy từ SETTINGS (utils/constants)
+  - Uses auth context: user, loading, logout, refresh
 */
 
 export default function Setting() {
-  // constants từ file chung -> dễ bảo trì / i18n
   const { PAGE_TITLE, HEADINGS, USER_INFO, UI_SETTINGS, TEXTS, ICONS } =
     SETTINGS;
 
-  /* ---------- Icon component refs (từ constants) ----------
-     - ICONS chứa các component React (lucide)
-     - map sang tên rõ ràng và memoize JSX để tránh recreate mỗi render
-  */
   const {
     USER: UserIconComp,
     EMAIL: EmailIconComp,
     TRASH: TrashIconComp,
-    AVATAR_EMPTY: AvatarIconComp,
     KEY: KeyIconComp,
     LOGOUT: LogoutIconComp,
   } = ICONS;
 
-  const AvatarIcon = useMemo(
-    () => (
-      <AvatarIconComp className="w-24 h-24 text-[var(--primary-blue-color)]" />
-    ),
-    [AvatarIconComp]
-  );
   const UserIcon = useMemo(
     () => <UserIconComp className="w-6 h-6 text-[var(--primary-blue-color)]" />,
     [UserIconComp]
@@ -62,12 +51,13 @@ export default function Setting() {
     [LogoutIconComp]
   );
 
-  /* ---------- Modal state (đơn giản, dễ hiểu) ---------- */
+  const { user, loading, logout, refresh } = useAuth(); // auth context
+  const navigate = useNavigate();
+
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteMode, setDeleteMode] = useState(null); // "account" | "logout" | null
 
-  /* ---------- Callbacks mở/đóng modal (useCallback để stable refs) ---------- */
   const handleOpenChangePassword = useCallback(
     () => setChangePasswordOpen(true),
     []
@@ -92,28 +82,28 @@ export default function Setting() {
     setDeleteMode(null);
   }, []);
 
-  /* ---------- Xử lý khi xác nhận (thực thi action thực tế ở đây) ---------- */
-  const handleDeleteConfirm = useCallback(() => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (deleteMode === "logout") {
-      // TODO: gọi hàm logout thật (clear token, redirect...)
-      console.log("Đã xác nhận đăng xuất");
+      await logout();
+      navigate("/login", { replace: true });
     } else if (deleteMode === "account") {
-      // TODO: gọi API xóa tài khoản, show spinner / error handling
-      console.log("Đã xác nhận xóa tài khoản");
+      // delete account not implemented in auth.service; placeholder
+      console.log("Xóa tài khoản chưa được triển khai.");
     }
-    // đóng modal sau khi xử lý
     closeDelete();
-  }, [deleteMode, closeDelete]);
+  }, [deleteMode, closeDelete, logout, navigate]);
+
+  const displayName = user?.displayName || USER_INFO.NAME;
+  const email = user?.email || USER_INFO.EMAIL;
+  const photoURL = user?.photoURL || null;
 
   return (
     <MainLayout auth={true} navbarBottom={true} title={PAGE_TITLE.vi}>
       <div className="flex gap-6 justify-center md:flex-row flex-col">
         {/* Left: profile card */}
         <Card className="flex flex-col gap-6 justify-center items-center px-8 py-6">
-          <div className="w-[150px] h-[150px] rounded-full border border-[var(--secondary-blue-color)] shadow-lg">
-            <div className="w-full h-full rounded-full flex items-center justify-center bg-gray-50">
-              {AvatarIcon}
-            </div>
+          <div className="rounded-full border border-[var(--secondary-blue-color)] shadow-lg">
+            <Avatar name={displayName} photoURL={photoURL} size={150} />
           </div>
 
           <div>
@@ -123,7 +113,7 @@ export default function Setting() {
             <div className="flex items-center space-x-4 mt-4">
               {UserIcon}
               <div>
-                <p className="font-medium">{USER_INFO.NAME}</p>
+                <p className="font-medium">{displayName}</p>
                 <p className="text-sm text-gray-600">{USER_INFO.ROLE}</p>
               </div>
             </div>
@@ -132,9 +122,28 @@ export default function Setting() {
             <div className="flex items-center space-x-4 mt-4">
               {EmailIcon}
               <div>
-                <p className="font-medium">{USER_INFO.EMAIL}</p>
+                <p className="font-medium">{email}</p>
                 <p className="text-sm text-gray-600">{USER_INFO.EMAIL_LABEL}</p>
               </div>
+            </div>
+
+            <div className="mt-4 flex justify-center gap-2">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => refresh()}
+                disabled={loading}
+              >
+                Refresh
+              </Button>
+              <Button
+                variant="red"
+                size="sm"
+                onClick={openLogoutConfirm}
+                disabled={loading}
+              >
+                {TEXTS.LOGOUT_TITLE}
+              </Button>
             </div>
           </div>
         </Card>
@@ -156,7 +165,12 @@ export default function Setting() {
                     <p className="text-sm text-gray-600">{TEXTS.LOGOUT_DESC}</p>
                   </div>
                 </div>
-                <Button variant="red" size="sm" onClick={openLogoutConfirm}>
+                <Button
+                  variant="red"
+                  size="sm"
+                  onClick={openLogoutConfirm}
+                  disabled={loading}
+                >
                   {TEXTS.LOGOUT_TITLE}
                 </Button>
               </div>
@@ -258,12 +272,10 @@ export default function Setting() {
           </div>
         </Card>
         {/* ------------Modal------------ */}
-        {/* Modal for changing password */}
         <ChangePassword
           open={changePasswordOpen}
           onClose={handleCloseChangePassword}
         />
-        {/* Modal for delete confirmation (for logout or delete account) */}
         <DeleteConfirm
           open={deleteOpen}
           onClose={closeDelete}
