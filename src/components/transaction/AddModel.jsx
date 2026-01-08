@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from "react";
-import Button from "../common/Button";
-import {X} from "lucide-react";
-
-const incomeCategories = ["Salary", "Freelance", "Other"];
-const expenseCategories = ["Food", "Transport", "Shopping", "Rent", "Other"];
+import React from "react";
+import { X } from "lucide-react";
+import TransactionForm from "./TransactionForm";
 
 export default function AddModel({
   open = false,
@@ -14,50 +11,7 @@ export default function AddModel({
   const isIncome = role === "income";
   const headerColor = isIncome ? "bg-green-600" : "bg-blue-600";
 
-  const deleteIcon = (
-    <X className="w-6 h-6 text-white" />
-  );
-
-  const todayDate = () => {
-    const d = new Date();
-    return d.toISOString().slice(0, 10);
-  };
-
-  const [form, setForm] = useState({
-    amount: "",
-    date: todayDate(),
-    category: "",
-    title: "",
-  });
-
-  useEffect(() => {
-    if (open) {
-      setForm({
-        amount: "",
-        date: todayDate(),
-        category: "",
-        title: "",
-      });
-    }
-  }, [open, role]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((s) => ({ ...s, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const amt = parseFloat(form.amount);
-    if (!amt || amt <= 0) return alert("Vui lòng nhập số tiền hợp lệ.");
-    const payload = {
-      ...form,
-      amount: amt,
-      role,
-    };
-    onSubmit(payload);
-    onClose();
-  };
+  const deleteIcon = <X className="w-6 h-6 text-white" />;
 
   if (!open) return null;
 
@@ -84,78 +38,16 @@ export default function AddModel({
             className="bg-transparent border-0 text-white text-xl leading-none"
           >
             {deleteIcon}
-              
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4">
-          <div className="mb-3">
-            <label className="block text-sm mb-1">Số tiền</label>
-            <input
-              name="amount"
-              value={form.amount}
-              onChange={handleChange}
-              type="number"
-              step="0.01"
-              placeholder="0.00"
-              className="w-full px-3 py-2 rounded-md border border-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-300"
-              autoFocus
-            />
-          </div>
-
-          <div className="mb-3 flex gap-3">
-            <div className="flex-1">
-              <label className="block text-sm mb-1">Ngày</label>
-              <input
-                name="date"
-                value={form.date}
-                onChange={handleChange}
-                type="date"
-                className="w-full px-3 py-2 rounded-md border border-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-300"
-              />
-            </div>
-
-            <div className="flex-1">
-              <label className="block text-sm mb-1">Danh mục</label>
-              <select
-                name="category"
-                value={form.category}
-                onChange={handleChange}
-                className="w-full px-3 py-2 rounded-md border border-gray-200 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-300"
-              >
-                <option value="">
-                  {isIncome ? "Chọn danh mục thu" : "Chọn danh mục chi"}
-                </option>
-                {(isIncome ? incomeCategories : expenseCategories).map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-sm mb-1">Tiêu đề</label>
-            <input
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              type="text"
-              placeholder="Mô tả ngắn..."
-              className="w-full px-3 py-2 rounded-md border border-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-300"
-            />
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="red" onClick={onClose}>
-              Hủy
-            </Button>
-            <Button type="submit" variant={isIncome ? "green" : "blue"}>
-              Lưu
-            </Button>
-          </div>
-        </form>
+        <TransactionForm
+          open={open}
+          layout="add"
+          role={role}
+          onSubmit={onSubmit}
+          onClose={onClose}
+        />
       </div>
     </div>
   );
