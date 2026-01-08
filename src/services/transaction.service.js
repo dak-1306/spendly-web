@@ -9,6 +9,7 @@ import {
   deleteDoc,
   onSnapshot,
   query,
+  where,
   orderBy,
   serverTimestamp,
 } from "firebase/firestore";
@@ -46,8 +47,19 @@ const deleteTransaction = async (id) => {
   await deleteDoc(ref);
 };
 
-const subscribeTransactions = (onUpdate, onError) => {
-  const q = query(colRef, orderBy("createdAt", "desc"));
+// Sửa subscribe để filter theo userId
+const subscribeTransactions = (userId, onUpdate, onError) => {
+  if (!userId) {
+    onUpdate([]);
+    return () => {};
+  }
+
+  const q = query(
+    colRef,
+    where("userId", "==", userId),
+    orderBy("createdAt", "desc")
+  );
+
   const unsub = onSnapshot(
     q,
     (snap) => {

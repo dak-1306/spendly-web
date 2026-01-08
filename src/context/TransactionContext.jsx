@@ -13,36 +13,45 @@ export const TransactionProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log("TransactionContext: currentUid =", currentUid);
+
+    if (!currentUid) {
+      setTransactions([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     const unsub = transactionService.subscribeTransactions(
+      currentUid,
       (items) => {
         setTransactions(items);
         setLoading(false);
       },
       (err) => {
+        console.error("Subscribe error:", err);
         setError(err);
         setLoading(false);
       }
     );
     return () => unsub && unsub();
-  }, []);
+  }, [currentUid]);
 
-  // addTransaction nhận payload thuần từ TransactionForm và chuyển thành payload cho Firestore
+  // addTransaction nhận payload từ TransactionForm với đầy đủ các trường
   const addTransaction = async (formPayload) => {
     try {
-      // formPayload.date là string 'YYYY-MM-DD' (hoặc ISO); chuyển sang Date
       const jsDate = new Date(formPayload.date);
       const payload = {
-        userId: formPayload.userId || currentUid || null,
+        userId: formPayload.userId || currentUid,
         type: formPayload.type,
         title: formPayload.title,
         amount: Number(formPayload.amount),
-        currency: formPayload.currency || "VND",
+        currency: formPayload.currency,
+        source: formPayload.source,
+        category: formPayload.category,
         date: Timestamp.fromDate(jsDate),
-        month: jsDate.toISOString().slice(0, 7),
+        month: formPayload.month,
       };
-
-      if (formPayload.type === "income") payload.source = formPayload.source;
-      else payload.category = formPayload.category;
 
       return await transactionService.addTransaction(payload);
     } catch (e) {

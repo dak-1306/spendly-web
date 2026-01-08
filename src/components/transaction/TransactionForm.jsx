@@ -7,28 +7,30 @@ const todayDate = () => {
   return d.toISOString().slice(0, 10);
 };
 
-// thêm mặc định categories ở đây
 const defaultIncomeCategories = ["Lương", "Freelance", "Khác"];
 const defaultExpenseCategories = [
   "Ăn uống",
   "Di chuyển",
   "Mua sắm",
   "Nhà thuê",
+  "Giải trí",
+  "Sức khỏe",
+  "Giáo dục",
   "Khác",
 ];
 
 export default function TransactionForm({
   open = false,
-  layout = "add", // "add" | "edit"
-  role = "expense", // "expense" | "income"
+  layout = "add",
+  role = "expense",
+  userId = "",
   initialValues = {},
-  categories = [], // nếu không truyền sẽ dùng mặc định bên dưới
+  categories = [],
   onSubmit = () => {},
   onClose = () => {},
   id = undefined,
 }) {
   const isIncome = role === "income";
-  // dùng prop categories nếu có, ngược lại lấy mặc định theo role
   const resolvedCategories =
     categories && categories.length > 0
       ? categories
@@ -37,26 +39,53 @@ export default function TransactionForm({
       : defaultExpenseCategories;
 
   const [form, setForm] = useState({
+    userId: "",
+    type: role,
     title: "",
     amount: "",
-    date: todayDate(),
+    currency: "VND",
+    source: "",
     category: "",
+    date: todayDate(),
+    month: todayDate().slice(0, 7),
   });
 
+  // Reset form chỉ khi modal mở và initialValues thay đổi
+  useEffect(() => {
+    if (!open) return;
+
+    const newDate = initialValues?.date ?? todayDate();
+    setForm({
+      userId: userId || "",
+      type: role,
+      title: initialValues?.title ?? initialValues?.source ?? "",
+      amount: initialValues?.amount ?? "",
+      currency: initialValues?.currency ?? "VND",
+      source: initialValues?.source ?? "",
+      category: initialValues?.category ?? initialValues?.source ?? "",
+      date: newDate,
+      month: newDate.slice(0, 7),
+    });
+  }, [open]); // chỉ phụ thuộc vào open, không cần initialValues/role/userId
+
+  // Sync userId/role khi chúng thay đổi mà modal đang mở
   useEffect(() => {
     if (open) {
-      setForm({
-        title: initialValues?.title ?? initialValues?.source ?? "",
-        amount: initialValues?.amount ?? "",
-        date: initialValues?.date ?? todayDate(),
-        category: initialValues?.category ?? initialValues?.source ?? "",
-      });
+      setForm((prev) => ({
+        ...prev,
+        userId: userId || prev.userId,
+        type: role,
+      }));
     }
-  }, [open, initialValues]);
+  }, [userId, role, open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((s) => ({ ...s, [name]: value }));
+    setForm((s) => {
+      const next = { ...s, [name]: value };
+      if (name === "date") next.month = value ? value.slice(0, 7) : "";
+      return next;
+    });
   };
 
   const handleSubmit = (e) => {
@@ -64,9 +93,15 @@ export default function TransactionForm({
     const amt = parseFloat(form.amount);
     if (!amt || amt <= 0) return alert("Vui lòng nhập số tiền hợp lệ.");
     const payload = {
-      ...form,
+      userId: form.userId,
+      type: form.type,
+      title: form.title,
       amount: amt,
-      role,
+      currency: form.currency,
+      source: form.source,
+      category: form.category,
+      date: form.date,
+      month: form.month,
       id,
     };
     onSubmit(payload);
@@ -200,6 +235,36 @@ export default function TransactionForm({
           />
         </div>
       )}
+
+      <div className="mb-3 flex gap-3">
+        <div className="flex-1">
+          <label className="block text-sm mb-1">Tiền tệ</label>
+          <select
+            name="currency"
+            value={form.currency}
+            onChange={handleChange}
+            className="w-full px-3 py-2 rounded-md border border-gray-200 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-300"
+          >
+            <option value="VND">VND</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+          </select>
+        </div>
+
+        <div className="flex-1">
+          <label className="block text-sm mb-1">
+            Nguồn / Đối tượng (source)
+          </label>
+          <input
+            name="source"
+            value={form.source}
+            onChange={handleChange}
+            type="text"
+            placeholder="Ví, ngân hàng, người trả..."
+            className="w-full px-3 py-2 rounded-md border border-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-300"
+          />
+        </div>
+      </div>
 
       <div className="flex justify-end gap-2">
         <Button type="button" variant="red" onClick={onClose}>

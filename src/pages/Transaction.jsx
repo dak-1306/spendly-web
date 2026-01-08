@@ -8,21 +8,18 @@ import AddModel from "../components/transaction/AddModel.jsx";
 import EditModel from "../components/transaction/EditModel.jsx";
 import DeleteModel from "../components/transaction/Delete.jsx";
 import FilterExpense from "../components/transaction/FilterExpense.jsx";
-import sampleData from "../data/sampleData.js";
 import { EXPENSE } from "../utils/constants.js";
-
-/*
-  Expense.jsx
-  - Trang quản lý chi tiêu & thu nhập
-  - Mục tiêu: code rõ ràng, dễ bảo trì, chú thích tiếng Việt
-  - Nguyên tắc: giữ state sạch, memoize dữ liệu suy ra, callbacks ổn định
-*/
+import useTransaction from "../hooks/useTransaction";
+import { Timestamp } from "firebase/firestore";
 
 export default function Transaction() {
-  /* ---------- State: tháng đang hiển thị ---------- */
-  const [month, setMonth] = useState(EXPENSE.DEFAULT_MONTH);
+  const [month, setMonth] = useState(
+    (() => {
+      const d = new Date();
+      return d.toISOString().slice(0, 7);
+    })()
+  );
 
-  /* ---------- Icon components (từ constants) ---------- */
   const { TRASH: TrashIconComp, EDIT: EditIconComp } = EXPENSE.ICONS;
   const trashIcon = useMemo(
     () => <TrashIconComp className="w-5 h-5 text-[var(--red-color)]" />,
@@ -33,17 +30,55 @@ export default function Transaction() {
     [EditIconComp]
   );
 
-  /* ---------- Dữ liệu cơ bản cho tháng (sample / API trong thực tế) ----------
-     Memoize để tránh tìm/ghi lại khi không cần thiết.
-  */
-  const monthData = useMemo(
-    () =>
-      sampleData.find((m) => m.month === month) ?? {
-        incomes: [],
-        expenses: [],
-      },
-    [month]
-  );
+  const {
+    transactions,
+    loading,
+    error,
+    addTransaction,
+    updateTransaction,
+    deleteTransaction,
+  } = useTransaction();
+
+  // derive incomes / expenses from context transactions by month
+  const incomes = useMemo(() => {
+    return (transactions || [])
+      .filter((t) => t.type === "income" && t.month === month)
+      .map((t) => ({
+        id: t.id,
+        userId: t.userId,
+        type: t.type,
+        source: t.source,
+        category: t.category,
+        title: t.title,
+        amount: t.amount,
+        currency: t.currency,
+        date:
+          t.date && typeof t.date.toDate === "function"
+            ? t.date.toDate().toISOString().slice(0, 10)
+            : t.date ?? "",
+        month: t.month,
+      }));
+  }, [transactions, month]);
+
+  const expenses = useMemo(() => {
+    return (transactions || [])
+      .filter((t) => t.type === "expense" && t.month === month)
+      .map((t) => ({
+        id: t.id,
+        userId: t.userId,
+        type: t.type,
+        source: t.source,
+        category: t.category,
+        title: t.title,
+        amount: t.amount,
+        currency: t.currency,
+        date:
+          t.date && typeof t.date.toDate === "function"
+            ? t.date.toDate().toISOString().slice(0, 10)
+            : t.date ?? "",
+        month: t.month,
+      }));
+  }, [transactions, month]);
 
   /* ---------- Modal / UI state ---------- */
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
@@ -57,77 +92,82 @@ export default function Transaction() {
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
-  const [deletingRole, setDeletingRole] = useState("expense"); // "expense" | "income"
+  const [deletingRole, setDeletingRole] = useState("expense");
 
-  /* ---------- Local lists (tạm lưu, trong app thực dùng store/API) ---------- */
-  const [expenses, setExpenses] = useState(monthData.expenses);
-  const [incomes, setIncomes] = useState(monthData.incomes);
+  /* ---------- CRUD handlers using context ---------- */
+  const handleAddExpenseSubmit = useCallback(
+    async (formPayload) => {
+      try {
+        // formPayload đã có đủ các trường: userId, type, title, amount, currency, source, category, date, month
+        await addTransaction(formPayload);
+        setIsAddExpenseOpen(false);
+      } catch (e) {
+        alert("Thêm chi tiêu thất bại.");
+        console.error(e);
+      }
+    },
+    [addTransaction]
+  );
 
-  /* ---------- CRUD handlers (thêm/sửa/xóa) ----------
-     - Các handler sử dụng useCallback để giữ reference ổn định khi truyền xuống modal
-     - Sau submit, modal sẽ đóng và list được cập nhật local
-  */
-  const handleAddExpenseSubmit = useCallback((payload) => {
-    const newItem = {
-      id: Date.now(),
-      title: payload.note || payload.category || "Chi tiêu",
-      category: payload.category || "Other",
-      date: payload.date,
-      amount: payload.amount,
-    };
-    setExpenses((s) => [newItem, ...s]);
-    setIsAddExpenseOpen(false);
-  }, []);
+  const handleAddIncomeSubmit = useCallback(
+    async (formPayload) => {
+      try {
+        await addTransaction(formPayload);
+        setIsAddIncomeOpen(false);
+      } catch (e) {
+        alert("Thêm thu nhập thất bại.");
+        console.error(e);
+      }
+    },
+    [addTransaction]
+  );
 
-  const handleAddIncomeSubmit = useCallback((payload) => {
-    const newItem = {
-      id: Date.now(),
-      source: payload.category || "Other",
-      date: payload.date,
-      amount: payload.amount,
-      title: payload.title || "Thu nhập",
-    };
-    setIncomes((s) => [newItem, ...s]);
-    setIsAddIncomeOpen(false);
-  }, []);
+  const handleEditSubmit = useCallback(
+    async (formPayload) => {
+      try {
+        const id = formPayload.id;
+        const jsDate = new Date(formPayload.date);
+        const payload = {
+          userId: formPayload.userId,
+          type: formPayload.type,
+          title: formPayload.title,
+          amount: Number(formPayload.amount),
+          currency: formPayload.currency,
+          source: formPayload.source,
+          category: formPayload.category,
+          date: Timestamp.fromDate(jsDate),
+          month: jsDate.toISOString().slice(0, 7),
+        };
 
-  const handleEditSubmit = useCallback((payload) => {
-    setExpenses((s) =>
-      s.map((it) =>
-        it.id === payload.id
-          ? {
-              ...it,
-              title: payload.note || payload.category || it.title,
-              category: payload.category || it.category,
-              date: payload.date,
-              amount: payload.amount,
-            }
-          : it
-      )
-    );
-    setIsEditOpen(false);
-    setEditingExpense(null);
-  }, []);
+        await updateTransaction(id, payload);
+        if (formPayload.type === "income") {
+          setIsEditIncomeOpen(false);
+          setEditingIncome(null);
+        } else {
+          setIsEditOpen(false);
+          setEditingExpense(null);
+        }
+      } catch (e) {
+        alert("Cập nhật thất bại.");
+        console.error(e);
+      }
+    },
+    [updateTransaction]
+  );
 
-  const handleEditIncomeSubmit = useCallback((payload) => {
-    setIncomes((s) =>
-      s.map((it) =>
-        it.id === payload.id
-          ? {
-              ...it,
-              source: payload.category || it.source,
-              title: payload.title || it.title,
-              date: payload.date,
-              amount: payload.amount,
-            }
-          : it
-      )
-    );
-    setIsEditIncomeOpen(false);
-    setEditingIncome(null);
-  }, []);
+  const handleDeleteConfirm = useCallback(
+    async ({ id }) => {
+      try {
+        await deleteTransaction(id);
+      } catch (e) {
+        alert("Xóa thất bại.");
+        console.error(e);
+      }
+    },
+    [deleteTransaction]
+  );
 
-  /* ---------- Helpers mở modal (giữ code rõ ràng) ---------- */
+  /* ---------- Helpers mở modal ---------- */
   const openEdit = useCallback((expense) => {
     setEditingExpense(expense);
     setIsEditOpen(true);
@@ -144,25 +184,12 @@ export default function Transaction() {
     setIsDeleteOpen(true);
   }, []);
 
-  /* ---------- Xác nhận xóa: cập nhật list tương ứng ---------- */
-  const handleDeleteConfirm = useCallback(({ id, role }) => {
-    if (role === "expense") {
-      setExpenses((s) => s.filter((it) => it.id !== id));
-    } else {
-      setIncomes((s) => s.filter((it) => it.id !== id));
-    }
-    // Đóng modal do component DeleteModel sẽ gọi onClose
-  }, []);
-
-  /* ---------- Filter state & logic ----------
-     - Các options lấy từ EXPENSE constants để tránh hard-code
-     - Lọc, sắp xếp, tìm kiếm được memoize trong filteredExpenses
-  */
+  /* ---------- Filter state & logic ---------- */
   const expenseCategories = EXPENSE.CATEGORIES;
   const amountRanges = EXPENSE.AMOUNT_RANGES;
 
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [dateSort, setDateSort] = useState(""); // "asc" | "desc" | ""
+  const [dateSort, setDateSort] = useState("");
   const [selectedAmountRange, setSelectedAmountRange] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -176,12 +203,10 @@ export default function Transaction() {
   const filteredExpenses = useMemo(() => {
     let result = [...expenses];
 
-    // lọc theo danh mục nếu chọn
     if (selectedCategory) {
       result = result.filter((e) => e.category === selectedCategory);
     }
 
-    // lọc theo khoảng tiền nếu chọn
     if (selectedAmountRange) {
       const range = amountRanges.find((r) => r.id === selectedAmountRange);
       if (range) {
@@ -191,7 +216,6 @@ export default function Transaction() {
       }
     }
 
-    // sắp xếp theo ngày nếu có yêu cầu
     if (dateSort) {
       result.sort((a, b) => {
         const da = new Date(a.date).getTime();
@@ -200,7 +224,6 @@ export default function Transaction() {
       });
     }
 
-    // tìm kiếm theo tiêu đề/danh mục
     if (searchTerm && searchTerm.trim()) {
       const q = searchTerm.trim().toLowerCase();
       result = result.filter(
@@ -220,7 +243,34 @@ export default function Transaction() {
     amountRanges,
   ]);
 
+  /* ---------- handlers chuyển tháng (useCallback giống Dashboard) ---------- */
+  const handlePrevMonth = useCallback(() => {
+    const [y, m] = month.split("-").map(Number);
+    const d = new Date(y, m - 2);
+    setMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
+  }, [month]);
+
+  const handleNextMonth = useCallback(() => {
+    const [y, m] = month.split("-").map(Number);
+    const d = new Date(y, m);
+    setMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
+  }, [month]);
+
   /* ---------- Render ---------- */
+  if (loading) {
+    return (
+      <MainLayout
+        auth={true}
+        navbarBottom={true}
+        title="Quản lý chi tiêu và thu nhập"
+      >
+        <div className="flex items-center justify-center h-64">
+          <Card className="text-center">Đang tải dữ liệu...</Card>
+        </div>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout
       auth={true}
@@ -228,9 +278,19 @@ export default function Transaction() {
       title="Quản lý chi tiêu và thu nhập"
     >
       <div className="space-y-4">
-        {/* Header: chọn tháng + nút hành động */}
+        {error && (
+          <Card className="border-l-4 border-red-500 bg-red-50 text-red-700">
+            Lỗi tải dữ liệu: {error.message ?? String(error)}
+          </Card>
+        )}
+
         <Card className="flex justify-between items-center mx-auto">
-          <ChangeDate month={month} setMonth={setMonth} />
+          <ChangeDate
+            month={month}
+            setMonth={setMonth}
+            onPrev={handlePrevMonth}
+            onNext={handleNextMonth}
+          />
           <div className="flex">
             <Button
               variant="blue"
@@ -245,13 +305,11 @@ export default function Transaction() {
           </div>
         </Card>
 
-        {/* Danh sách thu nhập (mục tóm tắt) */}
         <Card className="flex flex-col">
           <h2 className="text-xl font-semibold mb-4 text-[var(--primary-blue-color)]">
             Thu nhập tháng {month}
           </h2>
 
-          {/* empty state khi chưa có thu nhập */}
           <ul>
             {incomes.length === 0 && (
               <li className="text-gray-500">Chưa có thu nhập nào.</li>
@@ -262,12 +320,15 @@ export default function Transaction() {
                 className="py-2 border-b border-gray-300 flex justify-between items-center"
               >
                 <p className="flex items-center gap-2">
-                  <span className="text-body">{income.source ?? "Lương"}</span>
+                  <span className="text-body">
+                    {income.source ?? "Thu nhập"}
+                  </span>
                   <span className="text-gray-500">{income.title ?? ""}</span>
                   <span className="text-gray-500">{income.date ?? ""}</span>
                 </p>
                 <span className="font-semibold text-[var(--primary-green-color)]">
-                  {income.amount?.toLocaleString() ?? 0} VND
+                  {income.amount?.toLocaleString() ?? 0}{" "}
+                  {income.currency ?? "VND"}
                 </span>
                 <div className="flex gap-2">
                   <Button variant="edit" onClick={() => openEditIncome(income)}>
@@ -285,7 +346,6 @@ export default function Transaction() {
           </ul>
         </Card>
 
-        {/* Bộ lọc + bảng chi tiêu */}
         <Card>
           <FilterExpense
             expenseCategories={expenseCategories}
@@ -324,7 +384,8 @@ export default function Transaction() {
                     <td className="px-4 py-4">{expense.title}</td>
                     <td className="px-4 py-4">{expense.date}</td>
                     <td className="px-4 py-4 font-semibold text-[var(--red-color)]">
-                      {expense.amount?.toLocaleString() ?? 0} VND
+                      {expense.amount?.toLocaleString() ?? 0}{" "}
+                      {expense.currency ?? "VND"}
                     </td>
                     <td className="px-4 py-4 flex gap-2">
                       <Button variant="edit" onClick={() => openEdit(expense)}>
@@ -344,7 +405,6 @@ export default function Transaction() {
           </div>
         </Card>
 
-        {/* ---------- Modals: Thêm / Sửa / Xóa ---------- */}
         <AddModel
           open={isAddExpenseOpen}
           onClose={() => setIsAddExpenseOpen(false)}
@@ -377,7 +437,7 @@ export default function Transaction() {
           }}
           role="income"
           expense={editingIncome}
-          onSubmit={handleEditIncomeSubmit}
+          onSubmit={handleEditSubmit}
         />
 
         <DeleteModel

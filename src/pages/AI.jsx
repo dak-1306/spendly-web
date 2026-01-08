@@ -4,6 +4,7 @@ import BorderLinearColor from "../components/ai/BorderLinearColor.jsx";
 import Card from "../components/common/Card.jsx";
 import Chat from "../components/ai/Chat.jsx";
 import { AI_CONSTANTS } from "../utils/constants.js";
+import { ICONS } from "../assets/index.js";
 
 /*
   AI.jsx
@@ -16,16 +17,7 @@ export default function AI() {
   // trạng thái modal chat
   const [chatOpen, setChatOpen] = useState(false);
 
-  // lấy component icon từ constants (component ref)
-  const RobotIconComp = AI_CONSTANTS.ICON;
-
-  // memoize JSX icon để tránh recreate mỗi render
-  const RobotIcon = useMemo(
-    () => (
-      <RobotIconComp className="w-7 h-7 text-[var(--primary-blue-color)]" />
-    ),
-    [RobotIconComp]
-  );
+  const robotIcon = ICONS.icon_robot_color;
 
   // quick options từ constants
   const quickOptions = AI_CONSTANTS.QUICK_OPTIONS;
@@ -81,7 +73,9 @@ export default function AI() {
         aria-label="Mở chat trợ lý AI"
         className="fixed bottom-24 right-10 p-[1px] bg-linear-color rounded-full shadow-lg hover:scale-105 transition-transform cursor-pointer"
       >
-        <div className="px-4 py-5 bg-white rounded-full">{RobotIcon}</div>
+        <div className="px-4 py-5 bg-white rounded-full">
+          <img src={robotIcon.src} alt={robotIcon.alt} />
+        </div>
       </button>
 
       {/* Chat modal */}
