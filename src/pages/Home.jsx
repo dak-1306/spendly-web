@@ -5,6 +5,7 @@ import Card from "../components/common/Card.jsx";
 import Button from "../components/common/Button.jsx";
 import { IMAGES } from "../assets/index.js";
 import { HOME } from "../utils/constants.js";
+import { useAuth } from "../hooks/useAuth.js";
 
 /*
   Home.jsx
@@ -13,7 +14,7 @@ import { HOME } from "../utils/constants.js";
 
 export default function Home() {
   const navigate = useNavigate();
-
+  const { user } = useAuth();
   // Images lấy từ asset map (memo để tránh recreate khi render lại)
   const images = useMemo(
     () => [
@@ -22,7 +23,7 @@ export default function Home() {
       IMAGES.AI_image,
       IMAGES.profile_image,
     ],
-    []
+    [],
   );
 
   // Mô tả ngắn bên dưới mỗi ảnh (tách ra để dễ sửa / i18n)
@@ -33,7 +34,7 @@ export default function Home() {
       "AI Insights — đề xuất thông minh và phân tích tự động.",
       "Profile — cấu hình người dùng và thiết lập cá nhân.",
     ],
-    []
+    [],
   );
 
   // Slider index hiện tại
@@ -48,7 +49,13 @@ export default function Home() {
   }, [images.length]);
 
   // Handler điều hướng (useCallback giữ ref ổn định nếu truyền xuống con)
-  const goDashboard = useCallback(() => navigate("/dashboard"), [navigate]);
+  const CheckAuthAndNavigate = useCallback(() => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      navigate("/login");
+    }
+  }, [navigate, user]);
 
   return (
     <MainLayout title={false}>
@@ -120,7 +127,7 @@ export default function Home() {
             </Card>
           </div>
 
-          <Button variant="gradient" size="lg" onClick={goDashboard}>
+          <Button variant="gradient" size="lg" onClick={CheckAuthAndNavigate}>
             {HOME.textButton}
           </Button>
         </div>

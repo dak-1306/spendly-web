@@ -1,10 +1,13 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import MainLayout from "../components/layout/MainLayout.jsx";
-import BorderLinearColor from "../components/ai/BorderLinearColor.jsx";
 import Card from "../components/common/Card.jsx";
 import Chat from "../components/ai/Chat.jsx";
 import { AI_CONSTANTS } from "../utils/constants.js";
 import { ICONS } from "../assets/index.js";
+import { useFinancialReport } from "../hooks/useFinancialReport";
+import useTransaction from "../hooks/useTransaction"; // <-- added
+import ReactMarkdown from "react-markdown";
+import { buildFinancialPayload } from "../services/ai.transform"; // <-- added
 
 /*
   AI.jsx
@@ -14,6 +17,9 @@ import { ICONS } from "../assets/index.js";
 */
 
 export default function AI() {
+  // lấy transactions thật từ context
+  const { transactions: allTransactions = [] } = useTransaction();
+
   // trạng thái modal chat
   const [chatOpen, setChatOpen] = useState(false);
 
@@ -21,6 +27,40 @@ export default function AI() {
 
   // quick options từ constants
   const quickOptions = AI_CONSTANTS.QUICK_OPTIONS;
+
+  // NEW: hook for AI financial report
+  const { run, loading, error, result } = useFinancialReport();
+  const [monthlyBudget, setMonthlyBudget] = useState(0);
+  const [monthFilter, setMonthFilter] = useState("");
+
+  async function handleAnalyze() {
+    if (!allTransactions || allTransactions.length === 0) {
+      alert(
+        "Dữ liệu giao dịch đang được tải hoặc không tồn tại. Vui lòng đợi trong giây lát!",
+      );
+      return;
+    }
+
+    const monthForTransform = monthFilter || null;
+    const budgetNumber = Number(monthlyBudget || 0);
+
+    const payload = buildFinancialPayload(
+      allTransactions,
+      budgetNumber,
+      monthForTransform,
+    );
+
+    // DEBUG: log payload trước khi gửi
+    console.log("Payload gửi lên AI/financial (before run):", payload);
+
+    try {
+      const res = await run(payload); // run có thể serialize/transform payload bên trong
+      // DEBUG: log response trả về từ hook/run
+      console.log("Response từ useFinancialReport.run:", res);
+    } catch (err) {
+      console.error("AI analyze error:", err);
+    }
+  }
 
   return (
     <MainLayout
@@ -30,40 +70,49 @@ export default function AI() {
     >
       {/* Nội dung chính: các thẻ tổng quan */}
       <div className="space-y-6 mx-10">
+        {/* Controls for AI analysis */}
         <Card>
-          <BorderLinearColor
-            title="Tổng quan chi tiêu"
-            description={[
-              "Trong tháng này, bạn đã chi tiêu tổng cộng 5.200.000 VND, tăng 12% so với tháng trước.",
-              "Chi tiêu nhiều nhất vào các danh mục: Thực phẩm, Giải trí và Mua sắm.",
-              "Bạn đã tiết kiệm được 800.000 VND so với ngân sách đặt ra.",
-            ]}
-          />
-        </Card>
+          <div className="flex items-center gap-4">
+            <input
+              type="month"
+              value={monthFilter}
+              onChange={(e) => setMonthFilter(e.target.value)}
+              className="border px-2 py-1"
+            />
+            <input
+              type="number"
+              placeholder="Ngân sách mục tiêu (VND)"
+              value={monthlyBudget}
+              onChange={(e) => setMonthlyBudget(e.target.value)}
+              className="border px-2 py-1"
+            />
+            <button
+              onClick={handleAnalyze}
+              disabled={loading}
+              className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+            >
+              {loading ? "Đang phân tích..." : "Phân tích bằng AI"}
+            </button>
+          </div>
 
-        <Card className="space-y-6">
-          <BorderLinearColor
-            title="Tăng chi tiêu"
-            description={[
-              "Chi tiêu của bạn trong tháng này đã tăng 18% so với tháng trước.",
-              "Chi tiêu cho thực phẩm tăng nhiều nhất.",
-              "Hãy cân nhắc đặt ngân sách cho việc ăn ngoài để tiết kiệm tiền.",
-            ]}
-          />
-          <BorderLinearColor
-            title="Rủi ro vượt ngân sách"
-            description={[
-              'Bạn có nguy cơ vượt ngân sách đã đặt cho "Mua sắm" trong tuần này nếu tiếp tục chi tiêu với tốc độ hiện tại.',
-              "Hãy xem xét giảm bớt các khoản chi tiêu không cần thiết để duy trì ngân sách của bạn.",
-            ]}
-          />
-          <BorderLinearColor
-            title="Lời khuyên"
-            description={[
-              "Để giảm chi tiêu không cần thiết, hãy thử theo dõi các khoản chi hàng ngày của bạn.",
-              "Lên kế hoạch bữa ăn trước và tạo danh sách mua sắm để tránh mua sắm theo cảm hứng.",
-            ]}
-          />
+          {error && (
+            <div className="text-red-600 mt-2">
+              Lỗi: {error.message || String(error)}
+            </div>
+          )}
+
+          {result && (
+            <Card className="mt-4 border-t-4 border-blue-500">
+              <div>
+                <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
+                  <span>✨</span> Kết quả phân tích từ Trợ lý Spendly
+                </h3>
+                <div className="prose prose-blue max-w-none text-gray-700 leading-relaxed">
+                  <ReactMarkdown>{result}</ReactMarkdown>
+                </div>
+              </div>
+            </Card>
+          )}
         </Card>
       </div>
 

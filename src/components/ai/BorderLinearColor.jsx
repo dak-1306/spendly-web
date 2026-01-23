@@ -14,13 +14,9 @@ function BorderLinearColor({ title, description }) {
         <p className="text-xl text-h1 font-semibold">{title}</p>
       </div>
       <div className="bg-linear-color rounded-lg p-[1px] ml-[45px]">
-        <ol className="lspace-y-4 text-lg p-4 bg-white rounded-md">
-          {description.map((desc, index) => (
-            <li className="text-body" key={index}>
-              {desc}
-            </li>
-          ))}
-        </ol>
+        <div className="lspace-y-4 text-lg p-4 bg-white rounded-md">
+          {description}
+        </div>
       </div>
     </>
   );
