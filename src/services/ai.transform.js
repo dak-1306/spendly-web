@@ -3,10 +3,12 @@ export function buildFinancialPayload(
   monthlyBudget = 0,
   monthFilter = null
 ) {
-  // Lọc theo month nếu cần (chuỗi "YYYY-MM")
+  // 1. Lọc và Ép kiểu dữ liệu để tránh lỗi so sánh string/number
   const items = monthFilter
     ? transactions.filter((t) => t.month === monthFilter)
     : transactions;
+
+  const budgetNumber = Number(monthlyBudget || 0);
 
   const totalIncome = items
     .filter((t) => t.type === "income")
@@ -16,7 +18,7 @@ export function buildFinancialPayload(
     .filter((t) => t.type === "expense")
     .reduce((s, t) => s + (Number(t.amount) || 0), 0);
 
-  // Tổng theo category (chỉ tính expense để báo cáo chi tiêu)
+  // 2. Gom nhóm theo Category
   const catMap = items
     .filter((t) => t.type === "expense")
     .reduce((m, t) => {
@@ -25,23 +27,28 @@ export function buildFinancialPayload(
       return m;
     }, {});
 
-  const categories = Object.entries(catMap).map(([category, total]) => ({
-    category,
-    total,
-    percent: totalExpense > 0 ? +((total / totalExpense) * 100).toFixed(2) : 0,
-    count: items.filter(
-      (t) => t.type === "expense" && (t.category || "Khác") === category
-    ).length,
-  }));
+  // 3. QUAN TRỌNG: Sắp xếp category theo tên (A-Z) để Hash luôn cố định
+  const sortedCategories = Object.entries(catMap)
+    .sort((a, b) => a[0].localeCompare(b[0])) // Sắp xếp theo tên category
+    .map(([category, total]) => {
+      const count = items.filter(
+        (t) => t.type === "expense" && (t.category || "Khác") === category
+      ).length;
+      
+      return {
+        category,
+        total,
+        percent: totalExpense > 0 ? +((total / totalExpense) * 100).toFixed(2) : 0,
+        count,
+      };
+    });
 
-  // Format categoryBreakdown là chuỗi để chèn vào prompt (Markdown/simple list)
+  // 4. Tạo chuỗi breakdown (đã được sắp xếp)
   const categoryBreakdown =
-    categories
+    sortedCategories
       .map(
         (c) =>
-          `- ${c.category}: ${c.total.toLocaleString("vi-VN")} VND (${
-            c.percent
-          }%) — ${c.count} giao dịch`
+          `- ${c.category}: ${c.total.toLocaleString("vi-VN")} VND (${c.percent}%) — ${c.count} giao dịch`
       )
       .join("\n") || "Không có giao dịch chi tiêu.";
 
@@ -49,6 +56,6 @@ export function buildFinancialPayload(
     totalIncome,
     totalExpense,
     categoryBreakdown,
-    monthlyBudget,
+    monthlyBudget: budgetNumber,
   };
 }

@@ -5,129 +5,157 @@ import Chat from "../components/ai/Chat.jsx";
 import { AI_CONSTANTS } from "../utils/constants.js";
 import { ICONS } from "../assets/index.js";
 import { useFinancialReport } from "../hooks/useFinancialReport";
-import useTransaction from "../hooks/useTransaction"; // <-- added
+import useTransaction from "../hooks/useTransaction";
 import ReactMarkdown from "react-markdown";
-import { buildFinancialPayload } from "../services/ai.transform"; // <-- added
-
-/*
-  AI.jsx
-  - Trang trợ lý AI: hiển thị tổng quan + nút mở chat
-  - Mục tiêu: sạch, dễ đọc, dùng constants và component ref từ utils/constants
-  - Ghi chú: Robot icon là component (lucide), không dùng <img> từ assets
-*/
+import { buildFinancialPayload } from "../services/ai.transform";
+import { getAuth } from "firebase/auth";
+import app from "../firebase";
+import {
+  generateKey,
+  getCachedAnalysis,
+  saveAnalysis,
+} from "../services/firebaseAi";
 
 export default function AI() {
-  // lấy transactions thật từ context
   const { transactions: allTransactions = [] } = useTransaction();
-
-  // trạng thái modal chat
   const [chatOpen, setChatOpen] = useState(false);
-
-  const robotIcon = ICONS.icon_robot_color;
-
-  // quick options từ constants
-  const quickOptions = AI_CONSTANTS.QUICK_OPTIONS;
-
-  // NEW: hook for AI financial report
-  const { run, loading, error, result } = useFinancialReport();
   const [monthlyBudget, setMonthlyBudget] = useState(0);
   const [monthFilter, setMonthFilter] = useState("");
 
-  async function handleAnalyze() {
-    if (!allTransactions || allTransactions.length === 0) {
-      alert(
-        "Dữ liệu giao dịch đang được tải hoặc không tồn tại. Vui lòng đợi trong giây lát!",
-      );
+  // State duy nhất quản lý nội dung hiển thị (từ cache hoặc từ AI mới)
+  const [finalResult, setFinalResult] = useState("");
+
+  const { run, loading, error } = useFinancialReport();
+  const robotIcon = ICONS.icon_robot_color;
+  const quickOptions = AI_CONSTANTS.QUICK_OPTIONS;
+
+  const handleAnalyze = async () => {
+    if (!allTransactions?.length) {
+      alert("Dữ liệu giao dịch đang tải hoặc trống!");
       return;
     }
 
-    const monthForTransform = monthFilter || null;
-    const budgetNumber = Number(monthlyBudget || 0);
+    const auth = getAuth(app);
+    const uid = auth.currentUser?.uid;
+    if (!uid) return alert("Vui lòng đăng nhập!");
 
-    const payload = buildFinancialPayload(
-      allTransactions,
-      budgetNumber,
-      monthForTransform,
-    );
-
-    // DEBUG: log payload trước khi gửi
-    console.log("Payload gửi lên AI/financial (before run):", payload);
+    // Reset kết quả cũ để người dùng thấy trạng thái đang xử lý mới
+    setFinalResult("");
 
     try {
-      const res = await run(payload); // run có thể serialize/transform payload bên trong
-      // DEBUG: log response trả về từ hook/run
-      console.log("Response từ useFinancialReport.run:", res);
+      const payload = buildFinancialPayload(
+        allTransactions,
+        Number(monthlyBudget),
+        monthFilter || null,
+      );
+      const { key, snapshot } = await generateKey(payload);
+
+      // 1. Kiểm tra Cache trước
+      const cached = await getCachedAnalysis(key, uid);
+      if (cached) {
+        console.log("🚀 Cache Hit: Loading stored result...");
+        setFinalResult(cached.result);
+        return;
+      }
+
+      // 2. Gọi AI nếu không có cache
+      console.log("🤖 Cache Miss: Calling AI API...");
+      const res = await run(payload);
+      const aiText =
+        typeof res === "string" ? res : res?.result || res?.text || String(res);
+
+      if (aiText) {
+        setFinalResult(aiText);
+        // 3. Lưu lại vào cache cho lần sau
+        await saveAnalysis(key, uid, snapshot, aiText);
+      }
     } catch (err) {
-      console.error("AI analyze error:", err);
+      console.error("Lỗi phân tích:", err);
     }
+  };
+
+  // Hàm parse được cải tiến: linh hoạt hơn với format của AI
+  function parseAIResult(text) {
+    if (!text) return [];
+    const normalized = text.replace(/\r\n/g, "\n").trim();
+
+    // Split trước vị trí của "1. " / "2. " ... cho cả trường hợp có hoặc không có newline trước
+    const parts = normalized
+      .split(/(?=\n?\d+\.\s)/g)
+      .map((p) => p.trim())
+      .filter(Boolean);
+
+    const sections = parts.filter((p) => /^\d+\.\s/.test(p));
+    return sections.map((s) => {
+      const lines = s.split("\n");
+      const heading = lines[0].trim();
+      const body = lines.slice(1).join("\n").trim();
+      return { heading, body };
+    });
   }
 
   return (
-    <MainLayout
-      auth={true}
-      navbarBottom={true}
-      title={AI_CONSTANTS.PAGE_TITLE.vi}
-    >
-      {/* Nội dung chính: các thẻ tổng quan */}
+    <MainLayout auth navbarBottom title={AI_CONSTANTS.PAGE_TITLE.vi}>
       <div className="space-y-6 mx-10">
-        {/* Controls for AI analysis */}
         <Card>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <input
               type="month"
               value={monthFilter}
               onChange={(e) => setMonthFilter(e.target.value)}
-              className="border px-2 py-1"
+              className="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
             />
             <input
               type="number"
-              placeholder="Ngân sách mục tiêu (VND)"
+              placeholder="Ngân sách (VND)"
               value={monthlyBudget}
               onChange={(e) => setMonthlyBudget(e.target.value)}
-              className="border px-2 py-1"
+              className="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none flex-1"
             />
             <button
               onClick={handleAnalyze}
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors shadow-sm"
             >
-              {loading ? "Đang phân tích..." : "Phân tích bằng AI"}
+              {loading ? "Đang xử lý..." : "Phân tích bằng AI"}
             </button>
           </div>
 
           {error && (
-            <div className="text-red-600 mt-2">
-              Lỗi: {error.message || String(error)}
+            <div className="text-red-500 mt-4 text-sm">
+              Lỗi: {error.message}
             </div>
           )}
 
-          {result && (
-            <Card className="mt-4 border-t-4 border-blue-500">
-              <div>
-                <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
-                  <span>✨</span> Kết quả phân tích từ Trợ lý Spendly
-                </h3>
-                <div className="prose prose-blue max-w-none text-gray-700 leading-relaxed">
-                  <ReactMarkdown>{result}</ReactMarkdown>
+          {finalResult && (
+            <div className="mt-8 space-y-6 animate-in fade-in duration-500">
+              {parseAIResult(finalResult).map((sec, idx) => (
+                <div
+                  key={idx}
+                  className="border-l-4 border-blue-500 shadow-sm pl-4 py-1"
+                >
+                  <h3 className="font-bold text-xl text-gray-800 mb-2">
+                    {sec.heading}
+                  </h3>
+                  <div className="prose prose-slate max-w-none text-gray-600">
+                    <ReactMarkdown>{sec.body}</ReactMarkdown>
+                  </div>
                 </div>
-              </div>
-            </Card>
+              ))}
+            </div>
           )}
         </Card>
       </div>
 
-      {/* Nút mở chat: dùng RobotIcon component, có aria-label cho accessibility */}
       <button
         onClick={() => setChatOpen(true)}
-        aria-label="Mở chat trợ lý AI"
-        className="fixed bottom-24 right-10 p-[1px] bg-linear-color rounded-full shadow-lg hover:scale-105 transition-transform cursor-pointer"
+        className="fixed bottom-24 right-10 p-1 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full shadow-2xl hover:scale-110 transition-transform"
       >
-        <div className="px-4 py-5 bg-white rounded-full">
-          <img src={robotIcon.src} alt={robotIcon.alt} />
+        <div className="p-4 bg-white rounded-full">
+          <img src={robotIcon.src} alt="AI Robot" className="w-8 h-8" />
         </div>
       </button>
 
-      {/* Chat modal */}
       <Chat
         open={chatOpen}
         onClose={() => setChatOpen(false)}
