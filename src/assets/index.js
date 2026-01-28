@@ -3,15 +3,9 @@ import icon_logo_github from "../assets/icons/icon_logo_github.svg";
 import icon_facebook from "../assets/icons/icon_facebook.svg";
 import logo_color from "../assets/icons/logo_color.svg";
 import icon_google from "../assets/icons/icon_google.svg";
-
 import logo_navbar_bottom from "../assets/icons/logo_navbar_bottom.svg";
-
-
-
 import icon_robot_color from "../assets/icons/icon_robot_color.svg";
 import icon_submit from "../assets/icons/icon_submit.svg";
-
-
 import dashboard_img from "../assets/images/dashboard_img.png";
 import expense_img from "../assets/images/expense_img.png";
 import AI_img from "../assets/images/AI_img.png";
@@ -44,7 +38,6 @@ const IMAGES = {
   },
 };
 const ICONS = {
-  
   logo_header: {
     src: logo_header,
     alt: "Spendly Logo Header",
@@ -81,8 +74,7 @@ const ICONS = {
     width: 20,
     height: 20,
   },
-  
-  
+
   icon_robot_color: {
     src: icon_robot_color,
     alt: "Robot Color Icon",
@@ -95,6 +87,5 @@ const ICONS = {
     width: 20,
     height: 20,
   },
-  
 };
 export { ICONS, IMAGES };
