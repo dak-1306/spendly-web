@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import MainLayout from "../components/layout/MainLayout.jsx";
 import Card from "../components/common/Card.jsx";
+import Button from "../components/common/Button.jsx";
 import Chat from "../components/ai/Chat.jsx";
 import { AI_CONSTANTS } from "../utils/constants.js";
 import { ICONS } from "../assets/index.js";
@@ -112,13 +113,13 @@ export default function AI() {
               onChange={(e) => setMonthlyBudget(e.target.value)}
               className="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none flex-1"
             />
-            <button
+            <Button
               onClick={handleAnalyze}
               disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors shadow-sm"
+              variant="primary"
             >
               {loading ? "Đang xử lý..." : "Phân tích bằng AI"}
-            </button>
+            </Button>
           </div>
 
           {error && (

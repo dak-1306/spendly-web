@@ -67,7 +67,7 @@ export default function DeleteModel({
             <Button type="button" variant="secondary" onClick={onClose}>
               Hủy
             </Button>
-            <Button type="button" variant="red" onClick={handleConfirm}>
+            <Button type="button" variant="danger" onClick={handleConfirm}>
               Xóa
             </Button>
           </div>

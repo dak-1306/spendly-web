@@ -19,7 +19,7 @@ function NavbarBottom() {
 
   return (
     <>
-      <nav className="p-4 bg-navbar shadow-md fixed bottom-4 w-1/3 left-0 right-0 mx-auto rounded-lg">
+      <nav className="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 shadow-md fixed bottom-4 w-1/3 left-0 right-0 mx-auto rounded-lg">
         <div className="relative">
           <img
             className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-2 shadow-md border border-[var(--primary-blue-color)]"

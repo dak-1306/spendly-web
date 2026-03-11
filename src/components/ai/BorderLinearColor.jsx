@@ -13,8 +13,8 @@ function BorderLinearColor({ title, description }) {
         />
         <p className="text-xl text-h1 font-semibold">{title}</p>
       </div>
-      <div className="bg-linear-color rounded-lg p-[1px] ml-[45px]">
-        <div className="lspace-y-4 text-lg p-4 bg-white rounded-md">
+      <div className="bg-gradient-to-r from-blue-500 to-green-500 rounded-lg p-[1px] ml-[45px]">
+        <div className="space-y-4 text-lg p-4 bg-white rounded-md">
           {description}
         </div>
       </div>

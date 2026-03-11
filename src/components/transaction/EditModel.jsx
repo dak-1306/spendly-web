@@ -1,4 +1,3 @@
-import React from "react";
 import { X } from "lucide-react";
 import TransactionForm from "./TransactionForm";
 
@@ -12,10 +11,6 @@ export default function EditModel({
   const isIncome = role === "income";
 
   const deleteIcon = <X className="w-6 h-6 text-white" />;
-
-  const headerBg = isIncome
-    ? "bg-[var(--primary-green-color)]"
-    : "bg-[var(--primary-blue-color)]";
 
   if (!open) return null;
 
@@ -38,18 +33,14 @@ export default function EditModel({
         className="w-[500px] rounded-lg bg-white shadow-lg overflow-hidden"
       >
         <div
-          className={`${headerBg} flex justify-between items-center p-4 text-white`}
+          className={`bg-blue-600 flex justify-between items-center p-4 text-white`}
         >
           <strong className="text-base">
             {isIncome ? "Chỉnh sửa thu nhập" : "Chỉnh sửa chi tiêu"}
           </strong>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="text-white text-xl leading-none bg-transparent border-0"
-          >
+          <Button variant="ghost" onClick={onClose}>
             {deleteIcon}
-          </button>
+          </Button>
         </div>
 
         <TransactionForm

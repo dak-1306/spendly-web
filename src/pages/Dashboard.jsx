@@ -23,7 +23,7 @@ export default function Dashboard() {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
       2,
-      "0"
+      "0",
     )}`;
   });
 
@@ -39,23 +39,23 @@ export default function Dashboard() {
   // memoize icons dưới dạng JSX để tránh recreate khi không cần
   const incomeIcon = useMemo(
     () => <DollarIconComp className="w-6 h-6 text-white" />,
-    [DollarIconComp]
+    [DollarIconComp],
   );
   const expenseIcon = useMemo(
     () => <CreditCardComp className="w-6 h-6 text-white" />,
-    [CreditCardComp]
+    [CreditCardComp],
   );
   const balanceIcon = useMemo(
     () => <WalletComp className="w-6 h-6 text-white" />,
-    [WalletComp]
+    [WalletComp],
   );
   const arrowUp = useMemo(
     () => <ArrowUpComp className="w-6 h-6 text-white" />,
-    [ArrowUpComp]
+    [ArrowUpComp],
   );
   const arrowDown = useMemo(
     () => <ArrowDownComp className="w-6 h-6 text-white" />,
-    [ArrowDownComp]
+    [ArrowDownComp],
   );
 
   // transactions từ context (dữ liệu thật)
@@ -70,8 +70,8 @@ export default function Dashboard() {
       t.date && typeof t.date.toDate === "function"
         ? t.date.toDate()
         : t.date instanceof Date
-        ? t.date
-        : null;
+          ? t.date
+          : null;
     if (!d) return "";
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   }, []);
@@ -79,7 +79,7 @@ export default function Dashboard() {
   // lấy dữ liệu cho tháng đang chọn từ transactions
   const monthData = useMemo(() => {
     const filtered = transactions.filter(
-      (t) => transactionToMonth(t) === month
+      (t) => transactionToMonth(t) === month,
     );
     return {
       incomes: filtered.filter((t) => t.type === "income"),
@@ -90,17 +90,17 @@ export default function Dashboard() {
   // tổng thu nhập và chi tiêu cho tháng (memoized)
   const totalIncome = useMemo(
     () => monthData.incomes.reduce((s, i) => s + (Number(i.amount) || 0), 0),
-    [monthData.incomes]
+    [monthData.incomes],
   );
   const totalExpense = useMemo(
     () => monthData.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0),
-    [monthData.expenses]
+    [monthData.expenses],
   );
 
   // số dư hiện tại
   const balance = useMemo(
     () => totalIncome - totalExpense,
-    [totalIncome, totalExpense]
+    [totalIncome, totalExpense],
   );
 
   // tính tháng trước để so sánh (memoized)
@@ -112,7 +112,7 @@ export default function Dashboard() {
 
   const prevData = useMemo(() => {
     const filtered = transactions.filter(
-      (t) => transactionToMonth(t) === prevMonth
+      (t) => transactionToMonth(t) === prevMonth,
     );
     return {
       incomes: filtered.filter((t) => t.type === "income"),
@@ -122,7 +122,7 @@ export default function Dashboard() {
 
   const prevExpense = useMemo(
     () => prevData.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0),
-    [prevData.expenses]
+    [prevData.expenses],
   );
 
   // --- NEW: normalize date fields (convert Firestore Timestamp -> JS Date) ---
@@ -132,19 +132,19 @@ export default function Dashboard() {
       item.date && typeof item.date.toDate === "function"
         ? item.date.toDate()
         : item.date instanceof Date
-        ? item.date
-        : new Date(item.date);
+          ? item.date
+          : new Date(item.date);
     return { ...item, date: d };
   }, []);
 
   const normalizedMonthExpenses = useMemo(
     () => monthData.expenses.map(normalizeDate),
-    [monthData.expenses, normalizeDate]
+    [monthData.expenses, normalizeDate],
   );
 
   const _normalizedMonthIncomes = useMemo(
     () => monthData.incomes.map(normalizeDate),
-    [monthData.incomes, normalizeDate]
+    [monthData.incomes, normalizeDate],
   );
   // --- END NEW ---
 
@@ -179,7 +179,7 @@ export default function Dashboard() {
         />
         {/* aria-live để thông báo thay đổi tháng cho assistive tech */}
         <div
-          className="ml-auto font-semibold text-lg text-h1"
+          className="ml-auto font-semibold text-lg text-blue-500"
           aria-live="polite"
         >
           {month}

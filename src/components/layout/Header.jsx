@@ -5,7 +5,7 @@ function Header({ auth }) {
   const logo_header = ICONS.logo_header;
   return (
     <header>
-      <div className="bg-header shrink-0 h-16 py-4 px-10 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 shrink-0 h-16 py-4 px-10 flex items-center justify-between">
         <img
           src={logo_header.src}
           alt={logo_header.alt}
@@ -15,7 +15,7 @@ function Header({ auth }) {
         <div className="space-x-4">
           {!auth && (
             <Link to="/login">
-              <Button variant="blue">Login</Button>
+              <Button variant="cta">Login</Button>
             </Link>
           )}
         </div>

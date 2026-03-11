@@ -11,12 +11,12 @@ function MainLayout({
     <div className="h-screen flex flex-col overflow-hidden">
       <Header auth={auth} />
       <main
-        className={`bg-body ${
+        className={`bg-gradient-to-br from-slate-50 to-blue-50 text-gray-800 ${
           auth ? "px-[200px]" : ""
         } flex-1 overflow-y-auto ${navbarBottom ? "pb-20" : ""}`}
       >
         {title != "" && (
-          <h1 className="text-h1 text-2xl font-bold p-4 mx-auto w-max">
+          <h1 className="text-blue-600 text-2xl font-bold p-4 mx-auto w-max">
             {title}
           </h1>
         )}

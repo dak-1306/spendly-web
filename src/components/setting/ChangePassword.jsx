@@ -47,7 +47,7 @@ export default function ChangePassword({ open, onClose }) {
       >
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold mb-4">Đổi mật khẩu</h2>
-          <Button variant="red" size="sm" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={onClose}>
             {closeIcon}
           </Button>
         </div>
@@ -97,7 +97,7 @@ export default function ChangePassword({ open, onClose }) {
         )}
 
         <Button
-          variant="blue"
+          variant="primary"
           type="submit"
           disabled={loading}
           className="w-full"

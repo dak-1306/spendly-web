@@ -10,7 +10,7 @@ function ChangeDate({ month, setMonth, onPrev, onNext }) {
   );
   return (
     <div className="flex items-center gap-4">
-      <Button variant="primary" onClick={onPrev}>
+      <Button variant="outline" onClick={onPrev}>
         {prevIcon}
       </Button>
 
@@ -18,10 +18,10 @@ function ChangeDate({ month, setMonth, onPrev, onNext }) {
         type="month"
         value={month}
         onChange={(e) => setMonth(e.target.value)}
-        className="border rounded px-2 py-1"
+        className="border border-blue-500 text-blue-500 placeholder:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
       />
 
-      <Button variant="primary" onClick={onNext}>
+      <Button variant="outline" onClick={onNext}>
         {nextIcon}
       </Button>
     </div>

@@ -7,7 +7,6 @@ export default function DeleteConfirm({
   title = "Xác nhận",
   description = "",
   confirmLabel = "Xác nhận",
-  confirmVariant = "red",
   onConfirm = () => {},
 }) {
   if (!open) return null;
@@ -41,11 +40,7 @@ export default function DeleteConfirm({
             <Button type="button" variant="secondary" onClick={onClose}>
               Hủy
             </Button>
-            <Button
-              type="button"
-              variant={confirmVariant}
-              onClick={handleConfirm}
-            >
+            <Button type="button" variant="danger" onClick={handleConfirm}>
               {confirmLabel}
             </Button>
           </div>

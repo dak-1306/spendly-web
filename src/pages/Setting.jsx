@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import MainLayout from "../components/layout/MainLayout";
 import Button from "../components/common/Button";
 import Card from "../components/common/Card";
@@ -28,28 +28,24 @@ export default function Setting() {
   } = ICONS;
 
   const UserIcon = useMemo(
-    () => <UserIconComp className="w-6 h-6 text-[var(--primary-blue-color)]" />,
-    [UserIconComp]
+    () => <UserIconComp className="w-6 h-6 text-blue-500" />,
+    [UserIconComp],
   );
   const EmailIcon = useMemo(
-    () => (
-      <EmailIconComp className="w-6 h-6 text-[var(--primary-green-color)]" />
-    ),
-    [EmailIconComp]
+    () => <EmailIconComp className="w-6 h-6 text-green-500" />,
+    [EmailIconComp],
   );
   const KeyIcon = useMemo(
-    () => <KeyIconComp className="w-6 h-6 text-[var(--primary-green-color)]" />,
-    [KeyIconComp]
+    () => <KeyIconComp className="w-6 h-6 text-green-500" />,
+    [KeyIconComp],
   );
   const TrashIcon = useMemo(
-    () => <TrashIconComp className="w-6 h-6 text-[var(--red-color)]" />,
-    [TrashIconComp]
+    () => <TrashIconComp className="w-6 h-6 text-red-500" />,
+    [TrashIconComp],
   );
   const LogoutIcon = useMemo(
-    () => (
-      <LogoutIconComp className="w-6 h-6 text-[var(--primary-blue-color)]" />
-    ),
-    [LogoutIconComp]
+    () => <LogoutIconComp className="w-6 h-6 text-blue-500" />,
+    [LogoutIconComp],
   );
 
   const { user, loading: authLoading, logout } = useAuth(); // auth context (for logout)
@@ -63,11 +59,11 @@ export default function Setting() {
 
   const handleOpenChangePassword = useCallback(
     () => setChangePasswordOpen(true),
-    []
+    [],
   );
   const handleCloseChangePassword = useCallback(
     () => setChangePasswordOpen(false),
-    []
+    [],
   );
 
   const openDeleteAccount = useCallback(() => {
@@ -105,7 +101,7 @@ export default function Setting() {
       <div className="flex gap-6 justify-center md:flex-row flex-col">
         {/* Left: profile card */}
         <Card className="flex flex-col gap-6 justify-center items-center px-8 py-6">
-          <div className="rounded-full border border-[var(--secondary-blue-color)] shadow-lg">
+          <div className="rounded-full border border-gray-300 shadow-lg">
             <Avatar name={displayName} photoURL={photoURL} size={150} />
           </div>
 
@@ -140,7 +136,7 @@ export default function Setting() {
                 Refresh
               </Button>
               <Button
-                variant="red"
+                variant="danger"
                 size="sm"
                 onClick={openLogoutConfirm}
                 disabled={loading}
@@ -169,7 +165,7 @@ export default function Setting() {
                   </div>
                 </div>
                 <Button
-                  variant="red"
+                  variant="danger"
                   size="sm"
                   onClick={openLogoutConfirm}
                   disabled={loading}
@@ -209,11 +205,7 @@ export default function Setting() {
                     </p>
                   </div>
                 </div>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={openDeleteAccount}
-                >
+                <Button variant="danger" size="sm" onClick={openDeleteAccount}>
                   {TEXTS.BUTTON_DELETE}
                 </Button>
               </div>
@@ -297,7 +289,6 @@ export default function Setting() {
               ? TEXTS.DELETE_ACCOUNT_TITLE
               : TEXTS.LOGOUT_TITLE
           }
-          confirmVariant={deleteMode === "account" ? "red" : "blue"}
           onConfirm={handleDeleteConfirm}
         />
       </div>

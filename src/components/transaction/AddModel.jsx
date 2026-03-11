@@ -1,6 +1,6 @@
-import React from "react";
 import { X } from "lucide-react";
 import TransactionForm from "./TransactionForm";
+import Button from "../common/Button";
 
 export default function AddModel({
   open = false,
@@ -9,7 +9,6 @@ export default function AddModel({
   onSubmit = () => {},
 }) {
   const isIncome = role === "income";
-  const headerColor = isIncome ? "bg-green-600" : "bg-blue-600";
 
   const deleteIcon = <X className="w-6 h-6 text-white" />;
 
@@ -26,19 +25,13 @@ export default function AddModel({
         onClick={(e) => e.stopPropagation()}
         className="w-[500px] rounded-lg bg-white shadow-lg overflow-hidden"
       >
-        <div
-          className={`${headerColor} flex justify-between items-center p-4 text-white`}
-        >
+        <div className="bg-blue-600 flex justify-between items-center p-4 text-white">
           <strong className="text-base">
             {isIncome ? "Thêm thu nhập" : "Thêm chi tiêu"}
           </strong>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="bg-transparent border-0 text-white text-xl leading-none"
-          >
+          <Button variant="ghost" onClick={onClose}>
             {deleteIcon}
-          </button>
+          </Button>
         </div>
 
         <TransactionForm

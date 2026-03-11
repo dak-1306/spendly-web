@@ -35,8 +35,8 @@ export default function TransactionForm({
     categories && categories.length > 0
       ? categories
       : isIncome
-      ? defaultIncomeCategories
-      : defaultExpenseCategories;
+        ? defaultIncomeCategories
+        : defaultExpenseCategories;
 
   const [form, setForm] = useState({
     userId: "",
@@ -109,8 +109,6 @@ export default function TransactionForm({
   };
 
   if (!open) return null;
-
-  const submitVariant = isIncome ? "green" : "blue";
 
   return (
     <form onSubmit={handleSubmit} className="p-4">
@@ -267,10 +265,10 @@ export default function TransactionForm({
       </div>
 
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="red" onClick={onClose}>
+        <Button type="button" variant="secondary" onClick={onClose}>
           Hủy
         </Button>
-        <Button type="submit" variant={submitVariant}>
+        <Button type="submit" variant="primary">
           Lưu
         </Button>
       </div>

@@ -51,7 +51,7 @@ function Chat({ open, onClose, option }) {
             {option.map((item, index) => (
               <li
                 key={index}
-                className="text-sm text-gray-600 p-2 mb-2 border border-[var(--secondary-blue-color)] rounded-md"
+                className="text-sm text-gray-600 p-2 mb-2 border border-blue-500 rounded-md"
               >
                 {item}
               </li>
@@ -62,11 +62,11 @@ function Chat({ open, onClose, option }) {
             {answerList.map((item, index) => (
               <div className="w-full space-y-2" key={index}>
                 <p className="font-semibold flex justify-end p-1">
-                  <span className="p-2 border border-[var(--secondary-green-color)] rounded-md">
+                  <span className="p-2 border border-green-500 rounded-md">
                     Bạn: {item.question}
                   </span>
                 </p>
-                <p className="font-semibold flex justify-start p-2 border border-[var(--secondary-green-color)] rounded-md">
+                <p className="font-semibold flex justify-start p-2 border border-green-500 rounded-md">
                   AI: {item.answer}
                 </p>
               </div>
@@ -77,7 +77,7 @@ function Chat({ open, onClose, option }) {
         <div className="px-4 py-3">
           <div className="flex gap-2">
             <input
-              className="flex-1 border border-[var(--primary-green-color)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-green-color)] rounded px-3 py-2 text-sm"
+              className="flex-1 border border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-3 py-2 text-sm"
               placeholder="Nhập câu hỏi..."
               value={inputValue}
               onChange={handleInputChange}

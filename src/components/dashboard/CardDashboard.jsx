@@ -1,6 +1,6 @@
 function CardDashboard({ type, title, amount = 0, currency = "VND", icon }) {
   const baseMap = {
-    income: "bg-[var(--secondary-blue-color)]",
+    income: "bg-green-500",
     expense: "bg-red-500",
     balance: "bg-yellow-500",
     compare: "bg-blue-500",

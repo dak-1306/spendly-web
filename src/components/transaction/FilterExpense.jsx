@@ -82,7 +82,7 @@ export default function FilterExpense({
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border border-gray-300 rounded-md px-4 py-2 ml-auto"
         />
-        <Button variant="primary" className="ml-2">
+        <Button variant="outline" className="ml-2">
           {searchIcon}
         </Button>
       </form>

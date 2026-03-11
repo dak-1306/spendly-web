@@ -5,15 +5,12 @@ const baseStyles =
 // 🔧 MỖI VARIANT = 1 STYLE
 const variantStyles = {
   primary:
-    "bg-white text-[var(--primary-blue-color)] hover:bg-blue-200  border border-blue-600",
-  secondary: "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300",
-  blue: "btn-blue",
-  green: "btn-green",
-  gradient: "btn-gradient",
-  red: "btn-red",
-
-  edit: "bg-white text-blue-600  hover:bg-blue-50",
-  delete: "bg-white text-red-600 hover:bg-red-50",
+    "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700",
+  secondary: "bg-gray-100 text-gray-800 hover:bg-gray-200",
+  danger: "bg-red-500 text-white hover:bg-red-600",
+  outline: "border border-blue-600 text-blue-600 hover:bg-blue-50",
+  ghost: "text-gray-700 hover:bg-gray-100",
+  cta: "bg-gradient-to-r from-yellow-500 to-orange-600 text-white hover:from-yellow-600 hover:to-orange-700",
 };
 
 // 🔧 MỖI SIZE = padding + font-size
@@ -22,6 +19,9 @@ const sizeStyles = {
   md: "px-4 py-2 text-base",
   lg: "px-6 py-3 text-lg",
 };
+
+const animation =
+  "hover:shadow-lg transition-shadow duration-300 hover:scale-102";
 
 const Button = ({
   variant = "primary", // 🔧 đổi / thêm variant
@@ -38,6 +38,7 @@ const Button = ({
         ${baseStyles}
         ${variantStyles[variant]}
         ${sizeStyles[size]}
+        ${animation}
         ${className}
       `}
       disabled={disabled || isLoading}

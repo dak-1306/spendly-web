@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import MainLayout from "../components/layout/MainLayout.jsx";
 import LineColor from "../components/common/LineColor.jsx";
 import Card from "../components/common/Card.jsx";
@@ -17,17 +17,17 @@ export default function Transaction() {
     (() => {
       const d = new Date();
       return d.toISOString().slice(0, 7);
-    })()
+    })(),
   );
 
   const { TRASH: TrashIconComp, EDIT: EditIconComp } = EXPENSE.ICONS;
   const trashIcon = useMemo(
     () => <TrashIconComp className="w-5 h-5 text-[var(--red-color)]" />,
-    [TrashIconComp]
+    [TrashIconComp],
   );
   const editIcon = useMemo(
     () => <EditIconComp className="w-5 h-5 text-[var(--primary-blue-color)]" />,
-    [EditIconComp]
+    [EditIconComp],
   );
 
   const {
@@ -55,7 +55,7 @@ export default function Transaction() {
         date:
           t.date && typeof t.date.toDate === "function"
             ? t.date.toDate().toISOString().slice(0, 10)
-            : t.date ?? "",
+            : (t.date ?? ""),
         month: t.month,
       }));
   }, [transactions, month]);
@@ -75,7 +75,7 @@ export default function Transaction() {
         date:
           t.date && typeof t.date.toDate === "function"
             ? t.date.toDate().toISOString().slice(0, 10)
-            : t.date ?? "",
+            : (t.date ?? ""),
         month: t.month,
       }));
   }, [transactions, month]);
@@ -106,7 +106,7 @@ export default function Transaction() {
         console.error(e);
       }
     },
-    [addTransaction]
+    [addTransaction],
   );
 
   const handleAddIncomeSubmit = useCallback(
@@ -119,7 +119,7 @@ export default function Transaction() {
         console.error(e);
       }
     },
-    [addTransaction]
+    [addTransaction],
   );
 
   const handleEditSubmit = useCallback(
@@ -152,7 +152,7 @@ export default function Transaction() {
         console.error(e);
       }
     },
-    [updateTransaction]
+    [updateTransaction],
   );
 
   const handleDeleteConfirm = useCallback(
@@ -164,7 +164,7 @@ export default function Transaction() {
         console.error(e);
       }
     },
-    [deleteTransaction]
+    [deleteTransaction],
   );
 
   /* ---------- Helpers mở modal ---------- */
@@ -211,7 +211,7 @@ export default function Transaction() {
       const range = amountRanges.find((r) => r.id === selectedAmountRange);
       if (range) {
         result = result.filter(
-          (e) => e.amount >= range.min && e.amount <= range.max
+          (e) => e.amount >= range.min && e.amount <= range.max,
         );
       }
     }
@@ -229,7 +229,7 @@ export default function Transaction() {
       result = result.filter(
         (e) =>
           (e.title && e.title.toLowerCase().includes(q)) ||
-          (e.category && e.category.toLowerCase().includes(q))
+          (e.category && e.category.toLowerCase().includes(q)),
       );
     }
 
@@ -293,20 +293,20 @@ export default function Transaction() {
           />
           <div className="flex">
             <Button
-              variant="blue"
+              variant="primary"
               className="mr-4"
               onClick={() => setIsAddExpenseOpen(true)}
             >
               {EXPENSE.BUTTONS.ADD_EXPENSE}
             </Button>
-            <Button variant="green" onClick={() => setIsAddIncomeOpen(true)}>
+            <Button variant="primary" onClick={() => setIsAddIncomeOpen(true)}>
               {EXPENSE.BUTTONS.ADD_INCOME}
             </Button>
           </div>
         </Card>
 
         <Card className="flex flex-col">
-          <h2 className="text-xl font-semibold mb-4 text-[var(--primary-blue-color)]">
+          <h2 className="text-xl font-semibold mb-4 text-[--primary-blue-color]">
             Thu nhập tháng {month}
           </h2>
 

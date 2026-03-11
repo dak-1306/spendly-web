@@ -14,6 +14,16 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const checkAuth = async () => {
+    setLoading(true);
+    try {
+      const u = getCurrentUser();
+      setUser(u);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = subscribeAuth(async (u) => {
       setUser(u);
@@ -90,6 +100,7 @@ export function AuthProvider({ children }) {
         logout,
         refresh,
         loginWithGoogle,
+        checkAuth,
       }}
     >
       {children}
