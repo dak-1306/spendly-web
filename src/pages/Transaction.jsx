@@ -10,7 +10,6 @@ import DeleteModel from "../components/transaction/Delete.jsx";
 import FilterExpense from "../components/transaction/FilterExpense.jsx";
 import { EXPENSE } from "../utils/constants.js";
 import useTransaction from "../hooks/useTransaction";
-import { Timestamp } from "firebase/firestore";
 
 export default function Transaction() {
   const [month, setMonth] = useState(
@@ -22,22 +21,15 @@ export default function Transaction() {
 
   const { TRASH: TrashIconComp, EDIT: EditIconComp } = EXPENSE.ICONS;
   const trashIcon = useMemo(
-    () => <TrashIconComp className="w-5 h-5 text-[var(--red-color)]" />,
+    () => <TrashIconComp className="w-5 h-5 text-red-600" />,
     [TrashIconComp],
   );
   const editIcon = useMemo(
-    () => <EditIconComp className="w-5 h-5 text-[var(--primary-blue-color)]" />,
+    () => <EditIconComp className="w-5 h-5 text-blue-600" />,
     [EditIconComp],
   );
 
-  const {
-    transactions,
-    loading,
-    error,
-    addTransaction,
-    updateTransaction,
-    deleteTransaction,
-  } = useTransaction();
+  const { transactions, loading, error} = useTransaction();
 
   // derive incomes / expenses from context transactions by month
   const incomes = useMemo(() => {
@@ -93,79 +85,6 @@ export default function Transaction() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
   const [deletingRole, setDeletingRole] = useState("expense");
-
-  /* ---------- CRUD handlers using context ---------- */
-  const handleAddExpenseSubmit = useCallback(
-    async (formPayload) => {
-      try {
-        // formPayload đã có đủ các trường: userId, type, title, amount, currency, source, category, date, month
-        await addTransaction(formPayload);
-        setIsAddExpenseOpen(false);
-      } catch (e) {
-        alert("Thêm chi tiêu thất bại.");
-        console.error(e);
-      }
-    },
-    [addTransaction],
-  );
-
-  const handleAddIncomeSubmit = useCallback(
-    async (formPayload) => {
-      try {
-        await addTransaction(formPayload);
-        setIsAddIncomeOpen(false);
-      } catch (e) {
-        alert("Thêm thu nhập thất bại.");
-        console.error(e);
-      }
-    },
-    [addTransaction],
-  );
-
-  const handleEditSubmit = useCallback(
-    async (formPayload) => {
-      try {
-        const id = formPayload.id;
-        const jsDate = new Date(formPayload.date);
-        const payload = {
-          userId: formPayload.userId,
-          type: formPayload.type,
-          title: formPayload.title,
-          amount: Number(formPayload.amount),
-          currency: formPayload.currency,
-          source: formPayload.source,
-          category: formPayload.category,
-          date: Timestamp.fromDate(jsDate),
-          month: jsDate.toISOString().slice(0, 7),
-        };
-
-        await updateTransaction(id, payload);
-        if (formPayload.type === "income") {
-          setIsEditIncomeOpen(false);
-          setEditingIncome(null);
-        } else {
-          setIsEditOpen(false);
-          setEditingExpense(null);
-        }
-      } catch (e) {
-        alert("Cập nhật thất bại.");
-        console.error(e);
-      }
-    },
-    [updateTransaction],
-  );
-
-  const handleDeleteConfirm = useCallback(
-    async ({ id }) => {
-      try {
-        await deleteTransaction(id);
-      } catch (e) {
-        alert("Xóa thất bại.");
-        console.error(e);
-      }
-    },
-    [deleteTransaction],
-  );
 
   /* ---------- Helpers mở modal ---------- */
   const openEdit = useCallback((expense) => {
@@ -319,14 +238,14 @@ export default function Transaction() {
                 key={income.id}
                 className="py-2 border-b border-gray-300 flex justify-between items-center"
               >
-                <p className="flex items-center gap-2">
-                  <span className="text-body">
+                <p className="flex items-center gap-4">
+                  <span className="text-blue-600 font-medium">
                     {income.source ?? "Thu nhập"}
                   </span>
                   <span className="text-gray-500">{income.title ?? ""}</span>
                   <span className="text-gray-500">{income.date ?? ""}</span>
                 </p>
-                <span className="font-semibold text-[var(--primary-green-color)]">
+                <span className="font-semibold text-green-600">
                   {income.amount?.toLocaleString() ?? 0}{" "}
                   {income.currency ?? "VND"}
                 </span>
@@ -383,16 +302,16 @@ export default function Transaction() {
                     <td className="px-4 py-4">{expense.category}</td>
                     <td className="px-4 py-4">{expense.title}</td>
                     <td className="px-4 py-4">{expense.date}</td>
-                    <td className="px-4 py-4 font-semibold text-[var(--red-color)]">
+                    <td className="px-4 py-4 font-semibold text-red-600">
                       {expense.amount?.toLocaleString() ?? 0}{" "}
                       {expense.currency ?? "VND"}
                     </td>
                     <td className="px-4 py-4 flex gap-2">
-                      <Button variant="edit" onClick={() => openEdit(expense)}>
+                      <Button variant="ghost" onClick={() => openEdit(expense)}>
                         {editIcon}
                       </Button>
                       <Button
-                        variant="delete"
+                        variant="ghost"
                         onClick={() => openDelete(expense, "expense")}
                       >
                         {trashIcon}
@@ -409,13 +328,11 @@ export default function Transaction() {
           open={isAddExpenseOpen}
           onClose={() => setIsAddExpenseOpen(false)}
           role="expense"
-          onSubmit={handleAddExpenseSubmit}
         />
         <AddModel
           open={isAddIncomeOpen}
           onClose={() => setIsAddIncomeOpen(false)}
           role="income"
-          onSubmit={handleAddIncomeSubmit}
         />
 
         <EditModel
@@ -425,8 +342,7 @@ export default function Transaction() {
             setEditingExpense(null);
           }}
           role="expense"
-          expense={editingExpense}
-          onSubmit={handleEditSubmit}
+          data={editingExpense}
         />
 
         <EditModel
@@ -436,8 +352,7 @@ export default function Transaction() {
             setEditingIncome(null);
           }}
           role="income"
-          expense={editingIncome}
-          onSubmit={handleEditSubmit}
+          data={editingIncome}
         />
 
         <DeleteModel
@@ -448,7 +363,6 @@ export default function Transaction() {
           }}
           role={deletingRole}
           item={deletingItem}
-          onConfirm={handleDeleteConfirm}
         />
       </div>
     </MainLayout>

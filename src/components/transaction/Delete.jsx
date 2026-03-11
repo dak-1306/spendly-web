@@ -1,78 +1,35 @@
-import Button from "../common/Button.jsx";
-import { X } from "lucide-react";
+import DeleteConfirm from "../common/DeleteConfirm.jsx";
+import useTransaction from "../../hooks/useTransaction.js";
+import { useCallback } from "react";
 
 export default function DeleteModel({
   open = false,
   onClose = () => {},
   role = "expense", // "expense" | "income"
   item = null,
-  onConfirm = () => {},
 }) {
-  if (!open) return null;
-
-  const deleteIcon = <X className="w-6 h-6 text-white" />;
-
+  const { deleteTransaction } = useTransaction();
   const isIncome = role === "income";
   const title = item?.title ?? item?.source ?? item?.category ?? "Mục";
   const amount = item?.amount ?? 0;
 
-  const handleConfirm = () => {
-    onConfirm({ id: item?.id, role });
-    onClose();
-  };
+  const handleDeleteConfirm = useCallback(async () => {
+    try {
+      await deleteTransaction(item.id);
+      onClose();
+    } catch (e) {
+      alert("Xóa thất bại.");
+      console.error(e);
+    }
+  }, [deleteTransaction, item, onClose]);
 
   return (
-    <div
-      aria-modal="true"
-      role="dialog"
-      onClick={onClose}
-      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="w-[420px] rounded-lg bg-white shadow-lg overflow-hidden"
-      >
-        <div
-          className={`${
-            isIncome ? "bg-green-600" : "bg-blue-600"
-          } p-4 text-white flex justify-between items-center`}
-        >
-          <strong className="text-base">
-            Xóa {isIncome ? "thu nhập" : "chi tiêu"}
-          </strong>
-          <button
-            onClick={onClose}
-            className="text-white text-xl leading-none bg-transparent border-0"
-          >
-            {deleteIcon}
-          </button>
-        </div>
-
-        <div className="p-4">
-          <p className="mb-4 text-sm text-gray-700">
-            Bạn có chắc muốn xóa <span className="font-medium">{title}</span>
-            {amount ? (
-              <>
-                {" "}
-                —{" "}
-                <span className="font-semibold text-red-600">
-                  {Number(amount).toLocaleString()} VND
-                </span>
-              </>
-            ) : null}
-            ?
-          </p>
-
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={onClose}>
-              Hủy
-            </Button>
-            <Button type="button" variant="danger" onClick={handleConfirm}>
-              Xóa
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <DeleteConfirm
+      title={`Xóa ${isIncome ? "thu nhập" : "chi tiêu"}`}
+      description={`Bạn có chắc chắn muốn xóa ${title} với số tiền ${amount.toLocaleString()} ${item?.currency ?? "VND"} không?`}
+      open={open}
+      onClose={onClose}
+      onConfirm={handleDeleteConfirm}
+    />
   );
 }

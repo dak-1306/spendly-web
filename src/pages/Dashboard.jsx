@@ -59,7 +59,7 @@ export default function Dashboard() {
   );
 
   // transactions từ context (dữ liệu thật)
-  const { transactions = [] } = useTransaction();
+  const { transactions } = useTransaction();
 
   // helper lấy chuỗi tháng 'YYYY-MM' từ transaction (nếu không có month)
   const transactionToMonth = useCallback((t) => {

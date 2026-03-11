@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { TransactionContext } from "./TransactionContextValue";
 import { transactionService } from "../services";
 import { useAuth } from "../hooks/useAuth";
@@ -26,13 +26,14 @@ export const TransactionProvider = ({ children }) => {
       currentUid,
       (items) => {
         setTransactions(items);
+        console.log("Transactions updated:", items);
         setLoading(false);
       },
       (err) => {
         console.error("Subscribe error:", err);
         setError(err);
         setLoading(false);
-      }
+      },
     );
     return () => unsub && unsub();
   }, [currentUid]);
@@ -40,18 +41,21 @@ export const TransactionProvider = ({ children }) => {
   // addTransaction nhận payload từ TransactionForm với đầy đủ các trường
   const addTransaction = async (formPayload) => {
     try {
+      console.log("addTransaction received payload:", formPayload);
+      console.log("Current UID in addTransaction:", currentUid);
       const jsDate = new Date(formPayload.date);
       const payload = {
         userId: formPayload.userId || currentUid,
-        type: formPayload.type,
-        title: formPayload.title,
-        amount: Number(formPayload.amount),
-        currency: formPayload.currency,
-        source: formPayload.source,
-        category: formPayload.category,
-        date: Timestamp.fromDate(jsDate),
-        month: formPayload.month,
+        type: formPayload.type || "expense",
+        title: formPayload.title || "",
+        amount: Number(formPayload.amount) || 0,
+        currency: formPayload.currency || "VND",
+        source: formPayload.source || "",
+        category: formPayload.category || "",
+        date: Timestamp.fromDate(jsDate) || "",
+        month: formPayload.month || "",
       };
+      console.log("Constructed payload for addTransaction:", payload);
 
       return await transactionService.addTransaction(payload);
     } catch (e) {

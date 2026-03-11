@@ -1,5 +1,5 @@
-import React from "react";
 import Button from "./Button";
+import Modal from "./Modal";
 
 export default function DeleteConfirm({
   open = false,
@@ -17,35 +17,24 @@ export default function DeleteConfirm({
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-md bg-white rounded shadow-lg overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="px-4 py-3 border-b flex items-center justify-between">
-          <h3 className="text-lg font-semibold">{title}</h3>
-        </div>
+    <Modal isOpen={open} onClose={onClose}>
+      <div className="bg-red-500 p-4">
+        <h3 className="text-lg text-white font-semibold text-center">
+          {title}
+        </h3>
+      </div>
+      <div className="p-4 space-y-4">
+        {description && <p className=" text-md text-gray-700">{description}</p>}
 
-        <div className="p-4">
-          {description && (
-            <p className="mb-4 text-sm text-gray-700">{description}</p>
-          )}
-
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={onClose}>
-              Hủy
-            </Button>
-            <Button type="button" variant="danger" onClick={handleConfirm}>
-              {confirmLabel}
-            </Button>
-          </div>
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="secondary" onClick={onClose}>
+            Hủy
+          </Button>
+          <Button type="button" variant="danger" onClick={handleConfirm}>
+            {confirmLabel}
+          </Button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

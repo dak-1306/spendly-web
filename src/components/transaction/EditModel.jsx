@@ -1,58 +1,122 @@
-import { X } from "lucide-react";
 import TransactionForm from "./TransactionForm";
-
+import useTransaction from "../../hooks/useTransaction";
+import { useState, useEffect } from "react";
 export default function EditModel({
   open = false,
   onClose = () => {},
   role = "expense",
-  expense = null,
-  onSubmit = () => {},
+  data = null,
 }) {
   const isIncome = role === "income";
+  const [field, setField] = useState({
+    title: "",
+    amount: "",
+    currency: "",
+    category: "",
+    date: "",
+  });
+  console.log("EditModel received data:", data);
 
-  const deleteIcon = <X className="w-6 h-6 text-white" />;
+  useEffect(() => {
+    if (data) {
+      setField({
+        title: data.title || "",
+        amount: data.amount || "",
+        currency: data.currency || "",
+        category: data.category || "",
+        date: data.date || "",
+      });
+    } else {
+      setField({
+        title: "",
+        amount: "",
+        currency: "",
+        category: "",
+        date: "",
+      });
+    }
+  }, [data]);
 
-  if (!open) return null;
+  const handleFieldChange = (field) => (e) => {
+    const value = e.target.value;
+    setField((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+  const { updateTransaction } = useTransaction();
 
-  const initialValues = {
-    title: expense?.title ?? expense?.source ?? "",
-    amount: expense?.amount ?? "",
-    date: expense?.date ?? "",
-    category: expense?.category ?? expense?.source ?? "",
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formPayload = {
+        ...field,
+        type: role,
+      };
+      console.log("Submitting form with payload:", formPayload);
+      await updateTransaction(data.id, formPayload);
+      onClose();
+    } catch (e) {
+      alert("Cập nhật thất bại.");
+      console.error(e);
+    } finally {
+      setField({
+        title: "",
+        amount: "",
+        currency: "",
+        category: "",
+        date: "",
+      });
+    }
   };
 
-  return (
-    <div
-      aria-modal="true"
-      role="dialog"
-      onClick={onClose}
-      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="w-[500px] rounded-lg bg-white shadow-lg overflow-hidden"
-      >
-        <div
-          className={`bg-blue-600 flex justify-between items-center p-4 text-white`}
-        >
-          <strong className="text-base">
-            {isIncome ? "Chỉnh sửa thu nhập" : "Chỉnh sửa chi tiêu"}
-          </strong>
-          <Button variant="ghost" onClick={onClose}>
-            {deleteIcon}
-          </Button>
-        </div>
+  const fields = [
+    {
+      name: "title",
+      label: isIncome ? "Nguồn thu" : "Mục chi",
+      type: "text",
+      value: field.title,
+      onChange: handleFieldChange("title"),
+    },
+    {
+      name: "amount",
+      label: "Số tiền",
+      type: "number",
+      value: field.amount,
+      onChange: handleFieldChange("amount"),
+    },
+    {
+      name: "date",
+      label: "Ngày",
+      type: "date",
+      value: field.date,
+      onChange: handleFieldChange("date"),
+    },
+    {
+      name: "category",
+      label: "Danh mục",
+      type: "select",
+      value: field.category,
+      onChange: handleFieldChange("category"),
+    },
+    {
+      name: "currency",
+      label: "Loại tiền",
+      type: "select",
+      value: field.currency,
+      onChange: handleFieldChange("currency"),
+    },
+  ];
+  console.log("Initial values for form fields:", field);
 
-        <TransactionForm
-          open={open}
-          layout="edit"
-          role={role}
-          initialValues={initialValues}
-          onSubmit={onSubmit}
-          onClose={onClose}
-          id={expense?.id}
-        />
-      </div>
-    </div>
+  return (
+    <TransactionForm
+      fields={fields}
+      onSubmit={handleSubmit}
+      onClose={onClose}
+      isOpen={open}
+      type={role}
+      variant="edit"
+    />
   );
 }

@@ -1,47 +1,121 @@
-import { X } from "lucide-react";
 import TransactionForm from "./TransactionForm";
-import Button from "../common/Button";
+import useTransaction from "../../hooks/useTransaction";
+import { useCallback, useState } from "react";
 
-export default function AddModel({
-  open = false,
-  onClose = () => {},
-  role = "expense",
-  onSubmit = () => {},
-}) {
-  const isIncome = role === "income";
+export default function AddModel({ open = false, onClose = () => {}, role }) {
+  const { addTransaction } = useTransaction();
+  const [field, setField] = useState({
+    title: "",
+    amount: "",
+    source: "",
+    currency: "",
+    category: "",
+    date: "",
+    month: "",
+  });
+  const { title, amount, source, currency, category, date, month } = field;
 
-  const deleteIcon = <X className="w-6 h-6 text-white" />;
+  const handleFieldChange = (field) => (e) => {
+    const value = e.target.value;
+    setField((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+  console.log("AddModel field state:", field);
+  const handleAddExpenseSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const formPayload = { ...field, type: role };
+      try {
+        console.log("Submitting form with payload:", formPayload);
+        await addTransaction(formPayload);
+        onClose();
+      } catch (err) {
+        alert("Thêm chi tiêu thất bại.");
+        console.error(err);
+      }
+    },
+    [addTransaction, field, onClose, role],
+  );
 
-  if (!open) return null;
+  const handleAddIncomeSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const formPayload = { ...field, type: role };
+      try {
+        console.log("Submitting income with payload:", formPayload);
+        await addTransaction(formPayload);
+        onClose();
+      } catch (err) {
+        alert("Thêm thu nhập thất bại.");
+        console.error(err);
+      }
+    },
+    [addTransaction, field, onClose, role],
+  );
 
+  const handleSubmit =
+    role === "income" ? handleAddIncomeSubmit : handleAddExpenseSubmit;
+  const fields = [
+    {
+      name: "title",
+      label: role === "income" ? "Nguồn thu" : "Mục chi",
+      value: title,
+      type: "text",
+      onChange: handleFieldChange("title"),
+    },
+    {
+      name: "source",
+      label: "Nguồn",
+      value: source,
+      type: "text",
+      onChange: handleFieldChange("source"),
+    },
+    {
+      name: "amount",
+      label: "Số tiền",
+      type: "number",
+      value: amount,
+      onChange: handleFieldChange("amount"),
+    },
+    {
+      name: "currency",
+      label: "Loại tiền",
+      type: "select",
+      value: currency,
+      onChange: handleFieldChange("currency"),
+    },
+    {
+      name: "category",
+      label: "Danh mục",
+      type: "select",
+      value: category,
+      onChange: handleFieldChange("category"),
+    },
+    {
+      name: "date",
+      label: "Ngày giao dịch",
+      type: "date",
+      value: date,
+      onChange: handleFieldChange("date"),
+    },
+    {
+      name: "month",
+      label: "Tháng",
+      type: "month",
+      value: month,
+      onChange: handleFieldChange("month"),
+    },
+  ];
   return (
-    <div
-      aria-modal="true"
-      role="dialog"
-      onClick={onClose}
-      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="w-[500px] rounded-lg bg-white shadow-lg overflow-hidden"
-      >
-        <div className="bg-blue-600 flex justify-between items-center p-4 text-white">
-          <strong className="text-base">
-            {isIncome ? "Thêm thu nhập" : "Thêm chi tiêu"}
-          </strong>
-          <Button variant="ghost" onClick={onClose}>
-            {deleteIcon}
-          </Button>
-        </div>
-
-        <TransactionForm
-          open={open}
-          layout="add"
-          role={role}
-          onSubmit={onSubmit}
-          onClose={onClose}
-        />
-      </div>
-    </div>
+    <TransactionForm
+      fields={fields}
+      onSubmit={handleSubmit}
+      onClose={onClose}
+      isOpen={open}
+      type={role}
+      variant="add"
+    />
   );
 }
