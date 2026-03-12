@@ -12,6 +12,20 @@ import { EXPENSE } from "../utils/constants.js";
 import useTransaction from "../hooks/useTransaction";
 
 export default function Transaction() {
+    const { transactions, loading, error} = useTransaction();
+    /* ---------- Modal / UI state ---------- */
+  const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+  const [isAddIncomeOpen, setIsAddIncomeOpen] = useState(false);
+
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState(null);
+
+  const [isEditIncomeOpen, setIsEditIncomeOpen] = useState(false);
+  const [editingIncome, setEditingIncome] = useState(null);
+
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deletingItem, setDeletingItem] = useState(null);
+  const [deletingRole, setDeletingRole] = useState("expense");
   const [month, setMonth] = useState(
     (() => {
       const d = new Date();
@@ -20,16 +34,9 @@ export default function Transaction() {
   );
 
   const { TRASH: TrashIconComp, EDIT: EditIconComp } = EXPENSE.ICONS;
-  const trashIcon = useMemo(
-    () => <TrashIconComp className="w-5 h-5 text-red-600" />,
-    [TrashIconComp],
-  );
-  const editIcon = useMemo(
-    () => <EditIconComp className="w-5 h-5 text-blue-600" />,
-    [EditIconComp],
-  );
-
-  const { transactions, loading, error} = useTransaction();
+  // Icon components (khai báo ngoài render để tránh recreate mỗi render)
+  const trashIcon = <TrashIconComp className="w-5 h-5 text-red-600" />; 
+  const editIcon = <EditIconComp className="w-5 h-5 text-blue-600" />;
 
   // derive incomes / expenses from context transactions by month
   const incomes = useMemo(() => {
@@ -71,20 +78,6 @@ export default function Transaction() {
         month: t.month,
       }));
   }, [transactions, month]);
-
-  /* ---------- Modal / UI state ---------- */
-  const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
-  const [isAddIncomeOpen, setIsAddIncomeOpen] = useState(false);
-
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editingExpense, setEditingExpense] = useState(null);
-
-  const [isEditIncomeOpen, setIsEditIncomeOpen] = useState(false);
-  const [editingIncome, setEditingIncome] = useState(null);
-
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [deletingItem, setDeletingItem] = useState(null);
-  const [deletingRole, setDeletingRole] = useState("expense");
 
   /* ---------- Helpers mở modal ---------- */
   const openEdit = useCallback((expense) => {
@@ -162,18 +155,6 @@ export default function Transaction() {
     amountRanges,
   ]);
 
-  /* ---------- handlers chuyển tháng (useCallback giống Dashboard) ---------- */
-  const handlePrevMonth = useCallback(() => {
-    const [y, m] = month.split("-").map(Number);
-    const d = new Date(y, m - 2);
-    setMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
-  }, [month]);
-
-  const handleNextMonth = useCallback(() => {
-    const [y, m] = month.split("-").map(Number);
-    const d = new Date(y, m);
-    setMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
-  }, [month]);
 
   /* ---------- Render ---------- */
   if (loading) {
@@ -207,8 +188,7 @@ export default function Transaction() {
           <ChangeDate
             month={month}
             setMonth={setMonth}
-            onPrev={handlePrevMonth}
-            onNext={handleNextMonth}
+            
           />
           <div className="flex">
             <Button

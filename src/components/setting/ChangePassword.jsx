@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Button from "../common/Button";
-import { X } from "lucide-react";
+import Modal from "../common/Modal";
 
 export default function ChangePassword({ open, onClose }) {
   const [email, setEmail] = useState("");
@@ -8,11 +8,6 @@ export default function ChangePassword({ open, onClose }) {
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
-
-  // nếu chưa mở thì không render gì
-  if (!open) return null;
-
-  const closeIcon = <X className="w-5 h-5 text-white" />;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,18 +35,16 @@ export default function ChangePassword({ open, onClose }) {
 
   return (
     // modal overlay
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-md w-full bg-white p-6 rounded shadow"
-      >
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-semibold mb-4">Đổi mật khẩu</h2>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            {closeIcon}
-          </Button>
+    <Modal isOpen={open} onClose={onClose}>
+      
+        <div className="flex items-center justify-center bg-blue-600 p-4 rounded">
+          <h2 className="text-2xl font-semibold text-white">Đổi mật khẩu</h2>
+          
         </div>
-
+<form
+        onSubmit={handleSubmit}
+        className="max-w-md w-full bg-white rounded shadow p-6"
+      >
         <label className="block mb-2">
           <span className="text-sm">Email</span>
           <input
@@ -95,16 +88,20 @@ export default function ChangePassword({ open, onClose }) {
             {message.text}
           </div>
         )}
-
-        <Button
-          variant="primary"
-          type="submit"
-          disabled={loading}
-          className="w-full"
-        >
-          {loading ? "Đang xử lý..." : "Đổi mật khẩu"}
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="secondary" onClick={onClose} className="w-full">
+            Hủy
+          </Button>
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={loading}
+            className="w-full"
+          >
+            {loading ? "Đang xử lý..." : "Đổi mật khẩu"}
+          </Button>
+        </div>
       </form>
-    </div>
+    </Modal>
   );
 }

@@ -26,7 +26,7 @@ export default function Home() {
     [],
   );
 
-  // Mô tả ngắn bên dưới mỗi ảnh (tách ra để dễ sửa / i18n)
+  // Mô tả ngắn bên dưới mỗi ảnh
   const captions = useMemo(
     () => [
       "Dashboard — tổng quan thu chi, biểu đồ và số liệu quan trọng.",
@@ -58,7 +58,7 @@ export default function Home() {
       // Nếu đã login, redirect ngay
       navigate("/dashboard");
     }
-  }, [user]);
+  }, [user, navigate]);
 
   return (
     <MainLayout title={false}>

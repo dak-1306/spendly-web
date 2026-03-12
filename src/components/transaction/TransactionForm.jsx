@@ -86,11 +86,16 @@ export default function TransactionForm({
           </div>
         ))}
 
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="secondary" onClick={onClose}>
+        <div className="flex gap-3">
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full"
+            onClick={onClose}
+          >
             Hủy
           </Button>
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="primary" className="w-full">
             Lưu
           </Button>
         </div>

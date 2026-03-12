@@ -27,26 +27,12 @@ export default function Setting() {
     LOGOUT: LogoutIconComp,
   } = ICONS;
 
-  const UserIcon = useMemo(
-    () => <UserIconComp className="w-6 h-6 text-blue-500" />,
-    [UserIconComp],
-  );
-  const EmailIcon = useMemo(
-    () => <EmailIconComp className="w-6 h-6 text-green-500" />,
-    [EmailIconComp],
-  );
-  const KeyIcon = useMemo(
-    () => <KeyIconComp className="w-6 h-6 text-green-500" />,
-    [KeyIconComp],
-  );
-  const TrashIcon = useMemo(
-    () => <TrashIconComp className="w-6 h-6 text-red-500" />,
-    [TrashIconComp],
-  );
-  const LogoutIcon = useMemo(
-    () => <LogoutIconComp className="w-6 h-6 text-blue-500" />,
-    [LogoutIconComp],
-  );
+  const UserIcon = <UserIconComp className="w-6 h-6 text-blue-500" />;
+    
+  const EmailIcon = <EmailIconComp className="w-6 h-6 text-green-500" />;
+  const KeyIcon = <KeyIconComp className="w-6 h-6 text-green-500" />;
+  const TrashIcon = <TrashIconComp className="w-6 h-6 text-red-500" />;
+  const LogoutIcon = <LogoutIconComp className="w-6 h-6 text-blue-500" />;
 
   const { user, loading: authLoading, logout } = useAuth(); // auth context (for logout)
   const { userDoc, loading: userLoading, refresh: refreshUser } = useUser(); // user context
@@ -133,7 +119,7 @@ export default function Setting() {
                 onClick={() => refreshUser()}
                 disabled={loading}
               >
-                Refresh
+                Làm mới
               </Button>
               <Button
                 variant="danger"

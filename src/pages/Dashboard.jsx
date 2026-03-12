@@ -10,14 +10,23 @@ import ChangeDate from "../components/common/ChangeDate";
 import { DASHBOARD } from "../utils/constants";
 import useTransaction from "../hooks/useTransaction";
 
+import {
+  transactionToMonth,
+  balance,
+  prevMonth,
+  totalIncome,
+  totalExpense,
+  prevExpense,
+  formatPercent,
+} from "../utils/financial";
+
 /* Static chart config (khai báo ngoài component để tránh recreate mỗi render) */
 const PIE_CHART_CONFIG = { WIDTH: 440, HEIGHT: 240 };
 const BAR_CHART_CONFIG = { WIDTH: 1000, HEIGHT: 240 };
 
-/* Formatter nhỏ cho phần trăm */
-const formatPercent = (v) => Number(v.toFixed(2));
-
 export default function Dashboard() {
+  // transactions từ context (dữ liệu thật)
+  const { transactions } = useTransaction();
   // state chọn tháng hiển thị
   const [month, setMonth] = useState(() => {
     const now = new Date();
@@ -36,45 +45,12 @@ export default function Dashboard() {
     ARROW_DOWN: ArrowDownComp,
   } = DASHBOARD.ICONS;
 
-  // memoize icons dưới dạng JSX để tránh recreate khi không cần
-  const incomeIcon = useMemo(
-    () => <DollarIconComp className="w-6 h-6 text-white" />,
-    [DollarIconComp],
-  );
-  const expenseIcon = useMemo(
-    () => <CreditCardComp className="w-6 h-6 text-white" />,
-    [CreditCardComp],
-  );
-  const balanceIcon = useMemo(
-    () => <WalletComp className="w-6 h-6 text-white" />,
-    [WalletComp],
-  );
-  const arrowUp = useMemo(
-    () => <ArrowUpComp className="w-6 h-6 text-white" />,
-    [ArrowUpComp],
-  );
-  const arrowDown = useMemo(
-    () => <ArrowDownComp className="w-6 h-6 text-white" />,
-    [ArrowDownComp],
-  );
-
-  // transactions từ context (dữ liệu thật)
-  const { transactions } = useTransaction();
-
-  // helper lấy chuỗi tháng 'YYYY-MM' từ transaction (nếu không có month)
-  const transactionToMonth = useCallback((t) => {
-    if (!t) return "";
-    if (t.month) return t.month;
-    // t.date có thể là Firestore Timestamp hoặc Date
-    const d =
-      t.date && typeof t.date.toDate === "function"
-        ? t.date.toDate()
-        : t.date instanceof Date
-          ? t.date
-          : null;
-    if (!d) return "";
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-  }, []);
+  // Icon
+  const incomeIcon = <DollarIconComp className="w-6 h-6 text-white" />;
+  const expenseIcon = <CreditCardComp className="w-6 h-6 text-white" />;
+  const balanceIcon = <WalletComp className="w-6 h-6 text-white" />;
+  const arrowUp = <ArrowUpComp className="w-6 h-6 text-white" />;
+  const arrowDown = <ArrowDownComp className="w-6 h-6 text-white" />;
 
   // lấy dữ liệu cho tháng đang chọn từ transactions
   const monthData = useMemo(() => {
@@ -85,47 +61,20 @@ export default function Dashboard() {
       incomes: filtered.filter((t) => t.type === "income"),
       expenses: filtered.filter((t) => t.type === "expense"),
     };
-  }, [transactions, month, transactionToMonth]);
-
-  // tổng thu nhập và chi tiêu cho tháng (memoized)
-  const totalIncome = useMemo(
-    () => monthData.incomes.reduce((s, i) => s + (Number(i.amount) || 0), 0),
-    [monthData.incomes],
-  );
-  const totalExpense = useMemo(
-    () => monthData.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0),
-    [monthData.expenses],
-  );
-
-  // số dư hiện tại
-  const balance = useMemo(
-    () => totalIncome - totalExpense,
-    [totalIncome, totalExpense],
-  );
-
-  // tính tháng trước để so sánh (memoized)
-  const prevMonth = useMemo(() => {
-    const [y, m] = month.split("-").map(Number);
-    const d = new Date(y, m - 2);
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-  }, [month]);
+  }, [transactions, month]);
 
   const prevData = useMemo(() => {
+    const prevMonthStr = prevMonth({ month });
     const filtered = transactions.filter(
-      (t) => transactionToMonth(t) === prevMonth,
+      (t) => transactionToMonth(t) === prevMonthStr,
     );
     return {
       incomes: filtered.filter((t) => t.type === "income"),
       expenses: filtered.filter((t) => t.type === "expense"),
     };
-  }, [transactions, prevMonth, transactionToMonth]);
+  }, [transactions, month]);
 
-  const prevExpense = useMemo(
-    () => prevData.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0),
-    [prevData.expenses],
-  );
-
-  // --- NEW: normalize date fields (convert Firestore Timestamp -> JS Date) ---
+  // normalize dữ liệu ngày tháng cho charts (vì có thể là Timestamp hoặc Date, memoized để tránh recreate khi không cần) - trả về array mới với date đã chuẩn hóa
   const normalizeDate = useCallback((item) => {
     if (!item) return item;
     const d =
@@ -146,37 +95,21 @@ export default function Dashboard() {
     () => monthData.incomes.map(normalizeDate),
     [monthData.incomes, normalizeDate],
   );
-  // --- END NEW ---
 
   // phần trăm thay đổi chi tiêu so với tháng trước
+
   const percentChange = useMemo(() => {
-    if (prevExpense === 0) return totalExpense === 0 ? 0 : 100;
-    return ((totalExpense - prevExpense) / prevExpense) * 100;
-  }, [totalExpense, prevExpense]);
-
-  // handlers chuyển tháng (useCallback để stable reference khi truyền xuống con)
-  const handlePrevMonth = useCallback(() => {
-    const [y, m] = month.split("-").map(Number);
-    const d = new Date(y, m - 2);
-    setMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
-  }, [month]);
-
-  const handleNextMonth = useCallback(() => {
-    const [y, m] = month.split("-").map(Number);
-    const d = new Date(y, m);
-    setMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
-  }, [month]);
+    const current = totalExpense({ monthData });
+    const prev = prevExpense({ prevDataExpenses: prevData.expenses });
+    if (prev === 0) return current === 0 ? 0 : 100;
+    return ((current - prev) / prev) * 100;
+  }, [monthData, prevData]);
 
   return (
     <MainLayout navbarBottom={true} auth={true} title={DASHBOARD.PAGE_TITLE.vi}>
       {/* Header: chọn tháng */}
       <Card className="mb-4 flex items-center gap-3 mx-auto">
-        <ChangeDate
-          month={month}
-          setMonth={setMonth}
-          onPrev={handlePrevMonth}
-          onNext={handleNextMonth}
-        />
+        <ChangeDate month={month} setMonth={setMonth} />
         {/* aria-live để thông báo thay đổi tháng cho assistive tech */}
         <div
           className="ml-auto font-semibold text-lg text-blue-500"
@@ -191,21 +124,21 @@ export default function Dashboard() {
         <CardDashboard
           type="income"
           title={DASHBOARD.CARD_TITLES.INCOME}
-          amount={totalIncome}
+          amount={totalIncome({ monthData })}
           currency="VND"
           icon={incomeIcon}
         />
         <CardDashboard
           type="expense"
           title={DASHBOARD.CARD_TITLES.EXPENSES}
-          amount={totalExpense}
+          amount={totalExpense({ monthData })}
           currency="VND"
           icon={expenseIcon}
         />
         <CardDashboard
           type="balance"
           title={DASHBOARD.CARD_TITLES.BALANCE}
-          amount={balance}
+          amount={balance({ monthData })}
           currency="VND"
           icon={balanceIcon}
         />
@@ -231,7 +164,10 @@ export default function Dashboard() {
         </Card>
 
         <Card className="col-span-1">
-          <SpendingCard current={totalExpense} limit={totalIncome} />
+          <SpendingCard
+            current={totalExpense({ monthData })}
+            limit={totalIncome({ monthData })}
+          />
         </Card>
       </div>
 

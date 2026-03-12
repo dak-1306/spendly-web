@@ -62,11 +62,11 @@ function Chat({ open, onClose, option }) {
             {answerList.map((item, index) => (
               <div className="w-full space-y-2" key={index}>
                 <p className="font-semibold flex justify-end p-1">
-                  <span className="p-2 border border-green-500 rounded-md">
+                  <span className="p-2 border border-blue-500 rounded-md">
                     Bạn: {item.question}
                   </span>
                 </p>
-                <p className="font-semibold flex justify-start p-2 border border-green-500 rounded-md">
+                <p className="font-semibold flex justify-start p-2 border border-blue-500 rounded-md">
                   AI: {item.answer}
                 </p>
               </div>
@@ -87,7 +87,7 @@ function Chat({ open, onClose, option }) {
                 }
               }}
             />
-            <Button variant="gradient" size="sm" onClick={handleSubmit}>
+            <Button variant="primary" size="sm" onClick={handleSubmit}>
               <img
                 src={SUBMIT_ICON.src}
                 alt={SUBMIT_ICON.alt}
