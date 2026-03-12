@@ -15,7 +15,7 @@ import {
   generateKey,
   getCachedAnalysis,
   saveAnalysis,
-} from "../services/firebaseAi";
+} from "../services/firebaseAI";
 
 export default function AI() {
   const { transactions: allTransactions = [] } = useTransaction();
