@@ -1,51 +1,36 @@
 // src/utils/constants.js
-import {
-  User,
-  Mail,
-  Trash2,
-  Key,
-  LogOut,
-  Edit2,
-  Search,
-  DollarSign,
-  CreditCard,
-  Wallet,
-  ArrowUp,
-  ArrowDown,
-  Eye,
-} from "lucide-react";
 
 // Footer
 export const FOOTER = {
-  text: "© 2024 Spendly. All rights reserved.",
+  text: "Spendly - Quản lý chi tiêu thông minh",
 };
 
 // Home
 export const HOME = {
-  welcomeMessage: "Manage your money. Smarter",
-  text: "Track income, expenses, and budget in one place.",
+  welcomeMessage: "Chào mừng đến với Spendly!",
+  text: "Quản lý chi tiêu của bạn một cách thông minh và dễ dàng.",
   description: [
-    "Monitor income and expenses with a clean, intuitive dashboard.",
-    "Set monthly limits and get warned before overspending.",
-    "Understand spending habits and receive smart financial suggestions.",
+    "Theo dõi chi tiêu hàng ngày và xem báo cáo chi tiết.",
+    "Chỉnh sửa và xóa các giao dịch một cách dễ dàng.",
+    "Hiểu rõ thói quen chi tiêu và nhận được những gợi ý tài chính thông minh.",
   ],
-  featureHighlightsTitle: "Feature highlights",
+  featureHighlightsTitle: "Tính năng nổi bật",
   featureHighlights: [
-    "Real-time expense tracking",
-    "Customizable budget categories",
-    "Detailed financial reports",
-    "Secure data encryption",
-    "Multi-device sync",
+    "Theo dõi chi tiêu thời gian thực",
+    "Danh mục ngân sách có thể tùy chỉnh",
+    "Báo cáo tài chính chi tiết",
+    "Mã hóa dữ liệu an toàn",
+    "Đồng bộ đa thiết bị",
   ],
-  howItWorksTitle: "How it works",
+  howItWorksTitle: "Cách hoạt động",
   howItWorks: [
-    "Sign up for a free account",
-    "Link your bank accounts",
-    "Set your budget goals",
-    "Start tracking your expenses",
-    "Review reports and adjust as needed",
+    "Đăng ký tài khoản miễn phí",
+    "Liên kết tài khoản ngân hàng",
+    "Đặt mục tiêu ngân sách",
+    "Bắt đầu theo dõi chi tiêu",
+    "Xem báo cáo và điều chỉnh khi cần thiết",
   ],
-  textButton: "Get Started for Free",
+  textButton: "Bắt đầu ngay",
 };
 
 // Settings page constants (clear, reusable names)
@@ -94,13 +79,6 @@ export const SETTINGS = {
       ],
     },
   },
-  ICONS: {
-    USER: User,
-    EMAIL: Mail,
-    KEY: Key,
-    LOGOUT: LogOut,
-    TRASH: Trash2,
-  },
 
   TEXTS: {
     LOGOUT_TITLE: "Đăng xuất",
@@ -141,12 +119,6 @@ export const EXPENSE = {
     EDIT: "Sửa",
     DELETE: "Xóa",
   },
-  ICONS: {
-    TRASH: Trash2,
-    EDIT: Edit2,
-    SEARCH: Search,
-    EYE: Eye,
-  },
 };
 
 // AI page constants
@@ -179,12 +151,5 @@ export const DASHBOARD = {
     EXPENSES_BY_CATEGORY: "Chi tiêu theo danh mục",
     INCOME_VS_EXPENSES: "Thu nhập vs Chi tiêu",
     EXPENSES_OVER_TIME: "Chi tiêu theo ngày",
-  },
-  ICONS: {
-    DOLLAR: DollarSign,
-    CREDIT_CARD: CreditCard,
-    WALLET: Wallet,
-    ARROW_UP: ArrowUp,
-    ARROW_DOWN: ArrowDown,
   },
 };

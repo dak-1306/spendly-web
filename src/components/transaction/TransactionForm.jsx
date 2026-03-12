@@ -1,5 +1,6 @@
 import Button from "../common/Button";
 import Modal from "../common/Modal";
+import Input from "../common/Input";
 
 const defaultIncomeCategories = ["Lương", "Freelance", "Khác"];
 const defaultCurrency = ["VND", "USD", "EUR", "JPY", "GBP"];
@@ -39,9 +40,6 @@ export default function TransactionForm({
         {/* Các trường nhập liệu */}
         {fields.map((field) => (
           <div key={field.name} className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              {field.label}
-            </label>
             {field.type === "select" && field.name === "category" ? (
               <select
                 name={field.name}
@@ -49,7 +47,7 @@ export default function TransactionForm({
                 onChange={field.onChange}
                 className="w-full border rounded px-3 py-2"
               >
-                <option value="">-- Chọn --</option>
+                <option value="">-- Chọn {field.label} --</option>
                 {(field.name === "category" && type === "income"
                   ? defaultIncomeCategories
                   : defaultExpenseCategories
@@ -66,7 +64,7 @@ export default function TransactionForm({
                 onChange={field.onChange}
                 className="w-full border rounded px-3 py-2"
               >
-                <option value="">-- Chọn --</option>
+                <option value="">-- Chọn {field.label} --</option>
                 {defaultCurrency.map((option) => (
                   <option key={option} value={option}>
                     {option}
@@ -74,13 +72,13 @@ export default function TransactionForm({
                 ))}
               </select>
             ) : (
-              <input
+              <Input
+                label={field.label}
                 type={field.type}
                 name={field.name}
                 placeholder={field.label}
                 value={field.value}
                 onChange={field.onChange}
-                className="w-full border rounded px-3 py-2"
               />
             )}
           </div>

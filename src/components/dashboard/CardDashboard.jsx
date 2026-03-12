@@ -1,35 +1,70 @@
-function CardDashboard({ type, title, amount = 0, currency = "VND", icon }) {
+import {
+  DollarSign,
+  CreditCard,
+  Wallet,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
+function CardDashboard({ type, title, amount = 0, currency = "VND" }) {
   const baseMap = {
-    income: "bg-green-500",
-    expense: "bg-red-500",
-    balance: "bg-yellow-500",
-    compare: "bg-blue-500",
+    income: "border-green-600",
+    expense: "border-red-600",
+    balance: "border-blue-600",
+    compare: "bg-blue-600",
+  };
+
+  const textColor = {
+    income: "text-green-600",
+    expense: "text-red-600",
+    balance: "text-blue-600",
+    compare:
+      amount > 0
+        ? "text-green-600"
+        : amount < 0
+          ? "text-red-600"
+          : "text-gray-600",
+  };
+
+  const iconColor = {
+    income: <DollarSign className="text-green-600" />,
+    expense: <CreditCard className="text-red-600" />,
+    balance: <Wallet className="text-blue-600" />,
+    compare:
+      amount > 0 ? (
+        <ArrowUp className="text-green-600" />
+      ) : amount < 0 ? (
+        <ArrowDown className="text-red-600" />
+      ) : (
+        <DollarSign className="text-gray-600" />
+      ),
   };
 
   // nếu là compare: tăng (expense tăng) => đỏ, giảm => xanh, bằng => xám
-  let bgColor = baseMap[type] || "bg-gray-500";
+  let borderColor = baseMap[type] || "bg-gray-600";
   if (type === "compare") {
-    if (amount > 0) bgColor = "bg-red-500";
-    else if (amount < 0) bgColor = "bg-green-500";
-    else bgColor = "bg-gray-500";
+    if (amount > 0) borderColor = "border-green-600";
+    else if (amount < 0) borderColor = "border-red-600";
+    else borderColor = "bg-gray-600";
   }
 
   // format số chung; với compare hiển thị dấu +/-
   const formatted =
     type === "compare"
       ? `${amount > 0 ? "+" : amount < 0 ? "-" : ""}${Math.abs(
-          Number(amount)
+          Number(amount),
         ).toFixed(2)} ${currency}`
       : new Intl.NumberFormat("vi-VN").format(amount) + " " + currency;
 
   return (
     <div
-      className={`flex items-center space-x-4 p-4 ${bgColor} rounded-lg shadow-md hover:scale-105 transition-transform`}
+      className={`flex items-center space-x-4 p-4 bg-white border ${borderColor} rounded-lg shadow-md hover:scale-105 transition-transform`}
     >
-      {icon}
+      {iconColor[type] || <DollarSign className="text-gray-600" />}
       <div>
-        <p className="text-lg font-semibold text-white">{formatted}</p>
-        <p className="text-sm text-white/80">{title}</p>
+        <p className={`text-lg font-semibold ${textColor[type]}`}>
+          {formatted}
+        </p>
+        <p className="text-sm text-gray-600">{title}</p>
       </div>
     </div>
   );

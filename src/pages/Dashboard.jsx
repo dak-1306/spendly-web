@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
 import MainLayout from "../components/layout/MainLayout";
-// import sampleData from "../data/sampleData";
 import CardDashboard from "../components/dashboard/CardDashboard";
 import SpendingCard from "../components/dashboard/SpendingCard";
 import SpendingBarChart from "../components/dashboard/SpendingBarChart";
@@ -9,14 +8,6 @@ import Card from "../components/common/Card";
 import ChangeDate from "../components/common/ChangeDate";
 import { DASHBOARD } from "../utils/constants";
 import { useTransaction } from "../hooks/useTransaction";
-
-import {
-  DollarSign,
-  CreditCard,
-  Wallet,
-  ArrowUp,
-  ArrowDown,
-} from "lucide-react";
 
 import {
   transactionToMonth,
@@ -41,13 +32,6 @@ export default function Dashboard() {
       "0",
     )}`;
   });
-
-  // Icon
-  const incomeIcon = <DollarSign className="text-white" size={24} />;
-  const expenseIcon = <CreditCard className="text-white" size={24} />;
-  const balanceIcon = <Wallet className="text-white" size={24} />;
-  const arrowUp = <ArrowUp className="text-white" size={24} />;
-  const arrowDown = <ArrowDown className="text-white" size={24} />;
 
   // lấy dữ liệu cho tháng đang chọn từ transactions
   const monthData = useMemo(() => {
@@ -123,28 +107,24 @@ export default function Dashboard() {
           title={DASHBOARD.CARD_TITLES.INCOME}
           amount={totalIncome({ monthData })}
           currency="VND"
-          icon={incomeIcon}
         />
         <CardDashboard
           type="expense"
           title={DASHBOARD.CARD_TITLES.EXPENSES}
           amount={totalExpense({ monthData })}
           currency="VND"
-          icon={expenseIcon}
         />
         <CardDashboard
           type="balance"
           title={DASHBOARD.CARD_TITLES.BALANCE}
           amount={balance({ monthData })}
           currency="VND"
-          icon={balanceIcon}
         />
         <CardDashboard
           type="compare"
           title={DASHBOARD.CARD_TITLES.COMPARE}
           amount={formatPercent(percentChange)}
           currency="%"
-          icon={percentChange >= 0 ? arrowUp : arrowDown}
         />
       </div>
 

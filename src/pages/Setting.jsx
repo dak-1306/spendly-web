@@ -112,14 +112,6 @@ export default function Setting() {
               >
                 Làm mới
               </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={openLogoutConfirm}
-                disabled={loading}
-              >
-                {TEXTS.LOGOUT_TITLE}
-              </Button>
             </div>
           </div>
         </Card>

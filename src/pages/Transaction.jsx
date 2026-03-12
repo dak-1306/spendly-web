@@ -16,6 +16,11 @@ import { formatForInputDate, formatForDisplay } from "../utils/financial.js";
 import { Link } from "react-router-dom";
 
 export default function Transaction() {
+  // Icon
+  const editIcon = <Edit2 className="text-blue-600" size={16} />;
+  const trashIcon = <Trash2 className="text-red-600" size={16} />;
+  const eyeIcon = <Eye className="text-gray-600" size={16} />;
+
   const { transactions, loading, error } = useTransaction();
   /* ---------- Modal / UI state ---------- */
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
@@ -36,11 +41,6 @@ export default function Transaction() {
       return d.toISOString().slice(0, 7);
     })(),
   );
-
-  // Icon
-  const editIcon = <Edit2 className="text-blue-600" size={16} />;
-  const trashIcon = <Trash2 className="text-red-600" size={16} />;
-  const eyeIcon = <Eye className="text-gray-600" size={16} />;
 
   // Chuẩn hóa transactions thành incomes/expenses cho tháng hiện tại (memoized)
   const transactionNormalize = useMemo(() => {
@@ -186,7 +186,7 @@ export default function Transaction() {
             >
               {EXPENSE.BUTTONS.ADD_EXPENSE}
             </Button>
-            <Button variant="primary" onClick={() => setIsAddIncomeOpen(true)}>
+            <Button variant="cta" onClick={() => setIsAddIncomeOpen(true)}>
               {EXPENSE.BUTTONS.ADD_INCOME}
             </Button>
           </div>
@@ -302,46 +302,57 @@ export default function Transaction() {
           </div>
         </Card>
 
-        <AddModel
-          open={isAddExpenseOpen}
-          onClose={() => setIsAddExpenseOpen(false)}
-          role="expense"
-        />
-        <AddModel
-          open={isAddIncomeOpen}
-          onClose={() => setIsAddIncomeOpen(false)}
-          role="income"
-        />
+        {isAddExpenseOpen && (
+          <AddModel
+            open={isAddExpenseOpen}
+            onClose={() => setIsAddExpenseOpen(false)}
+            role="expense"
+          />
+        )}
+        {isAddIncomeOpen && (
+          <AddModel
+            open={isAddIncomeOpen}
+            onClose={() => setIsAddIncomeOpen(false)}
+            role="income"
+          />
+        )}
 
-        <EditModel
-          open={isEditOpen}
-          onClose={() => {
-            setIsEditOpen(false);
-            setEditingExpense(null);
-          }}
-          role="expense"
-          data={editingExpense}
-        />
+        {isEditOpen && editingExpense && (
+          <EditModel
+            open={isEditOpen}
+            onClose={() => {
+              setIsEditOpen(false);
+              setEditingExpense(null);
+            }}
+            role="expense"
+            data={editingExpense}
+          />
+        )}
 
-        <EditModel
-          open={isEditIncomeOpen}
-          onClose={() => {
-            setIsEditIncomeOpen(false);
-            setEditingIncome(null);
-          }}
-          role="income"
-          data={editingIncome}
-        />
+        {isEditIncomeOpen && editingIncome && (
+          <EditModel
+            open={isEditIncomeOpen}
+            onClose={() => {
+              setIsEditIncomeOpen(false);
+              setEditingIncome(null);
+            }}
+            role="income"
+            data={editingIncome}
+          />
+        )}
 
-        <DeleteModel
-          open={isDeleteOpen}
-          onClose={() => {
-            setIsDeleteOpen(false);
-            setDeletingItem(null);
-          }}
-          role={deletingRole}
-          item={deletingItem}
-        />
+        {isDeleteOpen && deletingItem && (
+          <DeleteModel
+            open={isDeleteOpen}
+            onClose={() => {
+              setIsDeleteOpen(false);
+              setDeletingItem(null);
+              setDeletingRole("expense");
+            }}
+            role={deletingRole}
+            item={deletingItem}
+          />
+        )}
       </div>
     </MainLayout>
   );

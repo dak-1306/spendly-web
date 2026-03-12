@@ -1,4 +1,5 @@
 import Button from "../common/Button";
+import Input from "../common/Input";
 import { Search } from "lucide-react";
 
 export default function FilterExpense({
@@ -14,10 +15,6 @@ export default function FilterExpense({
   searchTerm,
   setSearchTerm,
 }) {
-  // Icons
-  const searchIcon = (
-    <Search className="w-5 h-5 text-[var(--primary-blue-color)]" />
-  );
   // Filter labels and placeholders
   const Filter = {
     buttonAll: " Tất cả",
@@ -75,15 +72,14 @@ export default function FilterExpense({
       </div>
 
       <form className="flex items-center" onSubmit={(e) => e.preventDefault()}>
-        <input
+        <Input
           type="text"
           placeholder={Filter.searchPlaceholder}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border border-gray-300 rounded-md px-4 py-2 ml-auto"
         />
-        <Button variant="outline" className="ml-2">
-          {searchIcon}
+        <Button variant="primary" className="ml-2">
+          <Search className="w-5 h-5 text-white" />
         </Button>
       </form>
     </div>
