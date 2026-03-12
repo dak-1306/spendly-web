@@ -94,18 +94,18 @@ export default function Home() {
         </Card>
 
         {/* Right: giới thiệu, tính năng và CTA */}
-        <div className="flex flex-col justify-center items-center p-8 space-y-6">
+        <div className="flex flex-col justify-center items-center p-8 space-y-4">
           <h1 className="text-blue-600 text-3xl font-bold">
             {HOME.welcomeMessage}
           </h1>
-          <p className="text-orange-600">{HOME.text}</p>
+          <p className="text-lg text-orange-600">{HOME.text}</p>
 
           <Card
             className="flex flex-col items-start space-y-4"
             animation={true}
           >
             {HOME.description.map((desc, index) => (
-              <p key={index} className="text-center text-lg text-body">
+              <p key={index} className="text-gray-700 text-lg">
                 {desc}
               </p>
             ))}
