@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useCallback } from "react";
 import MainLayout from "../components/layout/MainLayout";
 import Button from "../components/common/Button";
 import Card from "../components/common/Card";
@@ -9,6 +9,7 @@ import { SETTINGS } from "../utils/constants";
 import { useAuth } from "../hooks/useAuth"; // <-- giữ để dùng logout
 import useUser from "../hooks/useUser"; // <-- thêm useUser
 import { useNavigate } from "react-router-dom";
+import { User, Mail, Key, Trash2, LogOut } from "lucide-react"; // <-- icons
 
 /*
   Setting.jsx
@@ -16,23 +17,13 @@ import { useNavigate } from "react-router-dom";
 */
 
 export default function Setting() {
-  const { PAGE_TITLE, HEADINGS, USER_INFO, UI_SETTINGS, TEXTS, ICONS } =
-    SETTINGS;
+  const { PAGE_TITLE, HEADINGS, USER_INFO, UI_SETTINGS, TEXTS } = SETTINGS;
 
-  const {
-    USER: UserIconComp,
-    EMAIL: EmailIconComp,
-    TRASH: TrashIconComp,
-    KEY: KeyIconComp,
-    LOGOUT: LogoutIconComp,
-  } = ICONS;
-
-  const UserIcon = <UserIconComp className="w-6 h-6 text-blue-500" />;
-    
-  const EmailIcon = <EmailIconComp className="w-6 h-6 text-green-500" />;
-  const KeyIcon = <KeyIconComp className="w-6 h-6 text-green-500" />;
-  const TrashIcon = <TrashIconComp className="w-6 h-6 text-red-500" />;
-  const LogoutIcon = <LogoutIconComp className="w-6 h-6 text-blue-500" />;
+  const UserIcon = <User className="text-blue-500" size={24} />;
+  const EmailIcon = <Mail className="text-green-500" size={24} />;
+  const KeyIcon = <Key className="text-green-500" size={24} />;
+  const TrashIcon = <Trash2 className="text-red-500" size={24} />;
+  const LogoutIcon = <LogOut className="text-blue-500" size={24} />;
 
   const { user, loading: authLoading, logout } = useAuth(); // auth context (for logout)
   const { userDoc, loading: userLoading, refresh: refreshUser } = useUser(); // user context

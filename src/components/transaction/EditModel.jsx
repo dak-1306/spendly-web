@@ -1,5 +1,5 @@
 import TransactionForm from "./TransactionForm";
-import useTransaction from "../../hooks/useTransaction";
+import { useTransaction } from "../../hooks/useTransaction";
 import { useState, useEffect } from "react";
 export default function EditModel({
   open = false,
@@ -11,9 +11,11 @@ export default function EditModel({
   const [field, setField] = useState({
     title: "",
     amount: "",
+    source: "",
     currency: "",
     category: "",
     date: "",
+    month: "",
   });
   console.log("EditModel received data:", data);
 
@@ -25,6 +27,8 @@ export default function EditModel({
         currency: data.currency || "",
         category: data.category || "",
         date: data.date || "",
+        source: data.source || "",
+        month: data.month || "",
       });
     } else {
       setField({
@@ -33,6 +37,8 @@ export default function EditModel({
         currency: "",
         category: "",
         date: "",
+        source: "",
+        month: "",
       });
     }
   }, [data]);
@@ -66,6 +72,8 @@ export default function EditModel({
         currency: "",
         category: "",
         date: "",
+        source: "",
+        month: "",
       });
     }
   };
@@ -84,6 +92,13 @@ export default function EditModel({
       type: "number",
       value: field.amount,
       onChange: handleFieldChange("amount"),
+    },
+    {
+      name: "source",
+      label: "Nguồn",
+      type: "text",
+      value: field.source,
+      onChange: handleFieldChange("source"),
     },
     {
       name: "date",
@@ -105,6 +120,14 @@ export default function EditModel({
       type: "select",
       value: field.currency,
       onChange: handleFieldChange("currency"),
+    },
+
+    {
+      name: "month",
+      label: "Tháng",
+      type: "text",
+      value: field.month,
+      onChange: handleFieldChange("month"),
     },
   ];
   console.log("Initial values for form fields:", field);

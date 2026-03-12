@@ -6,7 +6,7 @@ import Chat from "../components/ai/Chat.jsx";
 import { AI_CONSTANTS } from "../utils/constants.js";
 import { ICONS } from "../assets/index.js";
 import { useFinancialReport } from "../hooks/useFinancialReport";
-import useTransaction from "../hooks/useTransaction";
+import { useTransaction } from "../hooks/useTransaction";
 import ReactMarkdown from "react-markdown";
 import { buildFinancialPayload } from "../services/ai.transform";
 import { getAuth } from "firebase/auth";

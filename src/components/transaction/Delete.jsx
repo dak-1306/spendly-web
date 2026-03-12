@@ -1,5 +1,5 @@
 import DeleteConfirm from "../common/DeleteConfirm.jsx";
-import useTransaction from "../../hooks/useTransaction.js";
+import { useTransaction } from "../../hooks/useTransaction.js";
 import { useCallback } from "react";
 
 export default function DeleteModel({

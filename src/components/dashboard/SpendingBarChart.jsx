@@ -7,13 +7,8 @@ import React, { useMemo } from "react";
  *
  * Simple SVG bar chart showing total expense per day in the given month.
  */
-function SpendingBarChart({
-  month,
-  title,
-  expenses = [],
-  width = 1000,
-  height = 240,
-}) {
+const BAR_CHART_CONFIG = { WIDTH: 1000, HEIGHT: 240 };
+function SpendingBarChart({ month, title, expenses = [] }) {
   const { days, dailyTotals, max, tickVals } = useMemo(() => {
     const [year, monthNum] = month.split("-").map(Number);
     const daysCount = new Date(year, monthNum, 0).getDate(); // days in month
@@ -55,8 +50,8 @@ function SpendingBarChart({
   }, [month, expenses]);
 
   const margin = { top: 16, right: 12, bottom: 28, left: 80 }; // tăng lề trái để chứa nhãn lớn
-  const chartW = width - margin.left - margin.right;
-  const chartH = height - margin.top - margin.bottom;
+  const chartW = BAR_CHART_CONFIG.WIDTH - margin.left - margin.right;
+  const chartH = BAR_CHART_CONFIG.HEIGHT - margin.top - margin.bottom;
   const barSlot = chartW / days;
   const barW = Math.max(2, barSlot - 6);
 
@@ -65,11 +60,13 @@ function SpendingBarChart({
 
   return (
     <div className="w-full overflow-auto">
-      <h2 className="text-xl font-semibold mb-4 text-[var(--primary-blue-color)]">{title}</h2>
+      <h2 className="text-xl font-semibold mb-4 text-[var(--primary-blue-color)]">
+        {title}
+      </h2>
       <svg
-        viewBox={`0 0 ${width} ${height}`}
+        viewBox={`0 0 ${BAR_CHART_CONFIG.WIDTH} ${BAR_CHART_CONFIG.HEIGHT}`}
         width="100%"
-        height={height}
+        height={BAR_CHART_CONFIG.HEIGHT}
         preserveAspectRatio="xMinYMin meet"
         role="img"
         aria-label="Spending per day"

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { TransactionContext } from "./TransactionContextValue";
 import { transactionService } from "../services";
 import { useAuth } from "../hooks/useAuth";
+import { TransactionContext } from "../hooks/useTransaction";
 import { Timestamp } from "firebase/firestore";
 
 export const TransactionProvider = ({ children }) => {
@@ -38,6 +38,15 @@ export const TransactionProvider = ({ children }) => {
     return () => unsub && unsub();
   }, [currentUid]);
 
+  // Get transaction by ID
+  const getTransactionById = async (id) => {
+    try {
+      return await transactionService.getTransactionById(id);
+    } catch (e) {
+      setError(e);
+      throw e;
+    }
+  };
   // addTransaction nhận payload từ TransactionForm với đầy đủ các trường
   const addTransaction = async (formPayload) => {
     try {
@@ -91,6 +100,7 @@ export const TransactionProvider = ({ children }) => {
         addTransaction,
         updateTransaction,
         deleteTransaction,
+        getTransactionById,
       }}
     >
       {children}

@@ -1,5 +1,5 @@
 import TransactionForm from "./TransactionForm";
-import useTransaction from "../../hooks/useTransaction";
+import { useTransaction } from "../../hooks/useTransaction";
 import { useCallback, useState } from "react";
 
 export default function AddModel({ open = false, onClose = () => {}, role }) {
@@ -60,14 +60,14 @@ export default function AddModel({ open = false, onClose = () => {}, role }) {
   const fields = [
     {
       name: "title",
-      label: role === "income" ? "Nguồn thu" : "Mục chi",
+      label: "Tiêu đề",
       value: title,
       type: "text",
       onChange: handleFieldChange("title"),
     },
     {
       name: "source",
-      label: "Nguồn",
+      label: role === "income" ? "Nguồn thu nhập" : "Mô tả chi tiêu",
       value: source,
       type: "text",
       onChange: handleFieldChange("source"),

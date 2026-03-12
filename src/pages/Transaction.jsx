@@ -8,12 +8,16 @@ import AddModel from "../components/transaction/AddModel.jsx";
 import EditModel from "../components/transaction/EditModel.jsx";
 import DeleteModel from "../components/transaction/Delete.jsx";
 import FilterExpense from "../components/transaction/FilterExpense.jsx";
+import { Trash2, Edit2, Eye } from "lucide-react";
 import { EXPENSE } from "../utils/constants.js";
-import useTransaction from "../hooks/useTransaction";
+import { useTransaction } from "../hooks/useTransaction";
+import { formatForInputDate, formatForDisplay } from "../utils/financial.js";
+
+import { Link } from "react-router-dom";
 
 export default function Transaction() {
-    const { transactions, loading, error} = useTransaction();
-    /* ---------- Modal / UI state ---------- */
+  const { transactions, loading, error } = useTransaction();
+  /* ---------- Modal / UI state ---------- */
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isAddIncomeOpen, setIsAddIncomeOpen] = useState(false);
 
@@ -33,51 +37,40 @@ export default function Transaction() {
     })(),
   );
 
-  const { TRASH: TrashIconComp, EDIT: EditIconComp } = EXPENSE.ICONS;
-  // Icon components (khai báo ngoài render để tránh recreate mỗi render)
-  const trashIcon = <TrashIconComp className="w-5 h-5 text-red-600" />; 
-  const editIcon = <EditIconComp className="w-5 h-5 text-blue-600" />;
+  // Icon
+  const editIcon = <Edit2 className="text-blue-600" size={16} />;
+  const trashIcon = <Trash2 className="text-red-600" size={16} />;
+  const eyeIcon = <Eye className="text-gray-600" size={16} />;
 
-  // derive incomes / expenses from context transactions by month
-  const incomes = useMemo(() => {
-    return (transactions || [])
-      .filter((t) => t.type === "income" && t.month === month)
-      .map((t) => ({
-        id: t.id,
-        userId: t.userId,
-        type: t.type,
-        source: t.source,
-        category: t.category,
-        title: t.title,
-        amount: t.amount,
-        currency: t.currency,
-        date:
-          t.date && typeof t.date.toDate === "function"
-            ? t.date.toDate().toISOString().slice(0, 10)
-            : (t.date ?? ""),
-        month: t.month,
-      }));
+  // Chuẩn hóa transactions thành incomes/expenses cho tháng hiện tại (memoized)
+  const transactionNormalize = useMemo(() => {
+    const monthData = {
+      incomes: [],
+      expenses: [],
+    };
+    transactions.forEach((t) => {
+      if (t.type === "income" && t.month === month) {
+        const date = formatForInputDate(t.date);
+        monthData.incomes.push({
+          ...t,
+          date,
+        });
+      } else if (t.type === "expense" && t.month === month) {
+        const date = formatForInputDate(t.date);
+        monthData.expenses.push({
+          ...t,
+          date,
+        });
+      }
+    });
+    return monthData;
   }, [transactions, month]);
 
-  const expenses = useMemo(() => {
-    return (transactions || [])
-      .filter((t) => t.type === "expense" && t.month === month)
-      .map((t) => ({
-        id: t.id,
-        userId: t.userId,
-        type: t.type,
-        source: t.source,
-        category: t.category,
-        title: t.title,
-        amount: t.amount,
-        currency: t.currency,
-        date:
-          t.date && typeof t.date.toDate === "function"
-            ? t.date.toDate().toISOString().slice(0, 10)
-            : (t.date ?? ""),
-        month: t.month,
-      }));
-  }, [transactions, month]);
+  const { incomes, expenses } = transactionNormalize;
+  console.log("Normalized transactions for month", month, {
+    incomes,
+    expenses,
+  });
 
   /* ---------- Helpers mở modal ---------- */
   const openEdit = useCallback((expense) => {
@@ -155,7 +148,6 @@ export default function Transaction() {
     amountRanges,
   ]);
 
-
   /* ---------- Render ---------- */
   if (loading) {
     return (
@@ -185,11 +177,7 @@ export default function Transaction() {
         )}
 
         <Card className="flex justify-between items-center mx-auto">
-          <ChangeDate
-            month={month}
-            setMonth={setMonth}
-            
-          />
+          <ChangeDate month={month} setMonth={setMonth} />
           <div className="flex">
             <Button
               variant="primary"
@@ -205,7 +193,7 @@ export default function Transaction() {
         </Card>
 
         <Card className="flex flex-col">
-          <h2 className="text-xl font-semibold mb-4 text-[--primary-blue-color]">
+          <h2 className="text-xl font-semibold mb-4 text-blue-600">
             Thu nhập tháng {month}
           </h2>
 
@@ -219,11 +207,13 @@ export default function Transaction() {
                 className="py-2 border-b border-gray-300 flex justify-between items-center"
               >
                 <p className="flex items-center gap-4">
-                  <span className="text-blue-600 font-medium">
+                  <span className="text-gray-700 font-medium">
                     {income.source ?? "Thu nhập"}
                   </span>
                   <span className="text-gray-500">{income.title ?? ""}</span>
-                  <span className="text-gray-500">{income.date ?? ""}</span>
+                  <span className="text-gray-500">
+                    {formatForDisplay(income.date) ?? ""}
+                  </span>
                 </p>
                 <span className="font-semibold text-green-600">
                   {income.amount?.toLocaleString() ?? 0}{" "}
@@ -239,6 +229,9 @@ export default function Transaction() {
                   >
                     {trashIcon}
                   </Button>
+                  <Link to={`/transaction/${income.id}`}>
+                    <Button variant="ghost">{eyeIcon}</Button>
+                  </Link>
                 </div>
               </li>
             ))}
@@ -281,7 +274,9 @@ export default function Transaction() {
                   >
                     <td className="px-4 py-4">{expense.category}</td>
                     <td className="px-4 py-4">{expense.title}</td>
-                    <td className="px-4 py-4">{expense.date}</td>
+                    <td className="px-4 py-4">
+                      {formatForDisplay(expense.date)}
+                    </td>
                     <td className="px-4 py-4 font-semibold text-red-600">
                       {expense.amount?.toLocaleString() ?? 0}{" "}
                       {expense.currency ?? "VND"}
@@ -296,6 +291,9 @@ export default function Transaction() {
                       >
                         {trashIcon}
                       </Button>
+                      <Link to={`/transaction/${expense.id}`}>
+                        <Button variant="ghost">{eyeIcon}</Button>
+                      </Link>
                     </td>
                   </tr>
                 ))}

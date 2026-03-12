@@ -9,14 +9,8 @@ import React, { useMemo, useState } from "react";
  *
  * Renders an SVG pie chart of expense amounts grouped by category with a legend.
  */
-function SpendingPieChart({
-  month,
-  title,
-  expenses = [],
-  width = 420,
-  height = 320,
-  colors,
-}) {
+const PIE_CHART_CONFIG = { WIDTH: 440, HEIGHT: 240 };
+function SpendingPieChart({ month, title, expenses = [] }) {
   const [hoverIndex, setHoverIndex] = useState(null);
 
   const { groups, total } = useMemo(() => {
@@ -48,7 +42,7 @@ function SpendingPieChart({
     return { groups: arr, total: tot };
   }, [month, expenses]);
 
-  const palette = colors || [
+  const palette = [
     "#3b82f6",
     "#ef4444",
     "#10b981",
@@ -61,8 +55,14 @@ function SpendingPieChart({
 
   // center & radius (adjust as needed)
   // leave room at bottom for the "Tổng" label by subtracting 60px from height
-  const r = Math.min(width, Math.max(0, height - 60)) / 2 - 8;
-  const cx = width / 2;
+  const r =
+    Math.min(
+      PIE_CHART_CONFIG.WIDTH,
+      Math.max(0, PIE_CHART_CONFIG.HEIGHT - 60),
+    ) /
+      2 -
+    8;
+  const cx = PIE_CHART_CONFIG.WIDTH / 2;
   const cy = Math.max(r + 12, r); // place circle near top with some padding
 
   // describe arc correctly: startAngle -> endAngle (degrees)
@@ -112,21 +112,13 @@ function SpendingPieChart({
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4 text-[var(--primary-blue-color)]">
-        {title}
-      </h2>
+      <h2 className="text-xl font-semibold mb-4 text-blue-500">{title}</h2>
       <div className="flex flex-col md:flex-row gap-4 items-start">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
+        <div className="flex flex-col items-center">
           <svg
-            width={width}
-            height={height}
-            viewBox={`0 0 ${width} ${height}`}
+            width={PIE_CHART_CONFIG.WIDTH}
+            height={PIE_CHART_CONFIG.HEIGHT}
+            viewBox={`0 0 ${PIE_CHART_CONFIG.WIDTH} ${PIE_CHART_CONFIG.HEIGHT}`}
             role="img"
             aria-label="Spending by category pie chart"
           >
@@ -154,7 +146,7 @@ function SpendingPieChart({
                         onMouseLeave={() => setHoverIndex(null)}
                       >
                         <title>{`${s.category}: ${fmtAmount(
-                          s.amount
+                          s.amount,
                         )} (${s.percent.toFixed(2)}%)`}</title>
                       </circle>
                     </g>
@@ -175,7 +167,7 @@ function SpendingPieChart({
                       onMouseLeave={() => setHoverIndex(null)}
                     >
                       <title>{`${s.category}: ${fmtAmount(
-                        s.amount
+                        s.amount,
                       )} (${s.percent.toFixed(2)}%)`}</title>
                     </path>
                   </g>
@@ -185,17 +177,15 @@ function SpendingPieChart({
           </svg>
 
           {/* moved total label below the chart to avoid overlap */}
-          <div style={{ textAlign: "center", marginTop: 8 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>
-              Tổng
-            </div>
-            <div style={{ fontSize: 13, color: "#374151" }}>
+          <div className="mt-2 flex justify-center items-center gap-1">
+            <div className="text-sm text-gray-700">Tổng</div>
+            <div className="text-sm font-bold text-gray-900">
               {fmtAmount(total)} VND
             </div>
           </div>
         </div>
 
-        <div style={{ minWidth: 140 }}>
+        <div className="min-w-[140px]">
           {slices.length === 0 && (
             <div className="text-sm text-gray-500">Không có dữ liệu</div>
           )}
@@ -205,29 +195,20 @@ function SpendingPieChart({
                 key={s.category}
                 onMouseEnter={() => setHoverIndex(idx)}
                 onMouseLeave={() => setHoverIndex(null)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  opacity:
-                    hoverIndex === null ? 1 : hoverIndex === idx ? 1 : 0.6,
-                  cursor: "default",
-                }}
+                className={`flex items-center gap-2 p-2 rounded ${hoverIndex === idx ? "bg-gray-100" : ""} cursor-pointer`}
               >
                 <span
-                  style={{
-                    width: 12,
-                    height: 12,
-                    background: s.color,
-                    display: "inline-block",
-                    borderRadius: 3,
-                  }}
+                  className="inline-block w-3 h-3 rounded-full"
+                  style={{ backgroundColor: s.color }}
                 />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, color: "#0f172a" }}>
+                <div className="flex-1">
+                  <div
+                    className="text-sm font-medium"
+                    style={{ color: s.color }}
+                  >
                     {s.category}
                   </div>
-                  <div style={{ fontSize: 12, color: "#6b7280" }}>
+                  <div className="text-xs text-gray-500">
                     {fmtAmount(s.amount)} VND • {s.percent.toFixed(2)}%
                   </div>
                 </div>

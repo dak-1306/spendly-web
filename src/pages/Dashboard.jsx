@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import MainLayout from "../components/layout/MainLayout";
 // import sampleData from "../data/sampleData";
 import CardDashboard from "../components/dashboard/CardDashboard";
@@ -8,7 +8,15 @@ import SpendingPieChart from "../components/dashboard/SpendingPieChart";
 import Card from "../components/common/Card";
 import ChangeDate from "../components/common/ChangeDate";
 import { DASHBOARD } from "../utils/constants";
-import useTransaction from "../hooks/useTransaction";
+import { useTransaction } from "../hooks/useTransaction";
+
+import {
+  DollarSign,
+  CreditCard,
+  Wallet,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 
 import {
   transactionToMonth,
@@ -21,8 +29,6 @@ import {
 } from "../utils/financial";
 
 /* Static chart config (khai báo ngoài component để tránh recreate mỗi render) */
-const PIE_CHART_CONFIG = { WIDTH: 440, HEIGHT: 240 };
-const BAR_CHART_CONFIG = { WIDTH: 1000, HEIGHT: 240 };
 
 export default function Dashboard() {
   // transactions từ context (dữ liệu thật)
@@ -36,21 +42,12 @@ export default function Dashboard() {
     )}`;
   });
 
-  // lấy component icon từ constants (component refs, không phải JSX)
-  const {
-    DOLLAR: DollarIconComp,
-    CREDIT_CARD: CreditCardComp,
-    WALLET: WalletComp,
-    ARROW_UP: ArrowUpComp,
-    ARROW_DOWN: ArrowDownComp,
-  } = DASHBOARD.ICONS;
-
   // Icon
-  const incomeIcon = <DollarIconComp className="w-6 h-6 text-white" />;
-  const expenseIcon = <CreditCardComp className="w-6 h-6 text-white" />;
-  const balanceIcon = <WalletComp className="w-6 h-6 text-white" />;
-  const arrowUp = <ArrowUpComp className="w-6 h-6 text-white" />;
-  const arrowDown = <ArrowDownComp className="w-6 h-6 text-white" />;
+  const incomeIcon = <DollarSign className="text-white" size={24} />;
+  const expenseIcon = <CreditCard className="text-white" size={24} />;
+  const balanceIcon = <Wallet className="text-white" size={24} />;
+  const arrowUp = <ArrowUp className="text-white" size={24} />;
+  const arrowDown = <ArrowDown className="text-white" size={24} />;
 
   // lấy dữ liệu cho tháng đang chọn từ transactions
   const monthData = useMemo(() => {
@@ -158,8 +155,6 @@ export default function Dashboard() {
             month={month}
             title={DASHBOARD.CHART_TITLES.EXPENSES_BY_CATEGORY}
             expenses={normalizedMonthExpenses}
-            width={PIE_CHART_CONFIG.WIDTH}
-            height={PIE_CHART_CONFIG.HEIGHT}
           />
         </Card>
 
@@ -177,8 +172,6 @@ export default function Dashboard() {
           month={month}
           title={DASHBOARD.CHART_TITLES.EXPENSES_OVER_TIME}
           expenses={normalizedMonthExpenses}
-          width={BAR_CHART_CONFIG.WIDTH}
-          height={BAR_CHART_CONFIG.HEIGHT}
         />
       </Card>
     </MainLayout>

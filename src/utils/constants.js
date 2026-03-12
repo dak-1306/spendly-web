@@ -12,6 +12,7 @@ import {
   Wallet,
   ArrowUp,
   ArrowDown,
+  Eye,
 } from "lucide-react";
 
 // Footer
@@ -144,6 +145,7 @@ export const EXPENSE = {
     TRASH: Trash2,
     EDIT: Edit2,
     SEARCH: Search,
+    EYE: Eye,
   },
 };
 
