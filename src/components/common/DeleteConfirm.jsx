@@ -19,12 +19,16 @@ export default function DeleteConfirm({
   return (
     <Modal isOpen={open} onClose={onClose}>
       <div className="bg-red-500 p-4">
-        <h3 className="text-lg text-white font-semibold text-center">
+        <h3 className="text-lg text-white dark:text-gray-300 font-semibold text-center">
           {title}
         </h3>
       </div>
       <div className="p-4 space-y-4">
-        {description && <p className=" text-md text-gray-700">{description}</p>}
+        {description && (
+          <p className=" text-md text-gray-700 dark:text-gray-300">
+            {description}
+          </p>
+        )}
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>

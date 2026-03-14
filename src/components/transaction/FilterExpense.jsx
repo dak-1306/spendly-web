@@ -37,7 +37,7 @@ export default function FilterExpense({
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="border border-gray-300 rounded-md px-3 py-2"
+          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-md px-3 py-2"
         >
           <option value="">{Filter.selectCategory}</option>
           {expenseCategories.map((c) => (
@@ -50,7 +50,7 @@ export default function FilterExpense({
         <select
           value={dateSort}
           onChange={(e) => setDateSort(e.target.value)}
-          className="border border-gray-300 rounded-md px-3 py-2 "
+          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-md px-3 py-2 "
         >
           <option value="">{Filter.selectDate}</option>
           <option value="asc">{Filter.optionsDate.asc}</option>
@@ -60,7 +60,7 @@ export default function FilterExpense({
         <select
           value={selectedAmountRange}
           onChange={(e) => setSelectedAmountRange(e.target.value)}
-          className="border border-gray-300 rounded-md px-3 py-2"
+          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-md px-3 py-2"
         >
           <option value="">{Filter.selectAmount}</option>
           {amountRanges.map((r) => (

@@ -2,7 +2,7 @@ import TransactionForm from "./TransactionForm";
 import { useTransaction } from "../../hooks/useTransaction";
 import { useCallback, useState } from "react";
 
-export default function AddModel({ open = false, onClose = () => {}, role }) {
+export default function AddTransaction({ open = false, onClose = () => {}, role }) {
   const { addTransaction } = useTransaction();
   const [field, setField] = useState({
     title: "",
@@ -15,6 +15,7 @@ export default function AddModel({ open = false, onClose = () => {}, role }) {
   });
   const { title, amount, source, currency, category, date, month } = field;
 
+  // Hàm xử lý thay đổi giá trị của các trường input
   const handleFieldChange = (field) => (e) => {
     const value = e.target.value;
     setField((prev) => ({
@@ -23,7 +24,9 @@ export default function AddModel({ open = false, onClose = () => {}, role }) {
     }));
   };
   console.log("AddModel field state:", field);
-  const handleAddExpenseSubmit = useCallback(
+
+  // Hàm xử lý submit form thêm giao dịch
+  const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
       const formPayload = { ...field, type: role };
@@ -32,31 +35,13 @@ export default function AddModel({ open = false, onClose = () => {}, role }) {
         await addTransaction(formPayload);
         onClose();
       } catch (err) {
-        alert("Thêm chi tiêu thất bại.");
+        alert("Thêm giao dịch thất bại.");
         console.error(err);
       }
     },
     [addTransaction, field, onClose, role],
   );
 
-  const handleAddIncomeSubmit = useCallback(
-    async (e) => {
-      e.preventDefault();
-      const formPayload = { ...field, type: role };
-      try {
-        console.log("Submitting income with payload:", formPayload);
-        await addTransaction(formPayload);
-        onClose();
-      } catch (err) {
-        alert("Thêm thu nhập thất bại.");
-        console.error(err);
-      }
-    },
-    [addTransaction, field, onClose, role],
-  );
-
-  const handleSubmit =
-    role === "income" ? handleAddIncomeSubmit : handleAddExpenseSubmit;
   const fields = [
     {
       name: "title",

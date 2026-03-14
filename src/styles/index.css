@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 :root {
   /* Fonts */
   --font-family-base: "Poppins", sans-serif;

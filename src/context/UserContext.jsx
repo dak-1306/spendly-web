@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { UserContext } from "../hooks/useUser";
 import { subscribeAuth } from "../services/auth.service";
 import { createUserIfNotExists } from "../services/user.service";

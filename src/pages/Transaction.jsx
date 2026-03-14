@@ -4,11 +4,11 @@ import LineColor from "../components/common/LineColor.jsx";
 import Card from "../components/common/Card.jsx";
 import Button from "../components/common/Button.jsx";
 import ChangeDate from "../components/common/ChangeDate.jsx";
-import AddModel from "../components/transaction/AddModel.jsx";
-import EditModel from "../components/transaction/EditModel.jsx";
-import DeleteModel from "../components/transaction/Delete.jsx";
+import AddTransaction from "../components/transaction/AddTransaction.jsx";
+import EditTransaction from "../components/transaction/EditTransaction.jsx";
+import DeleteTransaction from "../components/transaction/DeleteTransaction.jsx";
 import FilterExpense from "../components/transaction/FilterExpense.jsx";
-import { Trash2, Edit2, Eye } from "lucide-react";
+import { Trash2, Edit2, Eye, Edit } from "lucide-react";
 import { EXPENSE } from "../utils/constants.js";
 import { useTransaction } from "../hooks/useTransaction";
 import { formatForInputDate, formatForDisplay } from "../utils/financial.js";
@@ -19,7 +19,9 @@ export default function Transaction() {
   // Icon
   const editIcon = <Edit2 className="text-blue-600" size={16} />;
   const trashIcon = <Trash2 className="text-red-600" size={16} />;
-  const eyeIcon = <Eye className="text-gray-600" size={16} />;
+  const eyeIcon = (
+    <Eye className="text-gray-600 dark:text-gray-400" size={16} />
+  );
 
   const { transactions, loading, error } = useTransaction();
   /* ---------- Modal / UI state ---------- */
@@ -193,25 +195,29 @@ export default function Transaction() {
         </Card>
 
         <Card className="flex flex-col">
-          <h2 className="text-xl font-semibold mb-4 text-blue-600">
+          <h2 className="text-xl font-semibold mb-4 text-blue-600 dark:text-blue-400">
             Thu nhập tháng {month}
           </h2>
 
           <ul>
             {incomes.length === 0 && (
-              <li className="text-gray-500">Chưa có thu nhập nào.</li>
+              <li className="text-gray-500 dark:text-gray-400">
+                Chưa có thu nhập nào.
+              </li>
             )}
             {incomes.map((income) => (
               <li
                 key={income.id}
-                className="py-2 border-b border-gray-300 flex justify-between items-center"
+                className="py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center"
               >
                 <p className="flex items-center gap-4">
-                  <span className="text-gray-700 font-medium">
+                  <span className="text-gray-700 font-medium dark:text-gray-300">
                     {income.source ?? "Thu nhập"}
                   </span>
-                  <span className="text-gray-500">{income.title ?? ""}</span>
-                  <span className="text-gray-500">
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {income.title ?? ""}
+                  </span>
+                  <span className="text-gray-500 dark:text-gray-400">
                     {formatForDisplay(income.date) ?? ""}
                   </span>
                 </p>
@@ -220,11 +226,14 @@ export default function Transaction() {
                   {income.currency ?? "VND"}
                 </span>
                 <div className="flex gap-2">
-                  <Button variant="edit" onClick={() => openEditIncome(income)}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => openEditIncome(income)}
+                  >
                     {editIcon}
                   </Button>
                   <Button
-                    variant="delete"
+                    variant="ghost"
                     onClick={() => openDelete(income, "income")}
                   >
                     {trashIcon}
@@ -270,7 +279,7 @@ export default function Transaction() {
                 {filteredExpenses.map((expense) => (
                   <tr
                     key={expense.id}
-                    className="border-b border-gray-200 hover:bg-gray-100"
+                    className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
                   >
                     <td className="px-4 py-4">{expense.category}</td>
                     <td className="px-4 py-4">{expense.title}</td>
@@ -303,14 +312,14 @@ export default function Transaction() {
         </Card>
 
         {isAddExpenseOpen && (
-          <AddModel
+          <AddTransaction
             open={isAddExpenseOpen}
             onClose={() => setIsAddExpenseOpen(false)}
             role="expense"
           />
         )}
         {isAddIncomeOpen && (
-          <AddModel
+          <AddTransaction
             open={isAddIncomeOpen}
             onClose={() => setIsAddIncomeOpen(false)}
             role="income"
@@ -318,7 +327,7 @@ export default function Transaction() {
         )}
 
         {isEditOpen && editingExpense && (
-          <EditModel
+          <EditTransaction
             open={isEditOpen}
             onClose={() => {
               setIsEditOpen(false);
@@ -330,7 +339,7 @@ export default function Transaction() {
         )}
 
         {isEditIncomeOpen && editingIncome && (
-          <EditModel
+          <EditTransaction
             open={isEditIncomeOpen}
             onClose={() => {
               setIsEditIncomeOpen(false);
@@ -342,7 +351,7 @@ export default function Transaction() {
         )}
 
         {isDeleteOpen && deletingItem && (
-          <DeleteModel
+          <DeleteTransaction
             open={isDeleteOpen}
             onClose={() => {
               setIsDeleteOpen(false);

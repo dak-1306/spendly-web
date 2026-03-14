@@ -178,16 +178,14 @@ function SpendingPieChart({ month, title, expenses = [] }) {
 
           {/* moved total label below the chart to avoid overlap */}
           <div className="mt-2 flex justify-center items-center gap-1">
-            <div className="text-sm text-gray-700">Tổng</div>
-            <div className="text-sm font-bold text-gray-900">
-              {fmtAmount(total)} VND
-            </div>
+            <div className="text-sm">Tổng</div>
+            <div className="text-sm font-bold">{fmtAmount(total)} VND</div>
           </div>
         </div>
 
         <div className="min-w-[140px]">
           {slices.length === 0 && (
-            <div className="text-sm text-gray-500">Không có dữ liệu</div>
+            <div className="text-sm">Không có dữ liệu</div>
           )}
           <ul className="space-y-2">
             {slices.map((s, idx) => (
@@ -195,7 +193,7 @@ function SpendingPieChart({ month, title, expenses = [] }) {
                 key={s.category}
                 onMouseEnter={() => setHoverIndex(idx)}
                 onMouseLeave={() => setHoverIndex(null)}
-                className={`flex items-center gap-2 p-2 rounded ${hoverIndex === idx ? "bg-gray-100" : ""} cursor-pointer`}
+                className={`flex items-center gap-2 p-2 rounded ${hoverIndex === idx ? "bg-gray-100 dark:bg-gray-600" : ""} cursor-pointer`}
               >
                 <span
                   className="inline-block w-3 h-3 rounded-full"
@@ -208,7 +206,7 @@ function SpendingPieChart({ month, title, expenses = [] }) {
                   >
                     {s.category}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     {fmtAmount(s.amount)} VND • {s.percent.toFixed(2)}%
                   </div>
                 </div>

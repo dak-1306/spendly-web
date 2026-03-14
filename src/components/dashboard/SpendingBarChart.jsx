@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
+import { useTheme } from "../../hooks/useTheme";
 
 /**
  * Props:
@@ -9,6 +10,7 @@ import React, { useMemo } from "react";
  */
 const BAR_CHART_CONFIG = { WIDTH: 1000, HEIGHT: 240 };
 function SpendingBarChart({ month, title, expenses = [] }) {
+  const theme = useTheme();
   const { days, dailyTotals, max, tickVals } = useMemo(() => {
     const [year, monthNum] = month.split("-").map(Number);
     const daysCount = new Date(year, monthNum, 0).getDate(); // days in month
@@ -60,7 +62,7 @@ function SpendingBarChart({ month, title, expenses = [] }) {
 
   return (
     <div className="w-full overflow-auto">
-      <h2 className="text-xl font-semibold mb-4 text-[var(--primary-blue-color)]">
+      <h2 className="text-xl font-semibold mb-4 text-blue-600 dark:text-blue-400">
         {title}
       </h2>
       <svg
@@ -85,15 +87,27 @@ function SpendingBarChart({ month, title, expenses = [] }) {
                   stroke="#e6e6e6"
                   strokeWidth={1}
                 />
-                <text
-                  x={-12}
-                  y={y + 4}
-                  textAnchor="end"
-                  fontSize={11}
-                  fill="#666"
-                >
-                  {fmt(t)}
-                </text>
+                {theme === "light" ? (
+                  <text
+                    x={-12}
+                    y={y + 4}
+                    textAnchor="end"
+                    fontSize={11}
+                    fill="#666"
+                  >
+                    {fmt(t)}
+                  </text>
+                ) : (
+                  <text
+                    x={-12}
+                    y={y + 4}
+                    textAnchor="end"
+                    fontSize={11}
+                    fill="#ccc"
+                  >
+                    {fmt(t)}
+                  </text>
+                )}
               </g>
             );
           })}

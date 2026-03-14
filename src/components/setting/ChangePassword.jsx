@@ -49,7 +49,7 @@ export default function ChangePassword({ open, onClose }) {
       </div>
       <form
         onSubmit={handleSubmit}
-        className="max-w-md w-full bg-white rounded shadow p-6 space-y-4"
+        className="max-w-md w-full rounded shadow p-6 space-y-4"
       >
         <Input
           label="Mật khẩu hiện tại"

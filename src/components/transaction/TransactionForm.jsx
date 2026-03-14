@@ -45,7 +45,7 @@ export default function TransactionForm({
                 name={field.name}
                 value={field.value}
                 onChange={field.onChange}
-                className="w-full border rounded px-3 py-2"
+                className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
               >
                 <option value="">-- Chọn {field.label} --</option>
                 {(field.name === "category" && type === "income"
@@ -62,7 +62,7 @@ export default function TransactionForm({
                 name={field.name}
                 value={field.value}
                 onChange={field.onChange}
-                className="w-full border rounded px-3 py-2"
+                className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
               >
                 <option value="">-- Chọn {field.label} --</option>
                 {defaultCurrency.map((option) => (

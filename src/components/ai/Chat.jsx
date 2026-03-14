@@ -1,6 +1,7 @@
 import { ICONS } from "../../assets/index.js";
 import Button from "../common/Button.jsx";
 import LineColor from "../common/LineColor.jsx";
+import Input from "../common/Input.jsx";
 import { X } from "lucide-react";
 import { useState } from "react";
 function Chat({ open, onClose, option }) {
@@ -26,9 +27,9 @@ function Chat({ open, onClose, option }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-end">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+      <div className="absolute inset-0" onClick={onClose}></div>
       <div
-        className="relative m-6 bg-white rounded-xl shadow-lg overflow-hidden"
+        className="relative m-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-4 py-3">
@@ -51,7 +52,7 @@ function Chat({ open, onClose, option }) {
             {option.map((item, index) => (
               <li
                 key={index}
-                className="text-sm text-gray-600 p-2 mb-2 border border-blue-500 rounded-md"
+                className="text-sm p-2 mb-2 border border-blue-500 rounded-md"
               >
                 {item}
               </li>
@@ -74,28 +75,26 @@ function Chat({ open, onClose, option }) {
           </div>
         </div>
         <LineColor />
-        <div className="px-4 py-3">
-          <div className="flex gap-2">
-            <input
-              className="flex-1 border border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-3 py-2 text-sm"
-              placeholder="Nhập câu hỏi..."
-              value={inputValue}
-              onChange={handleInputChange}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSubmit();
-                }
-              }}
+        <div className="flex gap-2 px-4 py-3">
+          <Input
+            className="flex-1"
+            placeholder="Nhập câu hỏi..."
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSubmit();
+              }
+            }}
+          />
+          <Button variant="primary" size="sm" onClick={handleSubmit}>
+            <img
+              src={SUBMIT_ICON.src}
+              alt={SUBMIT_ICON.alt}
+              width={SUBMIT_ICON.width}
+              height={SUBMIT_ICON.height}
             />
-            <Button variant="primary" size="sm" onClick={handleSubmit}>
-              <img
-                src={SUBMIT_ICON.src}
-                alt={SUBMIT_ICON.alt}
-                width={SUBMIT_ICON.width}
-                height={SUBMIT_ICON.height}
-              />
-            </Button>
-          </div>
+          </Button>
         </div>
       </div>
     </div>

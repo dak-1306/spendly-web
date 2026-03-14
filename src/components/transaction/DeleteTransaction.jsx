@@ -2,7 +2,7 @@ import DeleteConfirm from "../common/DeleteConfirm.jsx";
 import { useTransaction } from "../../hooks/useTransaction.js";
 import { useCallback } from "react";
 
-export default function DeleteModel({
+export default function DeleteTransaction({
   open = false,
   onClose = () => {},
   role = "expense", // "expense" | "income"

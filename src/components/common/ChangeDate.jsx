@@ -30,7 +30,7 @@ function ChangeDate({ month, setMonth }) {
         type="month"
         value={month}
         onChange={(e) => setMonth(e.target.value)}
-        className="border border-blue-500 text-blue-500 placeholder:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
+        className="border border-blue-500 text-blue-500 dark:text-blue-400  placeholder:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
       />
 
       <Button variant="outline" onClick={handleNextMonth}>

@@ -1,8 +1,8 @@
 import MainLayout from "../components/layout/MainLayout";
 import Button from "../components/common/Button";
 import Card from "../components/common/Card";
-import EditModel from "../components/transaction/EditModel";
-import DeleteModel from "../components/transaction/Delete.jsx";
+import EditTransaction from "../components/transaction/EditTransaction.jsx";
+import DeleteTransaction from "../components/transaction/DeleteTransaction.jsx";
 import { useTransaction } from "../hooks/useTransaction";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -52,13 +52,13 @@ export default function TransactionDetail() {
         <p className="text-lg text-yellow-500 font-bold">
           ${transaction.amount.toFixed(2)}
         </p>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           {transaction.type === "income" ? "Nguồn thu nhập" : "Mô tả chi tiêu"}:{" "}
           {transaction.source}
         </p>
-        <p className="text-gray-600">Loại tiền: {transaction.currency}</p>
-        <p className="text-gray-600">Danh mục: {transaction.category}</p>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">Loại tiền: {transaction.currency}</p>
+        <p className="text-gray-600 dark:text-gray-400">Danh mục: {transaction.category}</p>
+        <p className="text-gray-600 dark:text-gray-400">
           Ngày giao dịch:{" "}
           {new Date(transaction.date.seconds * 1000).toLocaleDateString()}
         </p>
@@ -73,13 +73,13 @@ export default function TransactionDetail() {
           </Button>
         </div>
       </Card>
-      <EditModel
+      <EditTransaction
         open={editOpen}
         onClose={() => setEditOpen(false)}
         role={transaction.type}
         data={transaction}
       />
-      <DeleteModel
+      <DeleteTransaction
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         role={transaction.type}

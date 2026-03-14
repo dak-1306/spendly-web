@@ -5,6 +5,7 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
+import Card from "../common/Card";
 function CardDashboard({ type, title, amount = 0, currency = "VND" }) {
   const baseMap = {
     income: "border-green-600",
@@ -56,17 +57,12 @@ function CardDashboard({ type, title, amount = 0, currency = "VND" }) {
       : new Intl.NumberFormat("vi-VN").format(amount) + " " + currency;
 
   return (
-    <div
-      className={`flex items-center space-x-4 p-4 bg-white border ${borderColor} rounded-lg shadow-md hover:scale-105 transition-transform`}
-    >
+    <Card className={`flex items-center space-x-4 p-4  border ${borderColor}`}>
       {iconColor[type] || <DollarSign className="text-gray-600" />}
-      <div>
-        <p className={`text-lg font-semibold ${textColor[type]}`}>
-          {formatted}
-        </p>
-        <p className="text-sm text-gray-600">{title}</p>
-      </div>
-    </div>
+
+      <p className={`text-lg font-semibold ${textColor[type]}`}>{formatted}</p>
+      <p className="text-sm ">{title}</p>
+    </Card>
   );
 }
 export default CardDashboard;

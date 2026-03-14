@@ -7,7 +7,7 @@ const SpendingCard = ({ current, limit }) => {
       {/* Header */}
       <div className="mb-3">
         <h3 className="font-medium">Chi tiêu hàng tháng</h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           {current} / {limit}
         </p>
       </div>

@@ -93,7 +93,7 @@ export default function Dashboard() {
         <ChangeDate month={month} setMonth={setMonth} />
         {/* aria-live để thông báo thay đổi tháng cho assistive tech */}
         <div
-          className="ml-auto font-semibold text-lg text-blue-500"
+          className="ml-auto font-semibold text-lg text-blue-500 dark:text-blue-400"
           aria-live="polite"
         >
           {month}

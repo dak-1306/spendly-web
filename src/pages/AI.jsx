@@ -135,10 +135,10 @@ export default function AI() {
                   key={idx}
                   className="border-l-4 border-blue-500 shadow-sm pl-4 py-1"
                 >
-                  <h3 className="font-bold text-xl text-gray-800 mb-2">
+                  <h3 className="font-bold text-xl text-gray-800 dark:text-gray-300 mb-2">
                     {sec.heading}
                   </h3>
-                  <div className="prose prose-slate max-w-none text-gray-600">
+                  <div className="prose prose-slate max-w-none">
                     <ReactMarkdown>{sec.body}</ReactMarkdown>
                   </div>
                 </div>
@@ -152,7 +152,7 @@ export default function AI() {
         onClick={() => setChatOpen(true)}
         className="fixed bottom-24 right-10 p-1 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full shadow-2xl hover:scale-110 transition-transform"
       >
-        <div className="p-4 bg-white rounded-full">
+        <div className="p-4 bg-white dark:bg-gray-800 rounded-full">
           <img src={robotIcon.src} alt="AI Robot" className="w-8 h-8" />
         </div>
       </button>

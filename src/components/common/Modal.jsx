@@ -9,7 +9,7 @@ function Modal({ isOpen, onClose, children }) {
         className="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col gap-4">{children}</div>
+        <div className="flex flex-col dark:bg-gray-800">{children}</div>
       </div>
     </div>
   );

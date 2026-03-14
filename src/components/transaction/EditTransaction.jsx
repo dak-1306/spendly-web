@@ -1,7 +1,7 @@
 import TransactionForm from "./TransactionForm";
 import { useTransaction } from "../../hooks/useTransaction";
 import { useState, useEffect } from "react";
-export default function EditModel({
+export default function EditTransaction({
   open = false,
   onClose = () => {},
   role = "expense",
@@ -17,7 +17,7 @@ export default function EditModel({
     date: "",
     month: "",
   });
-  console.log("EditModel received data:", data);
+  console.log("EditTransaction received data:", data);
 
   useEffect(() => {
     if (data) {

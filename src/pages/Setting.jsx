@@ -7,6 +7,7 @@ import DeleteConfirm from "../components/common/DeleteConfirm";
 import Avatar from "../components/setting/Avatar"; // <-- added
 import { SETTINGS } from "../utils/constants";
 import { useAuth } from "../hooks/useAuth"; // <-- giữ để dùng logout
+import { useTheme } from "../hooks/useTheme"; // <-- thêm useTheme
 import useUser from "../hooks/useUser"; // <-- thêm useUser
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Key, Trash2, LogOut } from "lucide-react"; // <-- icons
@@ -26,6 +27,7 @@ export default function Setting() {
   const LogoutIcon = <LogOut className="text-blue-500" size={24} />;
 
   const { user, loading: authLoading, logout } = useAuth(); // auth context (for logout)
+  const { theme, toggleTheme } = useTheme(); // theme context
   const { userDoc, loading: userLoading, refresh: refreshUser } = useUser(); // user context
   const loading = authLoading || userLoading; // combined loading state
   const navigate = useNavigate();
@@ -90,7 +92,7 @@ export default function Setting() {
               {UserIcon}
               <div>
                 <p className="font-medium">{displayName}</p>
-                <p className="text-sm text-gray-600">{USER_INFO.ROLE}</p>
+                <p className="text-sm ">{USER_INFO.ROLE}</p>
               </div>
             </div>
 
@@ -99,7 +101,7 @@ export default function Setting() {
               {EmailIcon}
               <div>
                 <p className="font-medium">{email}</p>
-                <p className="text-sm text-gray-600">{USER_INFO.EMAIL_LABEL}</p>
+                <p className="text-sm">{USER_INFO.EMAIL_LABEL}</p>
               </div>
             </div>
 
@@ -125,12 +127,12 @@ export default function Setting() {
 
             <div className="space-y-4">
               {/* Đăng xuất */}
-              <div className="flex items-center justify-between bg-white/5 rounded">
+              <div className="flex items-center justify-between rounded">
                 <div className="flex items-center justify-between space-x-4">
                   {LogoutIcon}
                   <div>
                     <p className="font-medium">{TEXTS.LOGOUT_TITLE}</p>
-                    <p className="text-sm text-gray-600">{TEXTS.LOGOUT_DESC}</p>
+                    <p className="text-sm">{TEXTS.LOGOUT_DESC}</p>
                   </div>
                 </div>
                 <Button
@@ -144,14 +146,12 @@ export default function Setting() {
               </div>
 
               {/* Đổi mật khẩu */}
-              <div className="flex items-center justify-between gap-4 bg-white/5 rounded-md">
+              <div className="flex items-center justify-between gap-4 rounded-md">
                 <div className="flex items-center space-x-4">
                   {KeyIcon}
                   <div>
                     <p className="font-medium">{TEXTS.CHANGE_PASSWORD_TITLE}</p>
-                    <p className="text-sm text-gray-600">
-                      {TEXTS.CHANGE_PASSWORD_DESC}
-                    </p>
+                    <p className="text-sm">{TEXTS.CHANGE_PASSWORD_DESC}</p>
                   </div>
                 </div>
                 <Button
@@ -164,14 +164,12 @@ export default function Setting() {
               </div>
 
               {/* Xóa tài khoản */}
-              <div className="flex items-center justify-between bg-white/5 rounded">
+              <div className="flex items-center justify-between  rounded">
                 <div className="flex items-center space-x-4">
                   {TrashIcon}
                   <div>
                     <p className="font-medium">{TEXTS.DELETE_ACCOUNT_TITLE}</p>
-                    <p className="text-sm text-gray-600">
-                      {TEXTS.DELETE_ACCOUNT_DESC}
-                    </p>
+                    <p className="text-sm">{TEXTS.DELETE_ACCOUNT_DESC}</p>
                   </div>
                 </div>
                 <Button variant="danger" size="sm" onClick={openDeleteAccount}>
@@ -181,33 +179,46 @@ export default function Setting() {
             </div>
 
             {/* UI settings: theme / language / currency */}
-            <div className="border-t border-gray-200/10">
+            <div className="border-t border-gray-300 dark:border-gray-600 mt-4 pt-4 space-y-4">
               <div className="flex items-center justify-between mt-4">
                 <div>
                   <p className="font-medium">{UI_SETTINGS.THEME.LABEL}</p>
-                  <p className="text-sm text-gray-600">
-                    {UI_SETTINGS.THEME.DESC}
-                  </p>
+                  <p className="text-sm">{UI_SETTINGS.THEME.DESC}</p>
                 </div>
                 <label className="flex items-center cursor-pointer">
-                  <input type="checkbox" className="sr-only" />
-                  <div className="w-12 h-6 bg-gray-300 rounded-full relative transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:bg-white after:rounded-full"></div>
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={theme === "dark"}
+                    onChange={toggleTheme}
+                  />
+                  {theme === "dark" ? (
+                    <span className="w-10 h-5 bg-gray-600 rounded-full relative">
+                      <span className="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform transform translate-x-5" />
+                    </span>
+                  ) : (
+                    <span className="w-10 h-5 bg-gray-300 rounded-full relative">
+                      <span className="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform transform" />
+                    </span>
+                  )}
                 </label>
               </div>
 
               <div className="mt-4 flex items-center justify-between">
                 <div>
                   <p className="font-medium">{UI_SETTINGS.LANGUAGE.LABEL}</p>
-                  <p className="text-sm text-gray-600">
-                    {UI_SETTINGS.LANGUAGE.DESC}
-                  </p>
+                  <p className="text-sm ">{UI_SETTINGS.LANGUAGE.DESC}</p>
                 </div>
                 <select
                   defaultValue="vi"
-                  className="bg-transparent border border-gray-300 rounded px-3 py-1"
+                  className="bg-transparent border border-gray-300 dark:border-gray-600 rounded px-3 py-1"
                 >
                   {UI_SETTINGS.LANGUAGE.OPTIONS.map((lang) => (
-                    <option key={lang.value} value={lang.value}>
+                    <option
+                      className="dark:bg-gray-800"
+                      key={lang.value}
+                      value={lang.value}
+                    >
                       {lang.label}
                     </option>
                   ))}
@@ -217,16 +228,18 @@ export default function Setting() {
               <div className="mt-4 flex items-center justify-between">
                 <div>
                   <p className="font-medium">{UI_SETTINGS.CURRENCY.LABEL}</p>
-                  <p className="text-sm text-gray-600">
-                    {UI_SETTINGS.CURRENCY.DESC}
-                  </p>
+                  <p className="text-sm">{UI_SETTINGS.CURRENCY.DESC}</p>
                 </div>
                 <select
                   defaultValue="vnd"
-                  className="bg-transparent border border-gray-300 rounded px-3 py-1"
+                  className="bg-transparent border border-gray-300 dark:border-gray-600 rounded px-3 py-1"
                 >
                   {UI_SETTINGS.CURRENCY.OPTIONS.map((c) => (
-                    <option key={c.value} value={c.value}>
+                    <option
+                      className="dark:bg-gray-800"
+                      key={c.value}
+                      value={c.value}
+                    >
                       {c.label}
                     </option>
                   ))}

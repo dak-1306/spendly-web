@@ -84,8 +84,8 @@ export default function Home() {
                     height={img.height}
                     className="object-cover rounded-2xl shadow-lg border-2 border-white"
                   />
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-[76%] bg-white bg-opacity-90 text-center rounded-md px-4 py-2 shadow-md">
-                    <p className="text-sm text-body">{captions[i]}</p>
+                  <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-[76%] bg-white dark:bg-gray-700 bg-opacity-90 text-center rounded-md px-4 py-2 shadow-md">
+                    <p className="text-sm">{captions[i]}</p>
                   </div>
                 </div>
               ))}
@@ -95,17 +95,19 @@ export default function Home() {
 
         {/* Right: giới thiệu, tính năng và CTA */}
         <div className="flex flex-col justify-center items-center p-8 space-y-4">
-          <h1 className="text-blue-600 text-3xl font-bold">
+          <h2 className="text-blue-600 dark:text-blue-400 text-3xl font-bold">
             {HOME.welcomeMessage}
-          </h1>
-          <p className="text-lg text-orange-600">{HOME.text}</p>
+          </h2>
+          <p className="text-lg text-orange-600 dark:text-orange-400">
+            {HOME.text}
+          </p>
 
           <Card
             className="flex flex-col items-start space-y-4"
             animation={true}
           >
             {HOME.description.map((desc, index) => (
-              <p key={index} className="text-gray-700 text-lg">
+              <p key={index} className="text-lg">
                 {desc}
               </p>
             ))}
@@ -113,10 +115,10 @@ export default function Home() {
 
           <div className="grid grid-cols-2 gap-4 w-full">
             <Card animation={true}>
-              <h2 className="text-blue-600 text-xl font-semibold mb-2">
+              <h2 className="text-blue-600 dark:text-blue-400 text-xl font-semibold mb-2">
                 {HOME.featureHighlightsTitle}
               </h2>
-              <ul className="list-disc list-inside text-body space-y-1">
+              <ul className="list-disc list-inside space-y-1">
                 {HOME.featureHighlights.map((feature, index) => (
                   <li key={index}>{feature}</li>
                 ))}
@@ -124,10 +126,10 @@ export default function Home() {
             </Card>
 
             <Card animation={true}>
-              <h2 className="text-orange-600 text-xl font-semibold mb-2">
+              <h2 className="text-orange-600 dark:text-orange-400 text-xl font-semibold mb-2">
                 {HOME.howItWorksTitle}
               </h2>
-              <ol className="list-decimal list-inside text-body space-y-1">
+              <ol className="list-decimal list-inside space-y-1">
                 {HOME.howItWorks.map((step, index) => (
                   <li key={index}>{step}</li>
                 ))}
