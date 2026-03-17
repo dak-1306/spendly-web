@@ -1,16 +1,21 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
+
 import MainLayout from "../components/layout/MainLayout.jsx";
 import LineColor from "../components/common/LineColor.jsx";
 import Card from "../components/common/Card.jsx";
 import Button from "../components/common/Button.jsx";
 import ChangeDate from "../components/common/ChangeDate.jsx";
+import Pagination from "../components/common/Pagination.jsx";
+
 import AddTransaction from "../components/transaction/AddTransaction.jsx";
 import EditTransaction from "../components/transaction/EditTransaction.jsx";
 import DeleteTransaction from "../components/transaction/DeleteTransaction.jsx";
 import FilterExpense from "../components/transaction/FilterExpense.jsx";
-import { Trash2, Edit2, Eye, Edit } from "lucide-react";
+import { Trash2, Edit2, Eye } from "lucide-react";
 import { EXPENSE } from "../utils/constants.js";
 import { useTransaction } from "../hooks/useTransaction";
+import { useAuth } from "../hooks/useAuth";
+
 import { formatForInputDate, formatForDisplay } from "../utils/financial.js";
 
 import { Link } from "react-router-dom";
@@ -23,7 +28,10 @@ export default function Transaction() {
     <Eye className="text-gray-600 dark:text-gray-400" size={16} />
   );
 
-  const { transactions, loading, error } = useTransaction();
+  const { transactions, fetchTransactions, loading, error } = useTransaction();
+  const { user } = useAuth();
+  const userId = user?.uid;
+
   /* ---------- Modal / UI state ---------- */
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isAddIncomeOpen, setIsAddIncomeOpen] = useState(false);
@@ -43,6 +51,34 @@ export default function Transaction() {
       return d.toISOString().slice(0, 7);
     })(),
   );
+
+  /* ---------- Filter state & logic ---------- */
+  const expenseCategories = EXPENSE.CATEGORIES;
+  const amountRanges = EXPENSE.AMOUNT_RANGES;
+
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [dateSort, setDateSort] = useState("");
+  const [selectedAmountRange, setSelectedAmountRange] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Tìm range object dựa trên selectedAmountRange để truyền vào filter
+
+  useEffect(() => {
+    fetchTransactions(userId, month, {
+      category: selectedCategory || null,
+      amountRange: selectedAmountRange || null,
+      sortBy: dateSort || null,
+      searchTerm: searchTerm || null,
+    });
+  }, [
+    fetchTransactions,
+    userId,
+    month,
+    dateSort,
+    selectedAmountRange,
+    searchTerm,
+    selectedCategory,
+  ]);
 
   // Chuẩn hóa transactions thành incomes/expenses cho tháng hiện tại (memoized)
   const transactionNormalize = useMemo(() => {
@@ -69,10 +105,6 @@ export default function Transaction() {
   }, [transactions, month]);
 
   const { incomes, expenses } = transactionNormalize;
-  console.log("Normalized transactions for month", month, {
-    incomes,
-    expenses,
-  });
 
   /* ---------- Helpers mở modal ---------- */
   const openEdit = useCallback((expense) => {
@@ -91,15 +123,6 @@ export default function Transaction() {
     setIsDeleteOpen(true);
   }, []);
 
-  /* ---------- Filter state & logic ---------- */
-  const expenseCategories = EXPENSE.CATEGORIES;
-  const amountRanges = EXPENSE.AMOUNT_RANGES;
-
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [dateSort, setDateSort] = useState("");
-  const [selectedAmountRange, setSelectedAmountRange] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-
   const resetFilters = useCallback(() => {
     setSelectedCategory("");
     setDateSort("");
@@ -107,48 +130,18 @@ export default function Transaction() {
     setSearchTerm("");
   }, []);
 
-  const filteredExpenses = useMemo(() => {
-    let result = [...expenses];
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(expenses.length / itemsPerPage);
 
-    if (selectedCategory) {
-      result = result.filter((e) => e.category === selectedCategory);
-    }
-
-    if (selectedAmountRange) {
-      const range = amountRanges.find((r) => r.id === selectedAmountRange);
-      if (range) {
-        result = result.filter(
-          (e) => e.amount >= range.min && e.amount <= range.max,
-        );
-      }
-    }
-
-    if (dateSort) {
-      result.sort((a, b) => {
-        const da = new Date(a.date).getTime();
-        const db = new Date(b.date).getTime();
-        return dateSort === "asc" ? da - db : db - da;
-      });
-    }
-
-    if (searchTerm && searchTerm.trim()) {
-      const q = searchTerm.trim().toLowerCase();
-      result = result.filter(
-        (e) =>
-          (e.title && e.title.toLowerCase().includes(q)) ||
-          (e.category && e.category.toLowerCase().includes(q)),
-      );
-    }
-
-    return result;
-  }, [
-    expenses,
+  console.log("userId in Transaction page:", userId);
+  console.log("transaction context render", transactions);
+  console.log("filter: ", {
     selectedCategory,
-    selectedAmountRange,
     dateSort,
+    selectedAmountRange,
     searchTerm,
-    amountRanges,
-  ]);
+  });
 
   /* ---------- Render ---------- */
   if (loading) {
@@ -200,50 +193,51 @@ export default function Transaction() {
           </h2>
 
           <ul>
-            {incomes.length === 0 && (
+            {loading && incomes.length === 0 && (
               <li className="text-gray-500 dark:text-gray-400">
                 Chưa có thu nhập nào.
               </li>
             )}
-            {incomes.map((income) => (
-              <li
-                key={income.id}
-                className="py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center"
-              >
-                <p className="flex items-center gap-4">
-                  <span className="text-gray-700 font-medium dark:text-gray-300">
-                    {income.source ?? "Thu nhập"}
+            {!loading &&
+              incomes.map((income) => (
+                <li
+                  key={income.id}
+                  className="py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center"
+                >
+                  <p className="flex items-center gap-4">
+                    <span className="text-gray-700 font-medium dark:text-gray-300">
+                      {income.source ?? "Thu nhập"}
+                    </span>
+                    <span className="text-gray-500 dark:text-gray-400">
+                      {income.title ?? ""}
+                    </span>
+                    <span className="text-gray-500 dark:text-gray-400">
+                      {formatForDisplay(income.date) ?? ""}
+                    </span>
+                  </p>
+                  <span className="font-semibold text-green-600">
+                    {income.amount?.toLocaleString() ?? 0}{" "}
+                    {income.currency ?? "VND"}
                   </span>
-                  <span className="text-gray-500 dark:text-gray-400">
-                    {income.title ?? ""}
-                  </span>
-                  <span className="text-gray-500 dark:text-gray-400">
-                    {formatForDisplay(income.date) ?? ""}
-                  </span>
-                </p>
-                <span className="font-semibold text-green-600">
-                  {income.amount?.toLocaleString() ?? 0}{" "}
-                  {income.currency ?? "VND"}
-                </span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    onClick={() => openEditIncome(income)}
-                  >
-                    {editIcon}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => openDelete(income, "income")}
-                  >
-                    {trashIcon}
-                  </Button>
-                  <Link to={`/transaction/${income.id}`}>
-                    <Button variant="ghost">{eyeIcon}</Button>
-                  </Link>
-                </div>
-              </li>
-            ))}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => openEditIncome(income)}
+                    >
+                      {editIcon}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => openDelete(income, "income")}
+                    >
+                      {trashIcon}
+                    </Button>
+                    <Link to={`/transaction/${income.id}`}>
+                      <Button variant="ghost">{eyeIcon}</Button>
+                    </Link>
+                  </div>
+                </li>
+              ))}
           </ul>
         </Card>
 
@@ -276,39 +270,48 @@ export default function Transaction() {
                 </tr>
               </thead>
               <tbody>
-                {filteredExpenses.map((expense) => (
-                  <tr
-                    key={expense.id}
-                    className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
-                  >
-                    <td className="px-4 py-4">{expense.category}</td>
-                    <td className="px-4 py-4">{expense.title}</td>
-                    <td className="px-4 py-4">
-                      {formatForDisplay(expense.date)}
-                    </td>
-                    <td className="px-4 py-4 font-semibold text-red-600">
-                      {expense.amount?.toLocaleString() ?? 0}{" "}
-                      {expense.currency ?? "VND"}
-                    </td>
-                    <td className="px-4 py-4 flex gap-2">
-                      <Button variant="ghost" onClick={() => openEdit(expense)}>
-                        {editIcon}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={() => openDelete(expense, "expense")}
-                      >
-                        {trashIcon}
-                      </Button>
-                      <Link to={`/transaction/${expense.id}`}>
-                        <Button variant="ghost">{eyeIcon}</Button>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                {!loading &&
+                  expenses.map((expense) => (
+                    <tr
+                      key={expense.id}
+                      className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
+                    >
+                      <td className="px-4 py-4">{expense.category}</td>
+                      <td className="px-4 py-4">{expense.title}</td>
+                      <td className="px-4 py-4">
+                        {formatForDisplay(expense.date)}
+                      </td>
+                      <td className="px-4 py-4 font-semibold text-red-600">
+                        {expense.amount?.toLocaleString() ?? 0}{" "}
+                        {expense.currency ?? "VND"}
+                      </td>
+                      <td className="px-4 py-4 flex gap-2">
+                        <Button
+                          variant="ghost"
+                          onClick={() => openEdit(expense)}
+                        >
+                          {editIcon}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          onClick={() => openDelete(expense, "expense")}
+                        >
+                          {trashIcon}
+                        </Button>
+                        <Link to={`/transaction/${expense.id}`}>
+                          <Button variant="ghost">{eyeIcon}</Button>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </Card>
 
         {isAddExpenseOpen && (

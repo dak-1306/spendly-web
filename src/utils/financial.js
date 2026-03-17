@@ -16,19 +16,19 @@ const transactionToMonth = (t) => {
 };
 
 // tổng thu nhập và chi tiêu cho tháng (memoized)
-const totalIncome = ({ monthData }) =>
-  monthData.incomes.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+const totalIncome = ({ data }) =>
+  data.length === 0 ? 0 : data.reduce((s, i) => s + (Number(i.amount) || 0), 0);
 
-const totalExpense = ({ monthData }) =>
-  monthData.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+const totalExpense = ({ data }) =>
+  data.length === 0 ? 0 : data.reduce((s, e) => s + (Number(e.amount) || 0), 0);
 
 // số dư hiện tại
-const balance = ({ monthData }) =>
-  totalIncome({ monthData }) - totalExpense({ monthData });
+const balance = ({ dataIncome, dataExpense }) =>
+  dataIncome.length === 0 && dataExpense.length === 0 ? 0 : totalIncome({ data: dataIncome }) - totalExpense({ data: dataExpense });
 
 // tính chi tiêu tháng trước để so sánh (memoized)
 const prevExpense = ({ prevDataExpenses }) =>
-  prevDataExpenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  prevDataExpenses.length === 0 ? 0 : prevDataExpenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
 
 // tính tháng trước để so sánh (memoized)
 const prevMonth = ({ month }) => {
@@ -61,8 +61,18 @@ function formatForInputDate(ts) {
 function formatForDisplay(ts, locale = undefined, opts) {
   const d = toDateObject(ts);
   if (!d) return "";
-  return d.toLocaleDateString(locale, opts || { year: "numeric", month: "short", day: "numeric" });
+  return d.toLocaleDateString(
+    locale,
+    opts || { year: "numeric", month: "short", day: "numeric" },
+  );
 }
+// ParseAmount
+const parseAmount = (value) => {
+  if (value == null) return 0;
+  const s = String(value).replace(/[^\d-]/g, ""); // loại bỏ dấu . , space, ký tự khác
+  return Number(s) || 0;
+};
+
 export {
   formatPercent,
   transactionToMonth,
@@ -71,7 +81,7 @@ export {
   balance,
   prevMonth,
   prevExpense,
-  
+  parseAmount,
   formatForInputDate,
   formatForDisplay,
 };

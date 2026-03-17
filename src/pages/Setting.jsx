@@ -26,10 +26,9 @@ export default function Setting() {
   const TrashIcon = <Trash2 className="text-red-500" size={24} />;
   const LogoutIcon = <LogOut className="text-blue-500" size={24} />;
 
-  const { user, loading: authLoading, logout } = useAuth(); // auth context (for logout)
+  const { loading, logout, deleteUserContext } = useAuth(); // auth context (for logout)
   const { theme, toggleTheme } = useTheme(); // theme context
-  const { userDoc, loading: userLoading, refresh: refreshUser } = useUser(); // user context
-  const loading = authLoading || userLoading; // combined loading state
+  const { userDoc, refresh: refreshUser, deleteUserDocContext } = useUser(); // user context
   const navigate = useNavigate();
 
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
@@ -65,15 +64,18 @@ export default function Setting() {
       await logout();
       navigate("/login", { replace: true });
     } else if (deleteMode === "account") {
-      // delete account not implemented in auth.service; placeholder
-      console.log("Xóa tài khoản chưa được triển khai.");
+      await deleteUserDocContext(userDoc?.id);
+      await deleteUserContext();
+      navigate("/login", { replace: true });
     }
     closeDelete();
   }, [deleteMode, closeDelete, logout, navigate]);
 
-  const displayName = userDoc?.name || user?.displayName || USER_INFO.NAME;
-  const email = userDoc?.email || user?.email || USER_INFO.EMAIL;
-  const photoURL = userDoc?.avatar || user?.photoURL || null;
+  const displayName = userDoc?.name || USER_INFO.NAME;
+  const email = userDoc?.email || USER_INFO.EMAIL;
+  const photoURL = userDoc?.avatar || null;
+
+  console.log('userDoc:', userDoc);
 
   return (
     <MainLayout auth={true} navbarBottom={true} title={PAGE_TITLE.vi}>

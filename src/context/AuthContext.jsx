@@ -3,6 +3,7 @@ import {
   registerWithEmail,
   loginWithEmail,
   logout as svcLogout,
+  deleteUserService,
   signInWithGoogle,
   subscribeAuth,
   getCurrentUser,
@@ -26,16 +27,11 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = subscribeAuth(async (u) => {
-      setUser(u);
-      try {
-        if (u) {
-          await createUserIfNotExists(u);
-        }
-      } catch (err) {
-        console.error("createUserIfNotExists failed:", err);
-      } finally {
-        setLoading(false);
+      if (u) {
+        await createUserIfNotExists(u);
       }
+      setUser(u);
+      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
@@ -63,6 +59,17 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await svcLogout();
+    } catch {
+      /* ignore */
+    } finally {
+      setUser(null);
+    }
+  };
+
+  // Delete user
+  const deleteUserContext = async () => {
+    try {
+      await deleteUserService();
     } catch {
       /* ignore */
     } finally {
@@ -98,6 +105,7 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
+        deleteUserContext,
         refresh,
         loginWithGoogle,
         checkAuth,

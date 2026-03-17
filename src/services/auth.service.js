@@ -2,6 +2,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  deleteUser,
   updateProfile,
   GoogleAuthProvider,
   signInWithPopup,
@@ -40,6 +41,13 @@ export async function logout() {
   await signOut(auth);
 }
 
+// Delete user
+export async function deleteUserService() {
+  const user = getCurrentUser();
+  if (!user) return;
+  await deleteUser(user);
+}
+
 /**
  * Sign in with Google popup. Returns firebase User object.
  */
@@ -68,6 +76,7 @@ export default {
   registerWithEmail,
   loginWithEmail,
   logout,
+  deleteUserService,
   signInWithGoogle,
   subscribeAuth,
   getCurrentUser,

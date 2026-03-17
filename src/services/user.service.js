@@ -3,6 +3,7 @@ import {
   doc,
   getDoc,
   setDoc,
+  deleteDoc,
   updateDoc,
   serverTimestamp,
 } from "firebase/firestore";
@@ -62,7 +63,16 @@ export async function updateUser(uid, data) {
   await updateDoc(ref, { ...data, updatedAt: serverTimestamp() });
 }
 
+// Delete user
+export async function deleteUserDocService(uid) {
+  console.log("deleteUserDocService", uid);
+  if (!uid) throw new Error("Missing uid");
+  const ref = doc(db, "users", uid);
+  await deleteDoc(ref);
+}
+
 export default {
   createUserIfNotExists,
   updateUser,
+  deleteUserDocService,
 };

@@ -34,6 +34,16 @@ export default function Avatar({
     return createAvatarDataUrl(initial, bg, size);
   }, [name, photoURL, size, initial]);
 
+  if(!photoURL) {
+    return (
+      <div
+        className={`rounded-full flex items-center justify-center ${className}`}
+        style={{ width: size, height: size, backgroundColor: stringToColor(name || "user") }}
+      >
+        <span className="text-white font-bold text-xl">{initial}</span>
+      </div>
+    )
+  }
   return (
     <img
       src={src}

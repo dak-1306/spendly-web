@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { UserContext } from "../hooks/useUser";
 import { subscribeAuth } from "../services/auth.service";
-import { createUserIfNotExists } from "../services/user.service";
+import { createUserIfNotExists, deleteUserDocService } from "../services/user.service";
 
 export function UserProvider({ children }) {
   const [userDoc, setUserDoc] = useState(null);
@@ -30,6 +30,21 @@ export function UserProvider({ children }) {
     return () => unsub();
   }, []);
 
+  // Delete user
+  const deleteUserDocContext = async (uid) => {
+    console.log("deleteUserDocContext", uid);
+    try {
+      if (!uid) {
+        throw new Error("Missing uid");
+      }
+      await deleteUserDocService(uid);
+    } catch {
+      /* ignore */
+    } finally {
+      setUserDoc(null);
+    }
+  };
+
   const refresh = async () => {
     setLoading(true);
     try {
@@ -48,7 +63,7 @@ export function UserProvider({ children }) {
   };
 
   return (
-    <UserContext.Provider value={{ userDoc, loading, refresh }}>
+    <UserContext.Provider value={{ userDoc, loading, refresh, deleteUserDocContext }}>
       {children}
     </UserContext.Provider>
   );

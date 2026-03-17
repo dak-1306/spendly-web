@@ -10,20 +10,19 @@ export default function EditTransaction({
   const isIncome = role === "income";
   const [field, setField] = useState({
     title: "",
-    amount: "",
+    amount: 0,
     source: "",
     currency: "",
     category: "",
     date: "",
     month: "",
   });
-  console.log("EditTransaction received data:", data);
 
   useEffect(() => {
     if (data) {
       setField({
         title: data.title || "",
-        amount: data.amount || "",
+        amount: data.amount || 0,
         currency: data.currency || "",
         category: data.category || "",
         date: data.date || "",
@@ -33,7 +32,7 @@ export default function EditTransaction({
     } else {
       setField({
         title: "",
-        amount: "",
+        amount: 0,
         currency: "",
         category: "",
         date: "",
@@ -59,7 +58,7 @@ export default function EditTransaction({
         ...field,
         type: role,
       };
-      console.log("Submitting form with payload:", formPayload);
+
       await updateTransaction(data.id, formPayload);
       onClose();
     } catch (e) {
@@ -68,7 +67,7 @@ export default function EditTransaction({
     } finally {
       setField({
         title: "",
-        amount: "",
+        amount: 0,
         currency: "",
         category: "",
         date: "",
