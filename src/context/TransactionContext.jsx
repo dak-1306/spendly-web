@@ -5,6 +5,12 @@ import { parseAmount } from "../utils/financial";
 import { Timestamp } from "firebase/firestore";
 
 export const TransactionProvider = ({ children }) => {
+  const [month, setMonth] = useState(
+    (() => {
+      const d = new Date();
+      return d.toISOString().slice(0, 7);
+    })(),
+  );
   const [transactions, setTransactions] = useState([]);
   const [transactionCurrent, setTransactionCurrent] = useState([]);
   const [transactionPrev, setTransactionPrev] = useState([]);
@@ -13,7 +19,7 @@ export const TransactionProvider = ({ children }) => {
 
   // Lấy dữ liệu transaction từ Firebase kèm filter, search
   const fetchTransactions = useCallback(
-    async (userId, month, { category, amountRange, sortBy, searchTerm }) => {
+    async (userId, { category, amountRange, sortBy, searchTerm }) => {
       console.log("fetchTransactions called with:", {
         userId,
         month,
@@ -70,16 +76,12 @@ export const TransactionProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [],
+    [month],
   );
 
-  // Lấy dữ liệu cho dashboard 
+  // Lấy dữ liệu cho dashboard
   const fetchTransactionCurrent = useCallback(
-    async (userId, month) => {
-      console.log("fetchDashboardData called with:", {
-        userId,
-        month,
-      });
+    async (userId) => {
       if (!userId) {
         setTransactionCurrent([]);
         setLoading(false);
@@ -96,11 +98,11 @@ export const TransactionProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [],
+    [month],
   );
   // Lấy dữ liệu cho tháng trước
   const fetchTransactionPrev = useCallback(
-    async (userId, month) => {
+    async (userId) => {
       console.log("fetchDashboardData called with:", {
         userId,
         month,
@@ -121,7 +123,7 @@ export const TransactionProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [],
+    [month],
   );
 
   // Get transaction by ID
@@ -191,6 +193,8 @@ export const TransactionProvider = ({ children }) => {
         transactionPrev,
         loading,
         error,
+        month,
+        setMonth,
         fetchTransactionCurrent,
         fetchTransactionPrev,
         addTransaction,

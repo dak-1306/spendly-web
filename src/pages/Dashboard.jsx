@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import {  useMemo, useCallback, useEffect } from "react";
 import MainLayout from "../components/layout/MainLayout";
 import CardDashboard from "../components/dashboard/CardDashboard";
 import SpendingCard from "../components/dashboard/SpendingCard";
@@ -24,22 +24,15 @@ import {
 
 export default function Dashboard() {
   // transactions từ context (dữ liệu thật)
-  const { loading, error, transactionCurrent, transactionPrev, fetchTransactionCurrent, fetchTransactionPrev } = useTransaction();
+  const { loading, month, setMonth, error, transactionCurrent, transactionPrev, fetchTransactionCurrent, fetchTransactionPrev } = useTransaction();
   const { user } = useAuth();
   const userId = user?.uid;
-  // state chọn tháng hiển thị
-  const [month, setMonth] = useState(() => {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-      2,
-      "0",
-    )}`;
-  });
+  
 
   // Lấy dữ liệu cho tháng hiện tại
   useEffect(() => {
-    fetchTransactionCurrent(userId, month);
-  }, [fetchTransactionCurrent, userId, month]);
+    fetchTransactionCurrent(userId);
+  }, [fetchTransactionCurrent, userId]);
 
   // Lấy dữ liệu cho tháng trước
   useEffect(() => {

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { buildFinancialPayload } from "../services/ai.transform";
 import { getFinancialReport } from "../services/ai.service";
 
 export function useFinancialReport() {
@@ -7,40 +6,26 @@ export function useFinancialReport() {
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
 
-  // run hỗ trợ 2 dạng input:
-  // - prebuilt payload: { totalIncome, totalExpense, categoryBreakdown, monthlyBudget }
-  // - raw transactions: { transactions, monthlyBudget, monthFilter }
+  // Chỉ hỗ trợ payload prebuilt:
+  // { totalIncome, totalExpense, categoryBreakdown, monthlyBudget }
   async function run(input = {}) {
     setLoading(true);
     setError(null);
     try {
-      let payload;
+      const {
+        totalIncome = 0,
+        totalExpense = 0,
+        categoryBreakdown = "",
+        monthlyBudget = 0,
+      } = input;
 
-      const isPrebuilt =
-        typeof input.totalIncome === "number" &&
-        typeof input.totalExpense === "number";
+      const payload = {
+        totalIncome: Number(totalIncome || 0),
+        totalExpense: Number(totalExpense || 0),
+        categoryBreakdown: categoryBreakdown || "",
+        monthlyBudget: Number(monthlyBudget || 0),
+      };
 
-      if (isPrebuilt) {
-        payload = {
-          totalIncome: Number(input.totalIncome || 0),
-          totalExpense: Number(input.totalExpense || 0),
-          categoryBreakdown: input.categoryBreakdown || "",
-          monthlyBudget: Number(input.monthlyBudget || 0),
-        };
-      } else {
-        const {
-          transactions = [],
-          monthlyBudget = 0,
-          monthFilter = null,
-        } = input;
-        payload = buildFinancialPayload(
-          transactions,
-          monthlyBudget,
-          monthFilter,
-        );
-      }
-
-      // CHỐT CHẶN: Nếu không có tiền thu/chi, không gọi API
       if (payload.totalIncome === 0 && payload.totalExpense === 0) {
         const msg =
           "Bạn chưa có dữ liệu giao dịch trong tháng này để AI phân tích.";
@@ -52,7 +37,6 @@ export function useFinancialReport() {
       setResult(res);
       return res;
     } catch (err) {
-      // Xử lý lỗi Quota thân thiện
       const errorMsg = err.message?.includes("AI_LIMIT")
         ? "Hệ thống AI đang hết lượt dùng miễn phí. Vui lòng thử lại sau nhé!"
         : "Không thể kết nối với trí tuệ nhân tạo lúc này.";

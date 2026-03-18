@@ -28,7 +28,7 @@ export default function Transaction() {
     <Eye className="text-gray-600 dark:text-gray-400" size={16} />
   );
 
-  const { transactions, fetchTransactions, loading, error } = useTransaction();
+  const { transactions, month, setMonth, fetchTransactions, loading, error } = useTransaction();
   const { user } = useAuth();
   const userId = user?.uid;
 
@@ -45,12 +45,7 @@ export default function Transaction() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
   const [deletingRole, setDeletingRole] = useState("expense");
-  const [month, setMonth] = useState(
-    (() => {
-      const d = new Date();
-      return d.toISOString().slice(0, 7);
-    })(),
-  );
+  
 
   /* ---------- Filter state & logic ---------- */
   const expenseCategories = EXPENSE.CATEGORIES;
@@ -64,7 +59,7 @@ export default function Transaction() {
   // Tìm range object dựa trên selectedAmountRange để truyền vào filter
 
   useEffect(() => {
-    fetchTransactions(userId, month, {
+    fetchTransactions(userId, {
       category: selectedCategory || null,
       amountRange: selectedAmountRange || null,
       sortBy: dateSort || null,
@@ -135,6 +130,7 @@ export default function Transaction() {
   const totalPages = Math.ceil(expenses.length / itemsPerPage);
 
   console.log("userId in Transaction page:", userId);
+  console.log('month in Transaction page:', month);
   console.log("transaction context render", transactions);
   console.log("filter: ", {
     selectedCategory,

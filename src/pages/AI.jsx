@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainLayout from "../components/layout/MainLayout.jsx";
 import Card from "../components/common/Card.jsx";
 import Button from "../components/common/Button.jsx";
@@ -7,21 +7,27 @@ import { AI_CONSTANTS } from "../utils/constants.js";
 import { ICONS } from "../assets/index.js";
 import { useFinancialReport } from "../hooks/useFinancialReport";
 import { useTransaction } from "../hooks/useTransaction";
+import { buildFinancialPayload } from "../services/ai.transform.js";
+import { useAuth } from "../hooks/useAuth.js";
 import ReactMarkdown from "react-markdown";
-import { buildFinancialPayload } from "../services/ai.transform";
-import { getAuth } from "firebase/auth";
-import app from "../firebase";
-import {
-  generateKey,
-  getCachedAnalysis,
-  saveAnalysis,
-} from "../services/firebaseAI";
+import { useFirebaseAI } from "../hooks/useFirebaseAI.js";
+
+import FinancePreviewAnimation from "../components/canvas/FinancePreviewAnimation.jsx";
+import AILoadingAnimation from "../components/canvas/AILoadingAnimation.jsx";
 
 export default function AI() {
-  const { transactions: allTransactions = [] } = useTransaction();
+  const { transactionCurrent, month, setMonth, fetchTransactionCurrent } =
+    useTransaction();
+  const { fetchOrCompute } = useFirebaseAI();
   const [chatOpen, setChatOpen] = useState(false);
   const [monthlyBudget, setMonthlyBudget] = useState(0);
-  const [monthFilter, setMonthFilter] = useState("");
+
+  const { user } = useAuth();
+  const userId = user?.uid;
+
+  useEffect(() => {
+    fetchTransactionCurrent(userId, month);
+  }, [fetchTransactionCurrent, userId, month]);
 
   // State duy nhất quản lý nội dung hiển thị (từ cache hoặc từ AI mới)
   const [finalResult, setFinalResult] = useState("");
@@ -31,47 +37,26 @@ export default function AI() {
   const quickOptions = AI_CONSTANTS.QUICK_OPTIONS;
 
   const handleAnalyze = async () => {
-    if (!allTransactions?.length) {
+    if (!transactionCurrent?.length) {
       alert("Dữ liệu giao dịch đang tải hoặc trống!");
       return;
     }
-
-    const auth = getAuth(app);
-    const uid = auth.currentUser?.uid;
-    if (!uid) return alert("Vui lòng đăng nhập!");
 
     // Reset kết quả cũ để người dùng thấy trạng thái đang xử lý mới
     setFinalResult("");
 
     try {
-      const payload = buildFinancialPayload(
-        allTransactions,
-        Number(monthlyBudget),
-        monthFilter || null,
-      );
-      const { key, snapshot } = await generateKey(payload);
-
-      // 1. Kiểm tra Cache trước
-      const cached = await getCachedAnalysis(key, uid);
-      if (cached) {
-        console.log("🚀 Cache Hit: Loading stored result...");
-        setFinalResult(cached.result);
-        return;
-      }
-
-      // 2. Gọi AI nếu không có cache
-      console.log("🤖 Cache Miss: Calling AI API...");
-      const res = await run(payload);
-      const aiText =
-        typeof res === "string" ? res : res?.result || res?.text || String(res);
-
-      if (aiText) {
-        setFinalResult(aiText);
-        // 3. Lưu lại vào cache cho lần sau
-        await saveAnalysis(key, uid, snapshot, aiText);
-      }
+      const payload = buildFinancialPayload({
+        monthlyBudget,
+        monthFilter: month,
+        transactions: transactionCurrent,
+      });
+      const res = await fetchOrCompute(payload, run);
+      setFinalResult(res);
     } catch (err) {
-      console.error("Lỗi phân tích:", err);
+      console.error("Lỗi khi phân tích tài chính:", err);
+      // Lỗi đã được xử lý trong hook useFinancialReport, chỉ cần hiển thị thông báo chung
+      alert("Có lỗi xảy ra khi phân tích. Vui lòng thử lại sau.");
     }
   };
 
@@ -95,6 +80,18 @@ export default function AI() {
     });
   }
 
+  console.log(
+    "Render AI page with transactions:",
+    transactionCurrent,
+    "and month:",
+    month,
+    "and payload:",
+    buildFinancialPayload({
+      monthlyBudget,
+      transactions: transactionCurrent,
+    }),
+  );
+
   return (
     <MainLayout auth navbarBottom title={AI_CONSTANTS.PAGE_TITLE.vi}>
       <div className="space-y-6 mx-10">
@@ -102,8 +99,8 @@ export default function AI() {
           <div className="flex flex-wrap items-center gap-4">
             <input
               type="month"
-              value={monthFilter}
-              onChange={(e) => setMonthFilter(e.target.value)}
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
               className="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
             />
             <input
@@ -121,13 +118,17 @@ export default function AI() {
               {loading ? "Đang xử lý..." : "Phân tích bằng AI"}
             </Button>
           </div>
-
           {error && (
             <div className="text-red-500 mt-4 text-sm">
               Lỗi: {error.message}
             </div>
           )}
 
+          {loading && (
+            <div className="mt-8">
+              <AILoadingAnimation />
+            </div>
+          )}
           {finalResult && (
             <div className="mt-8 space-y-6 animate-in fade-in duration-500">
               {parseAIResult(finalResult).map((sec, idx) => (
@@ -146,6 +147,7 @@ export default function AI() {
             </div>
           )}
         </Card>
+        {!finalResult && <FinancePreviewAnimation />}
       </div>
 
       <button

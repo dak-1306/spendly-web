@@ -61,19 +61,34 @@ export async function getCachedAnalysis(key, userId) {
 export async function saveAnalysis(key, userId, payloadSnapshot, result) {
   try {
     const ref = doc(db, "aiAnalysis", key);
-    await setDoc(
-      ref,
-      {
-        key,
-        userId,
-        payloadSnapshot,
-        result,
-        updatedAt: serverTimestamp(),
-        // Giữ lại createdAt nếu là tạo mới (dùng merge: true)
-        createdAt: serverTimestamp(),
-      },
-      { merge: true },
-    );
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      // Cập nhật fields cần thay đổi, giữ nguyên `createdAt`
+      await setDoc(
+        ref,
+        {
+          result,
+          payloadSnapshot,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+    } else {
+      // Tạo mới document với createdAt
+      await setDoc(
+        ref,
+        {
+          key,
+          userId,
+          payloadSnapshot,
+          result,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+    }
   } catch (error) {
     console.error("Lỗi khi lưu cache:", error);
   }
