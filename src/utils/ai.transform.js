@@ -1,10 +1,17 @@
-import {totalIncome, totalExpense} from "../utils/financial.js";
-export function buildFinancialPayload({transactions = [], monthlyBudget = 0}) {
+import { totalIncome, totalExpense } from "./financial.js";
+export function buildFinancialPayload({
+  transactions = [],
+  monthlyBudget = 0,
+}) {
   const budgetNumber = Number(monthlyBudget || 0);
 
   // 1. Tính tổng thu nhập và chi tiêu
-  const incomes= totalIncome({ data: transactions.filter((t) => t.type === "income") });
-  const expenses = totalExpense({ data: transactions.filter((t) => t.type === "expense") });
+  const incomes = totalIncome({
+    data: transactions.filter((t) => t.type === "income"),
+  });
+  const expenses = totalExpense({
+    data: transactions.filter((t) => t.type === "expense"),
+  });
 
   // 2. Gom nhóm theo Category
   const catMap = transactions
@@ -26,8 +33,7 @@ export function buildFinancialPayload({transactions = [], monthlyBudget = 0}) {
       return {
         category,
         total,
-        percent:
-          expenses > 0 ? +((total / expenses) * 100).toFixed(2) : 0,
+        percent: expenses > 0 ? +((total / expenses) * 100).toFixed(2) : 0,
         count,
       };
     });

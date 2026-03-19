@@ -1,6 +1,6 @@
 function Pagination({ onPrev, onNext, hasNext }) {
   return (
-    <div className="flex justify-center items-center space-x-2 mt-4 mb-6">
+    <div className="flex justify-center items-center space-x-2 mt-4">
       <button
         onClick={onPrev}
         disabled={!onPrev}

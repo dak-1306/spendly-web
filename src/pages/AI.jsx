@@ -7,7 +7,7 @@ import { AI_CONSTANTS } from "../utils/constants.js";
 import { ICONS } from "../assets/index.js";
 import { useFinancialReport } from "../hooks/useFinancialReport";
 import { useTransaction } from "../hooks/useTransaction";
-import { buildFinancialPayload } from "../services/ai.transform.js";
+import { buildFinancialPayload } from "../utils/ai.transform.js";
 import { useAuth } from "../hooks/useAuth.js";
 import ReactMarkdown from "react-markdown";
 import { useFirebaseAI } from "../hooks/useFirebaseAI.js";
@@ -79,18 +79,6 @@ export default function AI() {
       return { heading, body };
     });
   }
-
-  console.log(
-    "Render AI page with transactions:",
-    transactionCurrent,
-    "and month:",
-    month,
-    "and payload:",
-    buildFinancialPayload({
-      monthlyBudget,
-      transactions: transactionCurrent,
-    }),
-  );
 
   return (
     <MainLayout auth navbarBottom title={AI_CONSTANTS.PAGE_TITLE.vi}>

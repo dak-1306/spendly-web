@@ -69,13 +69,21 @@ export default function Setting() {
       navigate("/login", { replace: true });
     }
     closeDelete();
-  }, [deleteMode, closeDelete, logout, navigate]);
+  }, [
+    deleteMode,
+    closeDelete,
+    logout,
+    navigate,
+    deleteUserDocContext,
+    deleteUserContext,
+    userDoc?.id,
+  ]);
 
   const displayName = userDoc?.name || USER_INFO.NAME;
   const email = userDoc?.email || USER_INFO.EMAIL;
   const photoURL = userDoc?.avatar || null;
 
-  console.log('userDoc:', userDoc);
+  console.log("userDoc:", userDoc);
 
   return (
     <MainLayout auth={true} navbarBottom={true} title={PAGE_TITLE.vi}>

@@ -28,49 +28,46 @@ export default function FilterExpense({
     searchPlaceholder: "Tìm kiếm chi tiêu...",
   };
   return (
-    <div className="flex justify-between items-center mb-4">
-      <div className="flex gap-3 items-center">
-        <Button variant="primary" onClick={resetFilters}>
-          {Filter.buttonAll}
-        </Button>
+    <div className="flex gap-3 items-center">
+      <Button variant="primary" onClick={resetFilters}>
+        {Filter.buttonAll}
+      </Button>
 
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-md px-3 py-2"
-        >
-          <option value="">{Filter.selectCategory}</option>
-          {expenseCategories.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
+      <select
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)}
+        className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-md px-3 py-2"
+      >
+        <option value="">{Filter.selectCategory}</option>
+        {expenseCategories.map((c) => (
+          <option key={c} value={c}>
+            {c}
+          </option>
+        ))}
+      </select>
 
-        <select
-          value={dateSort}
-          onChange={(e) => setDateSort(e.target.value)}
-          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-md px-3 py-2 "
-        >
-          <option value="">{Filter.selectDate}</option>
-          <option value="asc">{Filter.optionsDate.asc}</option>
-          <option value="desc">{Filter.optionsDate.desc}</option>
-        </select>
+      <select
+        value={dateSort}
+        onChange={(e) => setDateSort(e.target.value)}
+        className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-md px-3 py-2 "
+      >
+        <option value="">{Filter.selectDate}</option>
+        <option value="asc">{Filter.optionsDate.asc}</option>
+        <option value="desc">{Filter.optionsDate.desc}</option>
+      </select>
 
-        <select
-          value={selectedAmountRange}
-          onChange={(e) => setSelectedAmountRange(e.target.value)}
-          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-md px-3 py-2"
-        >
-          <option value="">{Filter.selectAmount}</option>
-          {amountRanges.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
+      <select
+        value={selectedAmountRange}
+        onChange={(e) => setSelectedAmountRange(e.target.value)}
+        className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-md px-3 py-2"
+      >
+        <option value="">{Filter.selectAmount}</option>
+        {amountRanges.map((r) => (
+          <option key={r.id} value={r.id}>
+            {r.label}
+          </option>
+        ))}
+      </select>
       <form className="flex items-center" onSubmit={(e) => e.preventDefault()}>
         <Input
           type="text"

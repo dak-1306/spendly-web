@@ -3,7 +3,7 @@ import {
   generateKey,
   getCachedAnalysis,
   saveAnalysis,
-} from "../services/firebaseAI";
+} from "../services/firebaseAI.service";
 
 export function useFirebaseAI() {
   async function fetchOrCompute(payload, computeFn) {

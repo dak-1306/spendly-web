@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Dashboard from "./pages/Dashboard";
-import Transaction from "./pages/Transaction";
+import Transaction from "./pages/transaction/Transaction";
 import TransactionDetail from "./pages/TransactionDetail";
 import Setting from "./pages/Setting";
 import AI from "./pages/AI";

@@ -1,4 +1,4 @@
-import {  useMemo, useCallback, useEffect } from "react";
+import { useMemo, useCallback, useEffect } from "react";
 import MainLayout from "../components/layout/MainLayout";
 import CardDashboard from "../components/dashboard/CardDashboard";
 import SpendingCard from "../components/dashboard/SpendingCard";
@@ -24,10 +24,18 @@ import {
 
 export default function Dashboard() {
   // transactions từ context (dữ liệu thật)
-  const { loading, month, setMonth, error, transactionCurrent, transactionPrev, fetchTransactionCurrent, fetchTransactionPrev } = useTransaction();
+  const {
+    loading,
+    month,
+    setMonth,
+    error,
+    transactionCurrent,
+    transactionPrev,
+    fetchTransactionCurrent,
+    fetchTransactionPrev,
+  } = useTransaction();
   const { user } = useAuth();
   const userId = user?.uid;
-  
 
   // Lấy dữ liệu cho tháng hiện tại
   useEffect(() => {
@@ -41,17 +49,27 @@ export default function Dashboard() {
 
   // lấy dữ liệu cho tháng đang chọn từ transactions
   const currentData = useMemo(() => {
-
     return {
-      incomes: transactionCurrent.filter((t) => transactionToMonth(t) === month && t.type === "income"),
-      expenses: transactionCurrent.filter((t) => transactionToMonth(t) === month && t.type === "expense"),
+      incomes: transactionCurrent.filter(
+        (t) => transactionToMonth(t) === month && t.type === "income",
+      ),
+      expenses: transactionCurrent.filter(
+        (t) => transactionToMonth(t) === month && t.type === "expense",
+      ),
     };
   }, [transactionCurrent, month]);
 
   const prevData = useMemo(() => {
-      return {
-      incomes: transactionPrev.filter((t) => transactionToMonth(t) === prevMonth({ month }) && t.type === "income"),
-      expenses: transactionPrev.filter((t) => transactionToMonth(t) === prevMonth({ month }) && t.type === "expense"),
+    return {
+      incomes: transactionPrev.filter(
+        (t) =>
+          transactionToMonth(t) === prevMonth({ month }) && t.type === "income",
+      ),
+      expenses: transactionPrev.filter(
+        (t) =>
+          transactionToMonth(t) === prevMonth({ month }) &&
+          t.type === "expense",
+      ),
     };
   }, [transactionPrev, month]);
 
@@ -86,33 +104,41 @@ export default function Dashboard() {
     return ((current - prev) / prev) * 100;
   }, [currentData, prevData]);
 
-  console.log('current data:', currentData)
-  console.log('prev data:', prevData)
+  console.log("current data:", currentData);
+  console.log("prev data:", prevData);
 
-  if(loading) {
+  if (loading) {
     return (
-      <MainLayout navbarBottom={true} auth={true} title={DASHBOARD.PAGE_TITLE.vi}>
+      <MainLayout
+        navbarBottom={true}
+        auth={true}
+        title={DASHBOARD.PAGE_TITLE.vi}
+      >
         <div className="flex items-center justify-center h-64">
           <Card className="text-center">Đang tải dữ liệu...</Card>
         </div>
       </MainLayout>
-    )
-  } else{
-    if(error) {
+    );
+  } else {
+    if (error) {
       return (
-        <MainLayout navbarBottom={true} auth={true} title={DASHBOARD.PAGE_TITLE.vi}>
+        <MainLayout
+          navbarBottom={true}
+          auth={true}
+          title={DASHBOARD.PAGE_TITLE.vi}
+        >
           <div className="flex items-center justify-center h-64">
-            <Card className="text-center">Lỗi tải dữ liệu: {error.message}</Card>
+            <Card className="text-center">
+              Lỗi tải dữ liệu: {error.message}
+            </Card>
           </div>
         </MainLayout>
-      )
+      );
     }
-
-    
   }
 
   return (
-      <MainLayout navbarBottom={true} auth={true} title={DASHBOARD.PAGE_TITLE.vi}>
+    <MainLayout navbarBottom={true} auth={true} title={DASHBOARD.PAGE_TITLE.vi}>
       {/* Header: chọn tháng */}
       <Card className="mb-4 flex items-center gap-3 mx-auto">
         <ChangeDate month={month} setMonth={setMonth} />
@@ -148,7 +174,10 @@ export default function Dashboard() {
             <CardDashboard
               type="balance"
               title={DASHBOARD.CARD_TITLES.BALANCE}
-              amount={balance({ dataIncome: currentData.incomes, dataExpense: currentData.expenses })}
+              amount={balance({
+                dataIncome: currentData.incomes,
+                dataExpense: currentData.expenses,
+              })}
               currency="VND"
             />
             <CardDashboard
@@ -188,7 +217,5 @@ export default function Dashboard() {
         </>
       )}
     </MainLayout>
-    
-   
   );
 }
