@@ -22,13 +22,26 @@ import { Link } from "react-router-dom";
 
 export default function Transaction() {
   // Icon
-  const editIcon = <Edit2 className="text-blue-600" size={16} />;
-  const trashIcon = <Trash2 className="text-red-600" size={16} />;
+  const editIcon = (
+    <Edit2 className="text-blue-600 dark:text-blue-400" size={16} />
+  );
+  const trashIcon = (
+    <Trash2 className="text-red-600 dark:text-red-400" size={16} />
+  );
   const eyeIcon = (
     <Eye className="text-gray-600 dark:text-gray-400" size={16} />
   );
 
-  const { transactions, month, setMonth, fetchTransactions, loading, error } = useTransaction();
+  const {
+    incomes,
+    expenses,
+    month,
+    setMonth,
+    GetExpense,
+    GetIncome,
+    loading,
+    error,
+  } = useTransaction();
   const { user } = useAuth();
   const userId = user?.uid;
 
@@ -45,7 +58,6 @@ export default function Transaction() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
   const [deletingRole, setDeletingRole] = useState("expense");
-  
 
   /* ---------- Filter state & logic ---------- */
   const expenseCategories = EXPENSE.CATEGORIES;
@@ -56,51 +68,172 @@ export default function Transaction() {
   const [selectedAmountRange, setSelectedAmountRange] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Tìm range object dựa trên selectedAmountRange để truyền vào filter
+  const [cursorIncome, setCursorIncome] = useState(null);
+  const [cursorStackIncome, setCursorStackIncome] = useState([]);
+  const [cursorExpense, setCursorExpense] = useState(null);
+  const [cursorStackExpense, setCursorStackExpense] = useState([]);
+
+  const itemsPerPage = 5;
+  useEffect(() => {
+    const load = async () => {
+      const { nextCursor } = await GetExpense(
+        userId,
+        {
+          category: selectedCategory || null,
+          amountRange: selectedAmountRange || null,
+          sortBy: dateSort || null,
+          searchTerm: searchTerm || null,
+        },
+        {
+          limit: itemsPerPage,
+          cursor: null,
+        },
+      );
+
+      setCursorExpense(nextCursor);
+      setCursorStackExpense([]);
+    };
+
+    load();
+  }, [
+    userId,
+    month,
+    selectedCategory,
+    selectedAmountRange,
+    dateSort,
+    searchTerm,
+    GetExpense,
+  ]);
+  const resultExpenses = useMemo(() => {
+    if (expenses?.results) {
+      const expenseFormatDate = expenses.results.map((expense) => ({
+        ...expense,
+        date: formatForInputDate(expense.date),
+      }));
+      return expenseFormatDate;
+    }
+    return [];
+  }, [expenses]);
 
   useEffect(() => {
-    fetchTransactions(userId, {
+    const load = async () => {
+      const { nextCursor } = await GetIncome(
+        userId,
+        {
+          category: selectedCategory || null,
+          amountRange: selectedAmountRange || null,
+          sortBy: dateSort || null,
+          searchTerm: searchTerm || null,
+        },
+        {
+          limit: itemsPerPage,
+          cursor: null,
+        },
+      );
+      setCursorIncome(nextCursor);
+      setCursorStackIncome([]);
+    };
+    load();
+  }, [
+    userId,
+    month,
+    selectedCategory,
+    selectedAmountRange,
+    dateSort,
+    searchTerm,
+    GetIncome,
+  ]);
+  const resultIncomes = useMemo(() => {
+    if (incomes?.results) {
+      const incomeFormatDate = incomes.results.map((income) => ({
+        ...income,
+        date: formatForInputDate(income.date),
+      }));
+      return incomeFormatDate;
+    }
+    return [];
+  }, [incomes]);
+
+  const onNext = async (role) => {
+    if (role === "income") {
+      const res = await GetIncome(
+        userId,
+
+        { limit: itemsPerPage, cursor: cursorIncome },
+      );
+      if (res?.nextCursor) {
+        setCursorStackIncome((prev) => [...prev, cursorIncome]);
+        setCursorIncome(res.nextCursor);
+      }
+    } else {
+      const filters = {
+        category: selectedCategory || null,
+        amountRange: selectedAmountRange || null,
+        sortBy: dateSort || null,
+        searchTerm: searchTerm || null,
+      };
+      const res = await GetExpense(userId, filters, {
+        limit: itemsPerPage,
+        cursor: cursorExpense,
+      });
+      if (res?.nextCursor) {
+        setCursorStackExpense((prev) => [...prev, cursorExpense]);
+        setCursorExpense(res.nextCursor);
+      }
+    }
+  };
+
+  const onPrev = async (role) => {
+    if (role === "income") {
+      if (cursorStackIncome.length === 0) {
+        const res = await GetIncome(
+          userId,
+
+          { limit: itemsPerPage, cursor: null },
+        );
+        setCursorStackIncome([]);
+        setCursorIncome(res?.nextCursor ?? null);
+        return;
+      }
+      const newStack = cursorStackIncome.slice(0, -1);
+      const newTop = newStack.length ? newStack[newStack.length - 1] : null;
+      setCursorStackIncome(newStack);
+      const res = await GetIncome(
+        userId,
+
+        { limit: itemsPerPage, cursor: newTop },
+      );
+      setCursorIncome(res?.nextCursor ?? null);
+      return;
+    }
+    const filters = {
       category: selectedCategory || null,
       amountRange: selectedAmountRange || null,
       sortBy: dateSort || null,
       searchTerm: searchTerm || null,
-    });
-  }, [
-    fetchTransactions,
-    userId,
-    month,
-    dateSort,
-    selectedAmountRange,
-    searchTerm,
-    selectedCategory,
-  ]);
-
-  // Chuẩn hóa transactions thành incomes/expenses cho tháng hiện tại (memoized)
-  const transactionNormalize = useMemo(() => {
-    const monthData = {
-      incomes: [],
-      expenses: [],
     };
-    transactions.forEach((t) => {
-      if (t.type === "income" && t.month === month) {
-        const date = formatForInputDate(t.date);
-        monthData.incomes.push({
-          ...t,
-          date,
-        });
-      } else if (t.type === "expense" && t.month === month) {
-        const date = formatForInputDate(t.date);
-        monthData.expenses.push({
-          ...t,
-          date,
-        });
-      }
+    // nếu không có history, load trang đầu (cursor = null)
+    if (cursorStackExpense.length === 0) {
+      const res = await GetExpense(userId, filters, {
+        limit: itemsPerPage,
+        cursor: null,
+      });
+      setCursorStackExpense([]);
+      setCursorExpense(res?.nextCursor ?? null);
+      return;
+    }
+
+    // tính newStack và newTop trước khi setState
+    const newStack = cursorStackExpense.slice(0, -1);
+    const newTop = newStack.length ? newStack[newStack.length - 1] : null;
+    setCursorStackExpense(newStack);
+
+    const res = await GetExpense(userId, filters, {
+      limit: itemsPerPage,
+      cursor: newTop,
     });
-    return monthData;
-  }, [transactions, month]);
-
-  const { incomes, expenses } = transactionNormalize;
-
+    setCursorExpense(res?.nextCursor ?? null);
+  };
   /* ---------- Helpers mở modal ---------- */
   const openEdit = useCallback((expense) => {
     setEditingExpense(expense);
@@ -125,19 +258,10 @@ export default function Transaction() {
     setSearchTerm("");
   }, []);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(expenses.length / itemsPerPage);
-
-  console.log("userId in Transaction page:", userId);
-  console.log('month in Transaction page:', month);
-  console.log("transaction context render", transactions);
-  console.log("filter: ", {
-    selectedCategory,
-    dateSort,
-    selectedAmountRange,
-    searchTerm,
-  });
+  console.log("expenses:", resultExpenses);
+  console.log("incomes:", resultIncomes);
+  console.log("cursor: ", cursorExpense);
+  console.log("cursor stack: ", cursorStackExpense);
 
   /* ---------- Render ---------- */
   if (loading) {
@@ -189,13 +313,13 @@ export default function Transaction() {
           </h2>
 
           <ul>
-            {loading && incomes.length === 0 && (
+            {loading && resultIncomes.length === 0 && (
               <li className="text-gray-500 dark:text-gray-400">
                 Chưa có thu nhập nào.
               </li>
             )}
             {!loading &&
-              incomes.map((income) => (
+              resultIncomes.map((income) => (
                 <li
                   key={income.id}
                   className="py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center"
@@ -235,6 +359,11 @@ export default function Transaction() {
                 </li>
               ))}
           </ul>
+          <Pagination
+            onPrev={() => onPrev("income")}
+            onNext={() => onNext("income")}
+            hasNext={resultIncomes.length === itemsPerPage}
+          />
         </Card>
 
         <Card>
@@ -267,7 +396,7 @@ export default function Transaction() {
               </thead>
               <tbody>
                 {!loading &&
-                  expenses.map((expense) => (
+                  resultExpenses.map((expense) => (
                     <tr
                       key={expense.id}
                       className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
@@ -304,9 +433,9 @@ export default function Transaction() {
             </table>
           </div>
           <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPrev={() => onPrev("expense")}
+            onNext={() => onNext("expense")}
+            hasNext={resultExpenses.length === itemsPerPage}
           />
         </Card>
 

@@ -5,7 +5,7 @@ function Footer() {
   const icons_facebook = ICONS.icon_facebook;
 
   return (
-    <footer className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 text-white p-4 text-center">
+    <footer className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 text-white p-4 text-center">
       <p className="text-white">{FOOTER.text}</p>
       <div className="flex justify-center space-x-4 mt-2">
         <a href="#">

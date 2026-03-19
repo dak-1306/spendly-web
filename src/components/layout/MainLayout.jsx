@@ -11,7 +11,7 @@ function MainLayout({
     <div className="h-screen flex flex-col overflow-hidden">
       <Header auth={auth} />
       <main
-        className={`bg-gradient-to-br from-slate-50 to-blue-50 text-gray-800 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-600 dark:text-gray-300 ${
+        className={`bg-gradient-to-br from-slate-50 to-blue-50 text-gray-800 dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-700 dark:text-gray-300 ${
           auth ? "px-[200px]" : ""
         } flex-1 overflow-y-auto ${navbarBottom ? "pb-20" : ""}`}
       >

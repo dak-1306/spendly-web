@@ -11,68 +11,98 @@ export const TransactionProvider = ({ children }) => {
       return d.toISOString().slice(0, 7);
     })(),
   );
-  const [transactions, setTransactions] = useState([]);
+  const [incomes, setIncomes] = useState({
+    results: [],
+    nextCursor: null,
+  });
+  const [expenses, setExpenses] = useState({
+    results: [],
+    nextCursor: null,
+  });
+
   const [transactionCurrent, setTransactionCurrent] = useState([]);
   const [transactionPrev, setTransactionPrev] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Lấy dữ liệu transaction từ Firebase kèm filter, search
-  const fetchTransactions = useCallback(
-    async (userId, { category, amountRange, sortBy, searchTerm }) => {
-      console.log("fetchTransactions called with:", {
-        userId,
-        month,
-        category,
-        amountRange,
-        sortBy,
-        searchTerm,
-      });
+  // Lấy expenses của user, phân trang, sort theo ngày tạo mới nhất, có filter, search
+  const GetExpense = useCallback(
+    async (
+      userId,
+      { category, amountRange, sortBy, searchTerm },
+      { limit: pageLimit = 5, cursor: cursorValue } = {},
+    ) => {
       if (!userId) {
-        setTransactions([]);
+        setExpenses({ results: [], nextCursor: null });
         setLoading(false);
-        return;
+        return { results: [], nextCursor: null };
       }
       setLoading(true);
       try {
+        let items;
         if (searchTerm) {
-          const items = await transactionService.searchTransactions(
+          items = await transactionService.searchTransactions(
             userId,
             searchTerm,
+            { limit: pageLimit, cursor: cursorValue },
           );
-          setTransactions(items);
-          console.log("Search results:", items);
-          setLoading(false);
-          return;
-        }
-        if (category || amountRange || sortBy) {
-          const items = await transactionService.filterTransactions(
+        } else if (category || amountRange || sortBy) {
+          items = await transactionService.filterTransactions(
             userId,
             category,
             amountRange,
             sortBy,
+            { limit: pageLimit, cursor: cursorValue },
           );
-          setTransactions(items);
-          console.log("Filter results:", items);
-          setLoading(false);
-          return;
-        }
-        if (month) {
-          const items = await transactionService.filterTransactionsByMonth(
+        } else {
+          items = await transactionService.filterTransactionsByMonth(
             userId,
             month,
+            "expense",
+            {
+              limit: pageLimit,
+              cursor: cursorValue,
+            },
           );
-          setTransactions(items);
-          console.log("Filter by month results:", items);
-          setLoading(false);
-          return;
         }
-        const items = await transactionService.getAllTransactions(userId);
-        setTransactions(items);
-        console.log("All transactions:", items);
+        const results = items.results ?? [];
+        const nextCursor = items.nextCursor ?? null;
+        setExpenses({ results, nextCursor });
+        setLoading(false);
+        return { results, nextCursor };
       } catch (e) {
         setError(e);
-      } finally {
+        setLoading(false);
+      }
+    },
+    [month],
+  );
+
+  const GetIncome = useCallback(
+    async (userId, { limit: pageLimit = 5, cursor: cursorValue } = {}) => {
+      if (!userId) {
+        setIncomes({ results: [], nextCursor: null });
+        setLoading(false);
+        return { results: [], nextCursor: null };
+      }
+      setLoading(true);
+      try {
+        const items = await transactionService.filterTransactionsByMonth(
+          userId,
+          month,
+          "income",
+          {
+            limit: pageLimit,
+            cursor: cursorValue,
+          },
+        );
+        const results = items.results ?? [];
+        const nextCursor = items.nextCursor ?? null;
+        setIncomes({ results, nextCursor });
+        setLoading(false);
+        return { results, nextCursor };
+      } catch (e) {
+        setError(e);
         setLoading(false);
       }
     },
@@ -188,7 +218,8 @@ export const TransactionProvider = ({ children }) => {
   return (
     <TransactionContext.Provider
       value={{
-        transactions,
+        incomes,
+        expenses,
         transactionCurrent,
         transactionPrev,
         loading,
@@ -201,7 +232,8 @@ export const TransactionProvider = ({ children }) => {
         updateTransaction,
         deleteTransaction,
         getTransactionById,
-        fetchTransactions,
+        GetExpense,
+        GetIncome,
       }}
     >
       {children}

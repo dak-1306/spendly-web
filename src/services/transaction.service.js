@@ -11,13 +11,15 @@ import {
   where,
   orderBy,
   serverTimestamp,
+  limit,
+  startAfter,
 } from "firebase/firestore";
 import app from "../firebase";
 
 const db = getFirestore(app);
 const colRef = collection(db, "transactions");
 
-// Lấy dữ liệu cho dashboard 
+// Lấy dữ liệu cho dashboard
 const getDashboardData = async (userId, month) => {
   const start = new Date(month + "-01");
   const end = new Date(start.getFullYear(), start.getMonth() + 1, 1);
@@ -33,14 +35,26 @@ const getDashboardData = async (userId, month) => {
 };
 
 // Lấy tất cả transaction của user, sort theo ngày tạo mới nhất
-const getAllTransactions = async (userId) => {
-  const q = query(
+const getAllTransactions = async (
+  userId,
+  { limit: pageLimit = 5, cursor: cursorValue } = {},
+) => {
+  let q = query(
     colRef,
     where("userId", "==", userId),
     orderBy("createdAt", "desc"),
   );
+  if (cursorValue) {
+    const cursorSnap = await getDoc(doc(db, "transactions", cursorValue));
+    if (cursorSnap.exists()) q = query(q, startAfter(cursorSnap));
+  }
+  q = query(q, limit(pageLimit));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const results = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const nextCursor = snap.docs.length
+    ? snap.docs[snap.docs.length - 1].id
+    : null;
+  return { results, nextCursor };
 };
 
 const getTransactionById = async (id) => {
@@ -67,48 +81,85 @@ const deleteTransaction = async (id) => {
   await deleteDoc(ref);
 };
 
-// Filter transaction theo tháng năm
-const filterTransactionsByMonth = async (userId, month) => {
+const filterTransactionsByMonth = async (
+  userId,
+  month,
+  type,
+  { limit: pageLimit = 5, cursor: cursorValue } = {},
+) => {
   const start = new Date(month + "-01");
   const end = new Date(start.getFullYear(), start.getMonth() + 1, 1);
-  const q = query(
+
+  let q = query(
     colRef,
     where("userId", "==", userId),
     where("createdAt", ">=", start),
     where("createdAt", "<", end),
+    where("type", "==", type),
     orderBy("createdAt", "desc"),
+    limit(pageLimit),
   );
+
+  // dùng trực tiếp lastDoc
+  if (cursorValue) {
+    q = query(q, startAfter(cursorValue));
+  }
+
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+  const results = snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+
+  //  trả về document thật
+  const lastDoc = snap.docs[snap.docs.length - 1] || null;
+
+  return {
+    results,
+    nextCursor: lastDoc,
+  };
 };
 
 // Search transaction
-const searchTransactions = async (userId, searchTerm) => {
-  if (!searchTerm || !searchTerm.trim()) return [];
+const searchTransactions = async (
+  userId,
+  searchTerm,
+  { limit: pageLimit = 5, cursor: cursorValue } = {},
+) => {
+  if (!searchTerm || !searchTerm.trim())
+    return { results: [], nextCursor: null };
   const term = searchTerm;
-  const q = query(
+  let q = query(
     colRef,
     where("userId", "==", userId),
     where("title", ">=", term),
     where("title", "<=", term + "\uf8ff"),
+    orderBy("title"),
   );
+  if (cursorValue) {
+    q = query(q, startAfter(cursorValue));
+  }
+  q = query(q, limit(pageLimit));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const results = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  //  trả về document thật
+  const lastDoc = snap.docs[snap.docs.length - 1] || null;
+  
+  return { results, nextCursor: lastDoc };
 };
 
 // Filter transaction theo thể loại, theo khoảng giá, sort theo ngày tặng dần/giảm dần và pagination (nếu cần)
-const filterTransactions = async (userId, category, amountRange, sortBy) => {
-  console.log("filterTransactions params:", {
-    userId,
-    category,
-    amountRange,
-    sortBy,
-  });
+const filterTransactions = async (
+  userId,
+  category,
+  amountRange,
+  sortBy,
+  { limit: pageLimit = 5, cursor: cursorValue } = {},
+) => {
   let q = query(colRef, where("userId", "==", userId));
-
   if (category) q = query(q, where("category", "==", category));
 
-  // normalize amountRange: accept ["lt100"] id or [min,max]
   let rangeArr = null;
   if (amountRange) {
     if (typeof amountRange === "string") {
@@ -119,30 +170,36 @@ const filterTransactions = async (userId, category, amountRange, sortBy) => {
         gt1M: [1000000, Infinity],
       };
       rangeArr = map[amountRange] ?? null;
-    } else if (Array.isArray(amountRange)) {
-      rangeArr = amountRange;
-    }
+    } else if (Array.isArray(amountRange)) rangeArr = amountRange;
   }
 
-  console.log("Normalized rangeArr:", rangeArr);
   if (rangeArr) {
     q = query(
       q,
       where("amount", ">=", rangeArr[0]),
       where("amount", "<=", rangeArr[1]),
     );
-  }
-
-  if (sortBy) {
-    // nếu có inequality trên amount thì orderBy(amount) trước để thỏa rule của Firestore
-    if (rangeArr) {
-      q = query(q, orderBy("amount", "desc"));
-    }
+    q = query(
+      q,
+      orderBy("amount", "desc"),
+      orderBy("createdAt", sortBy === "newest" ? "desc" : "asc"),
+    );
+  } else {
     q = query(q, orderBy("createdAt", sortBy === "newest" ? "desc" : "asc"));
   }
 
+  if (cursorValue) {
+    q = query(q, startAfter(cursorValue));
+  }
+
+  q = query(q, limit(pageLimit));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const results = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+  //  trả về document thật
+  const lastDoc = snap.docs[snap.docs.length - 1] || null;
+
+  return { results, nextCursor: lastDoc };
 };
 
 export default {

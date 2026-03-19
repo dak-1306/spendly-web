@@ -9,7 +9,8 @@ const variantStyles = {
   secondary: "bg-gray-100 text-gray-800 hover:bg-gray-200",
   danger: "bg-red-500 text-white hover:bg-red-600",
   outline: "border border-blue-600 text-blue-600 hover:bg-blue-50",
-  ghost: "text-gray-700 hover:bg-gray-100",
+  ghost:
+    "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600",
   cta: "bg-gradient-to-r from-yellow-500 to-orange-600 text-white hover:from-yellow-600 hover:to-orange-700",
 };
 
