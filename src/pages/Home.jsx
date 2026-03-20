@@ -5,6 +5,7 @@ import Card from "../components/common/Card.jsx";
 import Button from "../components/common/Button.jsx";
 import { IMAGES } from "../assets/index.js";
 import { HOME } from "../utils/constants.js";
+import { useLanguage } from "../hooks/useLanguage";
 import { useAuth } from "../hooks/useAuth.js";
 
 /*
@@ -26,16 +27,9 @@ export default function Home() {
     [],
   );
 
+  const { t } = useLanguage();
   // Mô tả ngắn bên dưới mỗi ảnh
-  const captions = useMemo(
-    () => [
-      "Dashboard — tổng quan thu chi, biểu đồ và số liệu quan trọng.",
-      "Expenses — quản lý chi tiêu, danh mục và lịch sử giao dịch.",
-      "AI Insights — đề xuất thông minh và phân tích tự động.",
-      "Profile — cấu hình người dùng và thiết lập cá nhân.",
-    ],
-    [],
-  );
+  const captions = useMemo(() => t("home.captions"), [t]);
 
   // Slider index hiện tại
   const [active, setActive] = useState(0);
@@ -96,17 +90,17 @@ export default function Home() {
         {/* Right: giới thiệu, tính năng và CTA */}
         <div className="flex flex-col justify-center items-center p-8 space-y-4">
           <h2 className="text-blue-600 dark:text-blue-400 text-3xl font-bold">
-            {HOME.welcomeMessage}
+            {t("home.welcomeMessage")}
           </h2>
           <p className="text-lg text-orange-600 dark:text-orange-400">
-            {HOME.text}
+            {t("home.text")}
           </p>
 
           <Card
             className="flex flex-col items-start space-y-4"
             animation={true}
           >
-            {HOME.description.map((desc, index) => (
+            {t("home.description").map((desc, index) => (
               <p key={index} className="text-lg">
                 {desc}
               </p>
@@ -116,10 +110,10 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-4 w-full">
             <Card animation={true}>
               <h2 className="text-blue-600 dark:text-blue-400 text-xl font-semibold mb-2">
-                {HOME.featureHighlightsTitle}
+                {t("home.featureHighlightsTitle")}
               </h2>
               <ul className="list-disc list-inside space-y-1">
-                {HOME.featureHighlights.map((feature, index) => (
+                {t("home.featureHighlights").map((feature, index) => (
                   <li key={index}>{feature}</li>
                 ))}
               </ul>
@@ -127,10 +121,10 @@ export default function Home() {
 
             <Card animation={true}>
               <h2 className="text-orange-600 dark:text-orange-400 text-xl font-semibold mb-2">
-                {HOME.howItWorksTitle}
+                {t("home.howItWorksTitle")}
               </h2>
               <ol className="list-decimal list-inside space-y-1">
-                {HOME.howItWorks.map((step, index) => (
+                {t("home.howItWorks").map((step, index) => (
                   <li key={index}>{step}</li>
                 ))}
               </ol>
@@ -139,7 +133,7 @@ export default function Home() {
 
           <Link to="/register">
             <Button variant="primary" size="lg">
-              {HOME.textButton}
+              {t("home.textButton") }
             </Button>
           </Link>
         </div>

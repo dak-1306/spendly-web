@@ -1,0 +1,86 @@
+{
+  "pageTitle": "Expenses & Income",
+  "defaultMonth": "2025-07",
+  "filters": {
+    "categoryExpenses": {
+      "label": "Filter by category",
+      "options": [
+        "Food & Dining",
+        "Transportation",
+        "Shopping",
+        "Rent",
+        "Entertainment",
+        "Health",
+        "Education",
+        "Other"
+      ]
+    },
+    "categoryIncomes": {
+      "label": "Filter by category",
+      "options": ["Salary", "Business", "Investment", "Gift", "Other"]
+    },
+    "amountRanges": {
+      "label": "Amount range",
+      "options": [
+        { "id": "lt100", "label": "< 100,000", "min": 0, "max": 100000 },
+        {
+          "id": "100-500",
+          "label": "100,000 - 500,000",
+          "min": 100000,
+          "max": 500000
+        },
+        {
+          "id": "500-1M",
+          "label": "500,000 - 1,000,000",
+          "min": 500000,
+          "max": 1000000
+        },
+        { "id": "gt1M", "label": "> 1,000,000", "min": 1000000, "max": null }
+      ]
+    },
+    "dateSort": {
+      "label": "Sort by date",
+      "options": [
+        { "id": "asc", "label": "Oldest to newest", "value": "asc" },
+        { "id": "desc", "label": "Newest to oldest", "value": "desc" }
+      ]
+    }
+  },
+  "fields": {
+    "title": "Title",
+    "sourceExpense": "Expense source",
+    "sourceIncome": "Income source",
+    "amount": "Amount",
+    "category": "Category",
+    "date": "Date",
+    "type": "Type",
+    "currency": "Currency",
+    "month": "Month"
+  },
+  "tableHeaders": {
+    "category": "Category",
+    "title": "Title",
+    "date": "Date",
+    "amount": "Amount",
+    "actions": "Actions"
+  },
+  "buttons": {
+    "addExpense": "Add expense",
+    "addIncome": "Add income",
+    "edit": "Edit",
+    "delete": "Delete",
+    "refresh": "Refresh"
+  },
+  "noData": "No transactions found",
+  "loading": "Loading transactions...",
+  "placeholderSearch": "Search by title",
+  "titleAddExpense": "Add Expense",
+  "titleAddIncome": "Add Income",
+  "titleEditExpense": "Edit Expense",
+  "titleEditIncome": "Edit Income",
+  "formDelete": {
+    "titleIncome": "Delete Income",
+    "titleExpense": "Delete Expense",
+    "message": "Are you sure you want to delete this transaction?"
+  }
+}

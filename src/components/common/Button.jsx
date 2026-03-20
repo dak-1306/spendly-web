@@ -1,6 +1,6 @@
 // 🔧 STYLE DÙNG CHUNG
 const baseStyles =
-  "inline-flex rounded-lg items-center justify-center font-medium rounded cursor-pointer transition focus:outline-none";
+  "inline-flex whitespace-nowrap rounded-lg items-center justify-center font-medium rounded cursor-pointer transition focus:outline-none";
 
 // 🔧 MỖI VARIANT = 1 STYLE
 const variantStyles = {

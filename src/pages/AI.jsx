@@ -9,6 +9,7 @@ import { useFinancialReport } from "../hooks/useFinancialReport";
 import { useTransaction } from "../hooks/useTransaction";
 import { buildFinancialPayload } from "../utils/ai.transform.js";
 import { useAuth } from "../hooks/useAuth.js";
+import { useLanguage } from "../hooks/useLanguage";
 import ReactMarkdown from "react-markdown";
 import { useFirebaseAI } from "../hooks/useFirebaseAI.js";
 
@@ -34,11 +35,17 @@ export default function AI() {
 
   const { run, loading, error } = useFinancialReport();
   const robotIcon = ICONS.icon_robot_color;
-  const quickOptions = AI_CONSTANTS.QUICK_OPTIONS;
+  const { t } = useLanguage();
+  const quickOptions = t("ai.quickOptions") || AI_CONSTANTS.QUICK_OPTIONS;
 
   const handleAnalyze = async () => {
     if (!transactionCurrent?.length) {
-      alert("Dữ liệu giao dịch đang tải hoặc trống!");
+      alert(
+        t(
+          "ai.emptyTransactionsAlert",
+          "Dữ liệu giao dịch đang tải hoặc trống!",
+        ),
+      );
       return;
     }
 
@@ -56,7 +63,12 @@ export default function AI() {
     } catch (err) {
       console.error("Lỗi khi phân tích tài chính:", err);
       // Lỗi đã được xử lý trong hook useFinancialReport, chỉ cần hiển thị thông báo chung
-      alert("Có lỗi xảy ra khi phân tích. Vui lòng thử lại sau.");
+      alert(
+        t(
+          "ai.analysisErrorAlert",
+          "Có lỗi xảy ra khi phân tích. Vui lòng thử lại sau.",
+        ),
+      );
     }
   };
 
@@ -81,7 +93,11 @@ export default function AI() {
   }
 
   return (
-    <MainLayout auth navbarBottom title={AI_CONSTANTS.PAGE_TITLE.vi}>
+    <MainLayout
+      auth
+      navbarBottom
+      title={t("ai.pageTitle") || AI_CONSTANTS.PAGE_TITLE.vi}
+    >
       <div className="space-y-6 mx-10">
         <Card>
           <div className="flex flex-wrap items-center gap-4">
@@ -93,7 +109,7 @@ export default function AI() {
             />
             <input
               type="number"
-              placeholder="Ngân sách (VND)"
+              placeholder={t("ai.budgetPlaceholder", "Ngân sách (VND)")}
               value={monthlyBudget}
               onChange={(e) => setMonthlyBudget(e.target.value)}
               className="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none flex-1"
@@ -103,7 +119,9 @@ export default function AI() {
               disabled={loading}
               variant="primary"
             >
-              {loading ? "Đang xử lý..." : "Phân tích bằng AI"}
+              {loading
+                ? t("ai.analyzing", "Đang xử lý...")
+                : t("ai.analyzeButton", "Phân tích bằng AI")}
             </Button>
           </div>
           {error && (

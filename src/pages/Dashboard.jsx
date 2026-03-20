@@ -9,6 +9,7 @@ import ChangeDate from "../components/common/ChangeDate";
 import { DASHBOARD } from "../utils/constants";
 import { useTransaction } from "../hooks/useTransaction";
 import { useAuth } from "../hooks/useAuth";
+import { useLanguage } from "../hooks/useLanguage";
 
 import {
   transactionToMonth,
@@ -23,6 +24,7 @@ import {
 /* Static chart config (khai báo ngoài component để tránh recreate mỗi render) */
 
 export default function Dashboard() {
+  const { t } = useLanguage();
   // transactions từ context (dữ liệu thật)
   const {
     loading,
@@ -115,7 +117,9 @@ export default function Dashboard() {
         title={DASHBOARD.PAGE_TITLE.vi}
       >
         <div className="flex items-center justify-center h-64">
-          <Card className="text-center">Đang tải dữ liệu...</Card>
+          <Card className="text-center">
+            {t("dashboard.loading") || "Đang tải dữ liệu..."}
+          </Card>
         </div>
       </MainLayout>
     );
@@ -129,7 +133,8 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-center h-64">
             <Card className="text-center">
-              Lỗi tải dữ liệu: {error.message}
+              {t("dashboard.errorPrefix", "Lỗi tải dữ liệu:")}&nbsp;
+              {error.message}
             </Card>
           </div>
         </MainLayout>
@@ -138,7 +143,11 @@ export default function Dashboard() {
   }
 
   return (
-    <MainLayout navbarBottom={true} auth={true} title={DASHBOARD.PAGE_TITLE.vi}>
+    <MainLayout
+      navbarBottom={true}
+      auth={true}
+      title={t("dashboard.pageTitle") || DASHBOARD.PAGE_TITLE.vi}
+    >
       {/* Header: chọn tháng */}
       <Card className="mb-4 flex items-center gap-3 mx-auto">
         <ChangeDate month={month} setMonth={setMonth} />
@@ -161,19 +170,19 @@ export default function Dashboard() {
           <div className="grid grid-cols-4 gap-4 mx-auto mb-6">
             <CardDashboard
               type="income"
-              title={DASHBOARD.CARD_TITLES.INCOME}
+              title={t("dashboard.cardTitles.income")}
               amount={totalIncome({ data: currentData.incomes })}
               currency="VND"
             />
             <CardDashboard
               type="expense"
-              title={DASHBOARD.CARD_TITLES.EXPENSES}
+              title={t("dashboard.cardTitles.expenses")}
               amount={totalExpense({ data: currentData.expenses })}
               currency="VND"
             />
             <CardDashboard
               type="balance"
-              title={DASHBOARD.CARD_TITLES.BALANCE}
+              title={t("dashboard.cardTitles.balance")}
               amount={balance({
                 dataIncome: currentData.incomes,
                 dataExpense: currentData.expenses,
@@ -182,7 +191,7 @@ export default function Dashboard() {
             />
             <CardDashboard
               type="compare"
-              title={DASHBOARD.CARD_TITLES.COMPARE}
+              title={t("dashboard.cardTitles.compare")}
               amount={formatPercent(percentChange)}
               currency="%"
             />
@@ -193,13 +202,14 @@ export default function Dashboard() {
             <Card className="col-span-2">
               <SpendingPieChart
                 month={month}
-                title={DASHBOARD.CHART_TITLES.EXPENSES_BY_CATEGORY}
+                title={t("dashboard.chartTitles.expensesByCategory")}
                 expenses={normalizedMonthExpenses}
               />
             </Card>
 
             <Card className="col-span-1">
               <SpendingCard
+                title={t("dashboard.chartTitles.spendingCardTitle")}
                 current={totalExpense({ data: currentData.expenses })}
                 limit={totalIncome({ data: currentData.incomes })}
               />
@@ -210,7 +220,7 @@ export default function Dashboard() {
           <Card className="mx-auto mt-6 mb-8">
             <SpendingBarChart
               month={month}
-              title={DASHBOARD.CHART_TITLES.EXPENSES_OVER_TIME}
+              title={t("dashboard.chartTitles.expensesOverTime")}
               expenses={normalizedMonthExpenses}
             />
           </Card>

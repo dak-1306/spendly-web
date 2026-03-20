@@ -1,0 +1,18 @@
+{
+  "defaultMonth": "2025-12",
+  "pageTitle": "Tổng quan",
+  "cardTitles": {
+    "income": "Tổng thu nhập",
+    "expenses": "Tổng chi tiêu",
+    "balance": "Số dư hiện tại",
+    "compare": "Chi tiêu so với tháng trước"
+  },
+  "chartTitles": {
+    "expensesByCategory": "Chi tiêu theo danh mục",
+    "spendingCardTitle": "Chi tiêu hàng tháng",
+    "expensesOverTime": "Chi tiêu theo ngày"
+  },
+  "loading": "Đang tải dữ liệu...",
+  "errorPrefix": "Lỗi tải dữ liệu:",
+  "noData": "Không có dữ liệu"
+}

@@ -3,31 +3,39 @@ import Button from "../common/Button";
 import Modal from "../common/Modal";
 import Input from "../common/Input";
 
+import { useLanguage } from "../../hooks/useLanguage";
+
 export default function ChangePassword({ open, onClose }) {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const { t } = useLanguage();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage(null);
     if (!oldPassword || !newPassword || !confirmPassword) {
-      setMessage({ type: "error", text: "Vui lòng điền đủ thông tin." });
+      setMessage({
+        type: "error",
+        text: t("setting.formChangePassword.validation.allFieldsRequired"),
+      });
       return;
     }
     if (newPassword !== confirmPassword) {
       setMessage({
         type: "error",
-        text: "Mật khẩu xác nhận không khớp.",
+        text: t(
+          "setting.formChangePassword.validation.confirmPasswordMismatch",
+        ),
       });
       return;
     }
     if (oldPassword === newPassword) {
       setMessage({
         type: "error",
-        text: "Mật khẩu mới phải khác mật khẩu cũ.",
+        text: t("setting.formChangePassword.validation.newPasswordSameAsOld"),
       });
       return;
     }
@@ -38,21 +46,26 @@ export default function ChangePassword({ open, onClose }) {
     setOldPassword("");
     setNewPassword("");
     setConfirmPassword("");
-    setMessage({ type: "success", text: "Đổi mật khẩu thành công." });
+    setMessage({
+      type: "success",
+      text: t("setting.formChangePassword.success"),
+    });
   };
 
   return (
     // modal overlay
     <Modal isOpen={open} onClose={onClose}>
       <div className="flex items-center justify-center bg-blue-600 p-4 rounded">
-        <h2 className="text-2xl font-semibold text-white">Đổi mật khẩu</h2>
+        <h2 className="text-2xl font-semibold text-white">
+          {t("setting.formChangePassword.title")}
+        </h2>
       </div>
       <form
         onSubmit={handleSubmit}
         className="max-w-md w-full rounded shadow p-6 space-y-4"
       >
         <Input
-          label="Mật khẩu hiện tại"
+          label={t("setting.formChangePassword.currentPassword")}
           type="password"
           value={oldPassword}
           onChange={(e) => setOldPassword(e.target.value)}
@@ -60,7 +73,7 @@ export default function ChangePassword({ open, onClose }) {
         />
 
         <Input
-          label="Mật khẩu mới"
+          label={t("setting.formChangePassword.newPassword")}
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
@@ -69,7 +82,7 @@ export default function ChangePassword({ open, onClose }) {
         />
 
         <Input
-          label="Xác nhận mật khẩu mới"
+          label={t("setting.formChangePassword.confirmNewPassword")}
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
@@ -88,7 +101,7 @@ export default function ChangePassword({ open, onClose }) {
         )}
         <div className="flex gap-3">
           <Button variant="secondary" onClick={onClose} className="w-full">
-            Hủy
+            {t("common.buttons.cancel")}
           </Button>
           <Button
             variant="primary"
@@ -96,7 +109,9 @@ export default function ChangePassword({ open, onClose }) {
             disabled={loading}
             className="w-full"
           >
-            {loading ? "Đang xử lý..." : "Đổi mật khẩu"}
+            {loading
+              ? t("setting.formChangePassword.processing")
+              : t("common.buttons.confirm")}
           </Button>
         </div>
       </form>

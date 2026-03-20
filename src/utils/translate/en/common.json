@@ -1,0 +1,30 @@
+{
+  "footerText": "Spendly - Smart expense management",
+  "loading": "Loading...",
+  "back": "Back",
+  "transactionDetailTitle": "Transaction Detail",
+  "sourceIncome": "Income source",
+  "expenseDescription": "Expense description",
+  "currencyLabel": "Currency",
+  "categoryLabel": "Category",
+  "transactionDateLabel": "Transaction date",
+  "edit": "Edit",
+  "delete": "Delete",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "labels": {
+    "email": "Contact email",
+    "role": "Spendly user"
+  },
+  "buttons": {
+    "start": "Get started",
+    "delete": "Delete",
+    "edit": "Edit",
+    "addExpense": "Add expense",
+    "addIncome": "Add income",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "prev": "Previous",
+    "next": "Next"
+  }
+}

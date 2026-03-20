@@ -3,6 +3,7 @@ import AuthForm from "../../components/common/AuthForm";
 import FullScreenOceanWave from "../../components/canvas/FullScreenOceanWave";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import { useLanguage } from "../../hooks/useLanguage";
 function Login() {
   const navigate = useNavigate();
   const { login, loginWithGoogle } = useAuth(); // <-- use auth context
@@ -10,20 +11,17 @@ function Login() {
   const [error, setError] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { t } = useLanguage();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
     if (!email || !password) {
-      setError("Vui lòng điền đầy đủ thông tin.");
+      setError(t("auth.errors.required"));
       return;
     }
-
-    if (password !== password) {
-      setError("Mật khẩu và xác nhận mật khẩu không khớp.");
-      return;
-    }
+    // Note: Login doesn't confirm password here; keep validation minimal.
 
     setLoading(true);
     try {
@@ -36,10 +34,10 @@ function Login() {
       } else if (res?.error) {
         setError(res.error);
       } else {
-        setError("Lỗi không xác định. Vui lòng thử lại.");
+        setError(t("auth.errors.unknown"));
       }
     } catch (err) {
-      setError(err?.message || "Không thể kết nối đến server.");
+      setError(err?.message || t("auth.errors.network"));
     } finally {
       setLoading(false);
     }
@@ -52,22 +50,22 @@ function Login() {
       const res = await loginWithGoogle();
       if (res?.user) navigate("/dashboard", { replace: true });
       else if (res?.error) setError(res.error);
-      else setError("Lỗi đăng nhập bằng Google.");
+      else setError(t("auth.errors.googleSignIn"));
     } catch (err) {
-      setError(err?.message || "Lỗi đăng nhập bằng Google.");
+      setError(err?.message || t("auth.errors.googleSignIn"));
     } finally {
       setLoading(false);
     }
   };
   const fields = [
     {
-      label: "Email",
+      label: t("auth.login.emailLabel"),
       type: "email",
       value: email,
       onChange: (e) => setEmail(e.target.value),
     },
     {
-      label: "Mật khẩu",
+      label: t("auth.login.passwordLabel"),
       type: "password",
       value: password,
       onChange: (e) => setPassword(e.target.value),

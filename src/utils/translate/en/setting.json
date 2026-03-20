@@ -1,0 +1,62 @@
+{
+  "pageTitle": "Account Settings",
+  "headings": {
+    "profile": "Profile",
+    "settingsSection": "Account Settings"
+  },
+  "userInfo": {
+    "name": "Nguyen Van A",
+    "role": "Spendly User",
+    "email": "email@example.com",
+    "emailLabel": "Contact email"
+  },
+  "uiSettings": {
+    "theme": {
+      "label": "Theme",
+      "desc": "Toggle light/dark",
+      "options": [
+        { "label": "Light", "value": "light" },
+        { "label": "Dark", "value": "dark" }
+      ]
+    },
+    "language": {
+      "label": "Language",
+      "desc": "Choose display language",
+      "options": [
+        { "label": "Vietnamese", "value": "vi" },
+        { "label": "English", "value": "en" }
+      ]
+    },
+    "currency": {
+      "label": "Currency",
+      "desc": "Choose currency format",
+      "options": [
+        { "label": "VND (₫)", "value": "vnd" },
+        { "label": "USD ($)", "value": "usd" },
+        { "label": "EUR (€)", "value": "eur" }
+      ]
+    }
+  },
+  "texts": {
+    "logoutTitle": "Logout",
+    "logoutDesc": "Sign out of the current account",
+    "changePasswordTitle": "Change password",
+    "changePasswordDesc": "Update your login password",
+    "deleteAccountTitle": "Delete account",
+    "deleteAccountDesc": "Permanently delete account data",
+    "buttonDelete": "Delete"
+  },
+  "formChangePassword": {
+    "title": "Change Password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "validation": {
+      "allFieldsRequired": "Please fill in all fields",
+      "newPasswordSameAsOld": "New password cannot be the same as old password",
+      "confirmPasswordMismatch": "Confirm password does not match"
+    },
+    "success": "Password has been successfully changed",
+    "processing": "Processing..."
+  }
+}

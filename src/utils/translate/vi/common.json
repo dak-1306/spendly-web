@@ -1,0 +1,30 @@
+{
+  "footerText": "Spendly - Quản lý chi tiêu thông minh",
+  "loading": "Đang tải...",
+  "back": "Quay lại",
+  "transactionDetailTitle": "Chi tiết giao dịch",
+  "sourceIncome": "Nguồn thu nhập",
+  "expenseDescription": "Mô tả chi tiêu",
+  "currencyLabel": "Loại tiền",
+  "categoryLabel": "Danh mục",
+  "transactionDateLabel": "Ngày giao dịch",
+  "edit": "Sửa",
+  "delete": "Xóa",
+  "confirm": "Xác nhận",
+  "cancel": "Hủy",
+  "labels": {
+    "email": "Email liên hệ",
+    "role": "Người dùng Spendly"
+  },
+  "buttons": {
+    "start": "Bắt đầu ngay",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "addExpense": "Thêm chi tiêu",
+    "addIncome": "Thêm thu nhập",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy",
+    "prev": "Trước",
+    "next": "Tiếp"
+  }
+}

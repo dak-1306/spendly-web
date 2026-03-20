@@ -1,0 +1,32 @@
+{
+  "welcomeMessage": "Welcome to Spendly!",
+  "text": "Manage your expenses smartly and easily.",
+  "description": [
+    "Track daily spending and view detailed reports.",
+    "Edit and delete transactions with ease.",
+    "Understand spending habits and get smart financial suggestions."
+  ],
+  "featureHighlightsTitle": "Key features",
+  "featureHighlights": [
+    "Real-time expense tracking",
+    "Customizable budget categories",
+    "Detailed financial reports",
+    "Secure data encryption",
+    "Multi-device sync"
+  ],
+  "howItWorksTitle": "How it works",
+  "howItWorks": [
+    "Sign up for a free account",
+    "Link your bank accounts",
+    "Set budget goals",
+    "Start tracking expenses",
+    "View reports and adjust as needed"
+  ],
+  "textButton": "Get started",
+  "captions": [
+    "Dashboard — overview of income, expenses, charts and key metrics.",
+    "Expenses — manage spending, categories and transaction history.",
+    "AI Insights — smart suggestions and automated analysis.",
+    "Profile — user settings and personal preferences."
+  ]
+}

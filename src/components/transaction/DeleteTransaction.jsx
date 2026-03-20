@@ -1,6 +1,7 @@
 import DeleteConfirm from "../common/DeleteConfirm.jsx";
 import { useTransaction } from "../../hooks/useTransaction.js";
 import { useCallback } from "react";
+import { useLanguage } from "../../hooks/useLanguage.js";
 
 export default function DeleteTransaction({
   open = false,
@@ -12,6 +13,7 @@ export default function DeleteTransaction({
   const isIncome = role === "income";
   const title = item?.title ?? item?.source ?? item?.category ?? "Mục";
   const amount = item?.amount ?? 0;
+  const { t } = useLanguage();
 
   const handleDeleteConfirm = useCallback(async () => {
     try {
@@ -25,8 +27,8 @@ export default function DeleteTransaction({
 
   return (
     <DeleteConfirm
-      title={`Xóa ${isIncome ? "thu nhập" : "chi tiêu"}`}
-      description={`Bạn có chắc chắn muốn xóa ${title} với số tiền ${amount.toLocaleString()} ${item?.currency ?? "VND"} không?`}
+      title={`${isIncome ? t("transactions.formDelete.titleIncome") : t("transactions.formDelete.titleExpense")}`}
+      description={`${t("transactions.formDelete.message")} ${title} / ${amount.toLocaleString()} ${item?.currency ?? "VND"}?`}
       open={open}
       onClose={onClose}
       onConfirm={handleDeleteConfirm}

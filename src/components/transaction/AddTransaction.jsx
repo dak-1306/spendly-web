@@ -1,8 +1,13 @@
 import TransactionForm from "./TransactionForm";
 import { useTransaction } from "../../hooks/useTransaction";
+import { useLanguage } from "../../hooks/useLanguage";
 import { useCallback, useState } from "react";
 
-export default function AddTransaction({ open = false, onClose = () => {}, role }) {
+export default function AddTransaction({
+  open = false,
+  onClose = () => {},
+  role,
+}) {
   const { addTransaction } = useTransaction();
   const [field, setField] = useState({
     title: "",
@@ -14,6 +19,7 @@ export default function AddTransaction({ open = false, onClose = () => {}, role 
     month: "",
   });
   const { title, amount, source, currency, category, date, month } = field;
+  const { t } = useLanguage();
 
   // Hàm xử lý thay đổi giá trị của các trường input
   const handleFieldChange = (field) => (e) => {
@@ -45,49 +51,52 @@ export default function AddTransaction({ open = false, onClose = () => {}, role 
   const fields = [
     {
       name: "title",
-      label: "Tiêu đề",
+      label: t("transactions.fields.title"),
       value: title,
       type: "text",
       onChange: handleFieldChange("title"),
     },
     {
       name: "source",
-      label: role === "income" ? "Nguồn thu nhập" : "Mô tả chi tiêu",
+      label:
+        role === "income"
+          ? t("transactions.fields.sourceIncome")
+          : t("transactions.fields.sourceExpense"),
       value: source,
       type: "text",
       onChange: handleFieldChange("source"),
     },
     {
       name: "amount",
-      label: "Số tiền",
+      label: t("transactions.fields.amount"),
       type: "number",
       value: amount,
       onChange: handleFieldChange("amount"),
     },
     {
       name: "currency",
-      label: "Loại tiền",
+      label: t("transactions.fields.currency"),
       type: "select",
       value: currency,
       onChange: handleFieldChange("currency"),
     },
     {
       name: "category",
-      label: "Danh mục",
+      label: t("transactions.fields.category"),
       type: "select",
       value: category,
       onChange: handleFieldChange("category"),
     },
     {
       name: "date",
-      label: "Ngày giao dịch",
+      label: t("transactions.fields.date"),
       type: "date",
       value: date,
       onChange: handleFieldChange("date"),
     },
     {
       name: "month",
-      label: "Tháng",
+      label: t("transactions.fields.month"),
       type: "month",
       value: month,
       onChange: handleFieldChange("month"),

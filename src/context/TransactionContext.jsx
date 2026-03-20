@@ -49,6 +49,7 @@ export const TransactionProvider = ({ children }) => {
         } else if (category || amountRange || sortBy) {
           items = await transactionService.filterTransactions(
             userId,
+            "expense",
             category,
             amountRange,
             sortBy,

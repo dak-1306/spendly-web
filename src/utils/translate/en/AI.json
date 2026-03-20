@@ -1,0 +1,13 @@
+{
+  "pageTitle": "AI Assistant - Spendly",
+  "quickOptions": [
+    "Why did my spending increase this month?",
+    "How can I reduce unnecessary expenses?",
+    "Can you give me some money-saving tips?"
+  ],
+  "budgetPlaceholder": "Budget (VND)",
+  "analyzing": "Processing...",
+  "analyzeButton": "Analyze with AI",
+  "emptyTransactionsAlert": "Transaction data is loading or empty!",
+  "analysisErrorAlert": "An error occurred when analyzing. Please try again later."
+}

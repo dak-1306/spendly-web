@@ -5,6 +5,7 @@ import Card from "../../components/common/Card.jsx";
 import Button from "../../components/common/Button.jsx";
 import Pagination from "../../components/common/Pagination.jsx";
 import AddTransaction from "../../components/transaction/AddTransaction.jsx";
+import { useLanguage } from "../../hooks/useLanguage";
 import EditTransaction from "../../components/transaction/EditTransaction.jsx";
 import DeleteTransaction from "../../components/transaction/DeleteTransaction.jsx";
 import { Edit2, Trash2, Eye } from "lucide-react";
@@ -15,6 +16,7 @@ export default function IncomePage() {
   const { incomes, month, GetIncome, loading, error } = useTransaction();
   const { user } = useAuth();
   const userId = user?.uid;
+  const { t } = useLanguage();
 
   const [cursorIncome, setCursorIncome] = useState(null);
   const [cursorStackIncome, setCursorStackIncome] = useState([]);
@@ -114,16 +116,20 @@ export default function IncomePage() {
     <Card className="flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400">
-          Thu nhập tháng {month}
+          {t("transactions.pageTitle", `Thu nhập tháng ${month}`)}
         </h2>
-        <Button variant="cta" onClick={() => setIsAddIncomeOpen(true)}>
-          Thêm thu nhập
+        <Button
+          size="md"
+          variant="cta"
+          onClick={() => setIsAddIncomeOpen(true)}
+        >
+          {t("transactions.buttons.addIncome", "Thêm thu nhập")}
         </Button>
       </div>
       <ul>
         {loading && resultIncomes.length === 0 && (
           <li className="text-gray-500 dark:text-gray-400">
-            Đang tải dữ liệu...
+            {t("transactions.loading", "Đang tải dữ liệu...")}
           </li>
         )}
         {!loading &&

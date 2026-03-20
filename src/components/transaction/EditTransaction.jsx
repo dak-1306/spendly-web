@@ -1,5 +1,6 @@
 import TransactionForm from "./TransactionForm";
 import { useTransaction } from "../../hooks/useTransaction";
+import {useLanguage} from "../../hooks/useLanguage";
 import { useState, useEffect } from "react";
 export default function EditTransaction({
   open = false,
@@ -17,6 +18,7 @@ export default function EditTransaction({
     date: "",
     month: "",
   });
+    const { t } = useLanguage();
 
   useEffect(() => {
     if (data) {
@@ -80,42 +82,42 @@ export default function EditTransaction({
   const fields = [
     {
       name: "title",
-      label: isIncome ? "Nguồn thu" : "Mục chi",
+      label: isIncome ? t("transactions.fields.sourceIncome") : t("transactions.fields.sourceExpense"),
       type: "text",
       value: field.title,
       onChange: handleFieldChange("title"),
     },
     {
       name: "amount",
-      label: "Số tiền",
+      label: t("transactions.fields.amount"),
       type: "number",
       value: field.amount,
       onChange: handleFieldChange("amount"),
     },
     {
       name: "source",
-      label: "Nguồn",
+      label: t("transactions.fields.source"),
       type: "text",
       value: field.source,
       onChange: handleFieldChange("source"),
     },
     {
       name: "date",
-      label: "Ngày",
+      label: t("transactions.fields.date"),
       type: "date",
       value: field.date,
       onChange: handleFieldChange("date"),
     },
     {
       name: "category",
-      label: "Danh mục",
+      label: t("transactions.fields.category"),
       type: "select",
       value: field.category,
       onChange: handleFieldChange("category"),
     },
     {
       name: "currency",
-      label: "Loại tiền",
+      label: t("transactions.fields.currency"),
       type: "select",
       value: field.currency,
       onChange: handleFieldChange("currency"),
@@ -123,7 +125,7 @@ export default function EditTransaction({
 
     {
       name: "month",
-      label: "Tháng",
+      label: t("transactions.fields.month"),
       type: "text",
       value: field.month,
       onChange: handleFieldChange("month"),

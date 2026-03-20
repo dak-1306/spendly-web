@@ -1,0 +1,32 @@
+{
+  "welcomeMessage": "Chào mừng đến với Spendly!",
+  "text": "Quản lý chi tiêu của bạn một cách thông minh và dễ dàng.",
+  "description": [
+    "Theo dõi chi tiêu hàng ngày và xem báo cáo chi tiết.",
+    "Chỉnh sửa và xóa các giao dịch một cách dễ dàng.",
+    "Hiểu rõ thói quen chi tiêu và nhận được những gợi ý tài chính thông minh."
+  ],
+  "featureHighlightsTitle": "Tính năng nổi bật",
+  "featureHighlights": [
+    "Theo dõi chi tiêu thời gian thực",
+    "Danh mục ngân sách có thể tùy chỉnh",
+    "Báo cáo tài chính chi tiết",
+    "Mã hóa dữ liệu an toàn",
+    "Đồng bộ đa thiết bị"
+  ],
+  "howItWorksTitle": "Cách hoạt động",
+  "howItWorks": [
+    "Đăng ký tài khoản miễn phí",
+    "Liên kết tài khoản ngân hàng",
+    "Đặt mục tiêu ngân sách",
+    "Bắt đầu theo dõi chi tiêu",
+    "Xem báo cáo và điều chỉnh khi cần thiết"
+  ],
+  "textButton": "Bắt đầu ngay",
+  "captions": [
+    "Tổng quan — thu nhập, chi tiêu, biểu đồ và các chỉ số quan trọng.",
+    "Chi tiêu — quản lý giao dịch, danh mục và lịch sử.",
+    "AI Insights — gợi ý thông minh và phân tích tự động.",
+    "Hồ sơ — cài đặt người dùng và tùy chọn cá nhân."
+  ]
+}

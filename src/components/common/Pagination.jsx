@@ -1,4 +1,6 @@
+import { useLanguage } from "../../hooks/useLanguage.js";
 function Pagination({ onPrev, onNext, hasNext }) {
+  const { t } = useLanguage();
   return (
     <div className="flex justify-center items-center space-x-2 mt-4">
       <button
@@ -6,7 +8,7 @@ function Pagination({ onPrev, onNext, hasNext }) {
         disabled={!onPrev}
         className="px-3 py-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-50"
       >
-        Trước
+        {t("common.buttons.prev")}
       </button>
 
       <button
@@ -14,7 +16,7 @@ function Pagination({ onPrev, onNext, hasNext }) {
         disabled={!hasNext}
         className="px-3 py-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-50"
       >
-        Sau
+        {t("common.buttons.next")}
       </button>
     </div>
   );

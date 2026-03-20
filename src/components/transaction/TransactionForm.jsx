@@ -2,18 +2,7 @@ import Button from "../common/Button";
 import Modal from "../common/Modal";
 import Input from "../common/Input";
 
-const defaultIncomeCategories = ["Lương", "Freelance", "Khác"];
-const defaultCurrency = ["VND", "USD", "EUR", "JPY", "GBP"];
-const defaultExpenseCategories = [
-  "Ăn uống",
-  "Di chuyển",
-  "Mua sắm",
-  "Nhà thuê",
-  "Giải trí",
-  "Sức khỏe",
-  "Giáo dục",
-  "Khác",
-];
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function TransactionForm({
   fields,
@@ -23,17 +12,29 @@ export default function TransactionForm({
   type,
   variant,
 }) {
+  const { t } = useLanguage();
+  const defaultExpenseCategories = t(
+    "transactions.filters.categoryExpenses.options",
+  );
+  const defaultIncomeCategories = t(
+    "transactions.filters.categoryIncomes.options",
+  );
+  const defaultCurrency = t("setting.uiSettings.currency.options");
+  console.log(
+    "🚀 ~ file: TransactionForm.jsx:17 ~ TransactionForm ~ defaultCurrency:",
+    defaultCurrency,
+  );
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
       <div className="bg-blue-600 p-4">
         <h2 className="text-xl text-white font-semibold text-center">
           {variant === "add"
             ? type === "income"
-              ? "Thêm thu nhập"
-              : "Thêm chi tiêu"
+              ? t("transactions.titleAddIncome")
+              : t("transactions.titleAddExpense")
             : type === "income"
-              ? "Chỉnh sửa thu nhập"
-              : "Chỉnh sửa chi tiêu"}
+              ? t("transactions.titleEditIncome")
+              : t("transactions.titleEditExpense")}
         </h2>
       </div>
       <form onSubmit={onSubmit} className="p-4">
@@ -47,7 +48,7 @@ export default function TransactionForm({
                 onChange={field.onChange}
                 className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
               >
-                <option value="">-- Chọn {field.label} --</option>
+                <option value="">-- {field.label} --</option>
                 {(field.name === "category" && type === "income"
                   ? defaultIncomeCategories
                   : defaultExpenseCategories
@@ -64,10 +65,10 @@ export default function TransactionForm({
                 onChange={field.onChange}
                 className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
               >
-                <option value="">-- Chọn {field.label} --</option>
-                {defaultCurrency.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
+                <option value="">-- {field.label} --</option>
+                {defaultCurrency.map((currency) => (
+                  <option key={currency.value} value={currency.value}>
+                    {currency.label}
                   </option>
                 ))}
               </select>
@@ -91,10 +92,10 @@ export default function TransactionForm({
             className="w-full"
             onClick={onClose}
           >
-            Hủy
+            {t("common.cancel")}
           </Button>
           <Button type="submit" variant="primary" className="w-full">
-            Lưu
+            {t("common.confirm")}
           </Button>
         </div>
       </form>

@@ -1,4 +1,4 @@
-const SpendingCard = ({ current, limit }) => {
+const SpendingCard = ({ current, limit, title }) => {
   const percent = Math.min((current / limit) * 100, 100);
   const isOverLimit = current >= limit;
 
@@ -6,7 +6,7 @@ const SpendingCard = ({ current, limit }) => {
     <div className="p-4 rounded border w-full max-w-sm">
       {/* Header */}
       <div className="mb-3">
-        <h3 className="font-medium">Chi tiêu hàng tháng</h3>
+        <h3 className="font-medium">{title}</h3>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           {current} / {limit}
         </p>

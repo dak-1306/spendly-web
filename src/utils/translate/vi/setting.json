@@ -1,0 +1,62 @@
+{
+  "pageTitle": "Cài đặt tài khoản",
+  "headings": {
+    "profile": "Thông tin cá nhân",
+    "settingsSection": "Cài đặt tài khoản"
+  },
+  "userInfo": {
+    "name": "Nguyễn Văn A",
+    "role": "Người dùng Spendly",
+    "email": "email@example.com",
+    "emailLabel": "Email liên hệ"
+  },
+  "uiSettings": {
+    "theme": {
+      "label": "Giao diện",
+      "desc": "Chuyển giữa sáng và tối",
+      "options": [
+        { "label": "Sáng", "value": "light" },
+        { "label": "Tối", "value": "dark" }
+      ]
+    },
+    "language": {
+      "label": "Ngôn ngữ",
+      "desc": "Chọn ngôn ngữ hiển thị",
+      "options": [
+        { "label": "Tiếng Việt", "value": "vi" },
+        { "label": "English", "value": "en" }
+      ]
+    },
+    "currency": {
+      "label": "Đơn vị tiền tệ",
+      "desc": "Chọn định dạng tiền tệ",
+      "options": [
+        { "label": "VND (₫)", "value": "vnd" },
+        { "label": "USD ($)", "value": "usd" },
+        { "label": "EUR (€)", "value": "eur" }
+      ]
+    }
+  },
+  "texts": {
+    "logoutTitle": "Đăng xuất",
+    "logoutDesc": "Đăng xuất khỏi tài khoản hiện tại",
+    "changePasswordTitle": "Đổi mật khẩu",
+    "changePasswordDesc": "Thay đổi mật khẩu đăng nhập",
+    "deleteAccountTitle": "Xóa tài khoản",
+    "deleteAccountDesc": "Xóa vĩnh viễn dữ liệu tài khoản",
+    "buttonDelete": "Xóa"
+  },
+  "formChangePassword": {
+    "title": "Đổi mật khẩu",
+    "currentPassword": "Mật khẩu hiện tại",
+    "newPassword": "Mật khẩu mới",
+    "confirmNewPassword": "Xác nhận mật khẩu mới",
+    "validation": {
+      "allFieldsRequired": "Vui lòng điền vào tất cả các trường",
+      "newPasswordSameAsOld": "Mật khẩu mới không được trùng với mật khẩu cũ",
+      "confirmPasswordMismatch": "Xác nhận mật khẩu không khớp"
+    },
+    "success": "Mật khẩu đã được thay đổi thành công",
+    "processing": "Đang xử lý..."
+  }
+}

@@ -5,12 +5,13 @@ import Card from "../components/common/Card";
 import ChangePassword from "../components/setting/ChangePassword";
 import DeleteConfirm from "../components/common/DeleteConfirm";
 import Avatar from "../components/setting/Avatar"; // <-- added
-import { SETTINGS } from "../utils/constants";
 import { useAuth } from "../hooks/useAuth"; // <-- giữ để dùng logout
 import { useTheme } from "../hooks/useTheme"; // <-- thêm useTheme
 import useUser from "../hooks/useUser"; // <-- thêm useUser
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Key, Trash2, LogOut } from "lucide-react"; // <-- icons
+import { SETTINGS } from "../utils/constants"; // <-- import constants
+import { useLanguage } from "../hooks/useLanguage";
 
 /*
   Setting.jsx
@@ -18,8 +19,7 @@ import { User, Mail, Key, Trash2, LogOut } from "lucide-react"; // <-- icons
 */
 
 export default function Setting() {
-  const { PAGE_TITLE, HEADINGS, USER_INFO, UI_SETTINGS, TEXTS } = SETTINGS;
-
+  const { t, lang, setLanguage } = useLanguage();
   const UserIcon = <User className="text-blue-500" size={24} />;
   const EmailIcon = <Mail className="text-green-500" size={24} />;
   const KeyIcon = <Key className="text-green-500" size={24} />;
@@ -79,14 +79,15 @@ export default function Setting() {
     userDoc?.id,
   ]);
 
-  const displayName = userDoc?.name || USER_INFO.NAME;
-  const email = userDoc?.email || USER_INFO.EMAIL;
+  const displayName = userDoc?.name || t("setting.userInfo.name");
+  const email = userDoc?.email || t("setting.userInfo.email");
   const photoURL = userDoc?.avatar || null;
 
   console.log("userDoc:", userDoc);
+  console.log("options language:", t("setting.uiSettings.language.options"));
 
   return (
-    <MainLayout auth={true} navbarBottom={true} title={PAGE_TITLE.vi}>
+    <MainLayout auth={true} navbarBottom={true} title={t("setting.pageTitle")}>
       <div className="flex gap-6 justify-center md:flex-row flex-col">
         {/* Left: profile card */}
         <Card className="flex flex-col gap-6 justify-center items-center px-8 py-6">
@@ -95,14 +96,16 @@ export default function Setting() {
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold">{HEADINGS.PROFILE}</h2>
+            <h2 className="text-xl font-semibold">
+              {t("setting.headings.profile", "Profile")}
+            </h2>
 
             {/* Tên & vai trò */}
             <div className="flex items-center space-x-4 mt-4">
               {UserIcon}
               <div>
                 <p className="font-medium">{displayName}</p>
-                <p className="text-sm ">{USER_INFO.ROLE}</p>
+                <p className="text-sm ">{t("setting.userInfo.role", "User")}</p>
               </div>
             </div>
 
@@ -111,7 +114,9 @@ export default function Setting() {
               {EmailIcon}
               <div>
                 <p className="font-medium">{email}</p>
-                <p className="text-sm">{USER_INFO.EMAIL_LABEL}</p>
+                <p className="text-sm">
+                  {t("setting.userInfo.emailLabel", "Email Address")}
+                </p>
               </div>
             </div>
 
@@ -122,7 +127,7 @@ export default function Setting() {
                 onClick={() => refreshUser()}
                 disabled={loading}
               >
-                Làm mới
+                {t("common.buttons.refresh", "Refresh")}
               </Button>
             </div>
           </div>
@@ -132,7 +137,7 @@ export default function Setting() {
         <Card className=" p-6">
           <div className="flex flex-col space-y-4">
             <h2 className="text-xl font-semibold">
-              {HEADINGS.SETTINGS_SECTION}
+              {t("setting.headings.settingsSection", "Settings")}
             </h2>
 
             <div className="space-y-4">
@@ -141,8 +146,15 @@ export default function Setting() {
                 <div className="flex items-center justify-between space-x-4">
                   {LogoutIcon}
                   <div>
-                    <p className="font-medium">{TEXTS.LOGOUT_TITLE}</p>
-                    <p className="text-sm">{TEXTS.LOGOUT_DESC}</p>
+                    <p className="font-medium">
+                      {t("setting.texts.logoutTitle", "Logout")}
+                    </p>
+                    <p className="text-sm">
+                      {t(
+                        "setting.texts.logoutDesc",
+                        "Sign out of your account",
+                      )}
+                    </p>
                   </div>
                 </div>
                 <Button
@@ -151,7 +163,7 @@ export default function Setting() {
                   onClick={openLogoutConfirm}
                   disabled={loading}
                 >
-                  {TEXTS.LOGOUT_TITLE}
+                  {t("setting.texts.logoutTitle", "Logout")}
                 </Button>
               </div>
 
@@ -160,8 +172,18 @@ export default function Setting() {
                 <div className="flex items-center space-x-4">
                   {KeyIcon}
                   <div>
-                    <p className="font-medium">{TEXTS.CHANGE_PASSWORD_TITLE}</p>
-                    <p className="text-sm">{TEXTS.CHANGE_PASSWORD_DESC}</p>
+                    <p className="font-medium">
+                      {t(
+                        "setting.texts.changePasswordTitle",
+                        "Change Password",
+                      )}
+                    </p>
+                    <p className="text-sm">
+                      {t(
+                        "setting.texts.changePasswordDesc",
+                        "Update your password",
+                      )}
+                    </p>
                   </div>
                 </div>
                 <Button
@@ -169,7 +191,7 @@ export default function Setting() {
                   size="sm"
                   onClick={handleOpenChangePassword}
                 >
-                  {TEXTS.CHANGE_PASSWORD_TITLE}
+                  {t("setting.texts.changePasswordTitle", "Change Password")}
                 </Button>
               </div>
 
@@ -178,12 +200,19 @@ export default function Setting() {
                 <div className="flex items-center space-x-4">
                   {TrashIcon}
                   <div>
-                    <p className="font-medium">{TEXTS.DELETE_ACCOUNT_TITLE}</p>
-                    <p className="text-sm">{TEXTS.DELETE_ACCOUNT_DESC}</p>
+                    <p className="font-medium">
+                      {t("setting.texts.deleteAccountTitle", "Delete Account")}
+                    </p>
+                    <p className="text-sm">
+                      {t(
+                        "setting.texts.deleteAccountDesc",
+                        "Permanently delete your account",
+                      )}
+                    </p>
                   </div>
                 </div>
                 <Button variant="danger" size="sm" onClick={openDeleteAccount}>
-                  {TEXTS.BUTTON_DELETE}
+                  {t("setting.texts.deleteAccountTitle", "Delete Account")}
                 </Button>
               </div>
             </div>
@@ -192,8 +221,15 @@ export default function Setting() {
             <div className="border-t border-gray-300 dark:border-gray-600 mt-4 pt-4 space-y-4">
               <div className="flex items-center justify-between mt-4">
                 <div>
-                  <p className="font-medium">{UI_SETTINGS.THEME.LABEL}</p>
-                  <p className="text-sm">{UI_SETTINGS.THEME.DESC}</p>
+                  <p className="font-medium">
+                    {t("setting.uiSettings.theme.label", "Theme")}
+                  </p>
+                  <p className="text-sm">
+                    {t(
+                      "setting.uiSettings.theme.desc",
+                      "Switch between light and dark mode",
+                    )}
+                  </p>
                 </div>
                 <label className="flex items-center cursor-pointer">
                   <input
@@ -216,20 +252,28 @@ export default function Setting() {
 
               <div className="mt-4 flex items-center justify-between">
                 <div>
-                  <p className="font-medium">{UI_SETTINGS.LANGUAGE.LABEL}</p>
-                  <p className="text-sm ">{UI_SETTINGS.LANGUAGE.DESC}</p>
+                  <p className="font-medium">
+                    {t("setting.uiSettings.language.label", "Language")}
+                  </p>
+                  <p className="text-sm ">
+                    {t(
+                      "setting.uiSettings.language.desc",
+                      "Select your preferred language",
+                    )}
+                  </p>
                 </div>
                 <select
-                  defaultValue="vi"
+                  value={lang}
+                  onChange={(e) => setLanguage(e.target.value)}
                   className="bg-transparent border border-gray-300 dark:border-gray-600 rounded px-3 py-1"
                 >
-                  {UI_SETTINGS.LANGUAGE.OPTIONS.map((lang) => (
+                  {t("setting.uiSettings.language.options").map((opt) => (
                     <option
                       className="dark:bg-gray-800"
-                      key={lang.value}
-                      value={lang.value}
+                      key={opt.value}
+                      value={opt.value}
                     >
-                      {lang.label}
+                      {opt.label}
                     </option>
                   ))}
                 </select>
@@ -237,14 +281,21 @@ export default function Setting() {
 
               <div className="mt-4 flex items-center justify-between">
                 <div>
-                  <p className="font-medium">{UI_SETTINGS.CURRENCY.LABEL}</p>
-                  <p className="text-sm">{UI_SETTINGS.CURRENCY.DESC}</p>
+                  <p className="font-medium">
+                    {t("setting.uiSettings.currency.label", "Currency")}
+                  </p>
+                  <p className="text-sm">
+                    {t(
+                      "setting.uiSettings.currency.desc",
+                      "Select your preferred currency",
+                    )}
+                  </p>
                 </div>
                 <select
                   defaultValue="vnd"
                   className="bg-transparent border border-gray-300 dark:border-gray-600 rounded px-3 py-1"
                 >
-                  {UI_SETTINGS.CURRENCY.OPTIONS.map((c) => (
+                  {t("setting.uiSettings.currency.options").map((c) => (
                     <option
                       className="dark:bg-gray-800"
                       key={c.value}
@@ -268,18 +319,18 @@ export default function Setting() {
           onClose={closeDelete}
           title={
             deleteMode === "account"
-              ? TEXTS.DELETE_ACCOUNT_TITLE
-              : TEXTS.LOGOUT_TITLE
+              ? t("setting.texts.deleteAccountTitle")
+              : t("setting.texts.logoutTitle")
           }
           description={
             deleteMode === "account"
-              ? TEXTS.DELETE_ACCOUNT_DESC
-              : TEXTS.LOGOUT_DESC
+              ? t("setting.texts.deleteAccountDesc")
+              : t("setting.texts.logoutDesc")
           }
           confirmLabel={
             deleteMode === "account"
-              ? TEXTS.DELETE_ACCOUNT_TITLE
-              : TEXTS.LOGOUT_TITLE
+              ? t("setting.texts.deleteAccountTitle")
+              : t("setting.texts.logoutTitle")
           }
           onConfirm={handleDeleteConfirm}
         />

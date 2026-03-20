@@ -5,6 +5,8 @@ import Button from "../common/Button";
 import "../../styles/auth.css";
 import { useState } from "react";
 
+import { useLanguage } from "../../hooks/useLanguage";
+
 function AuthForm({
   fields,
   variant = "login",
@@ -18,6 +20,7 @@ function AuthForm({
   const FACEBOOK = ICONS.icon_facebook;
 
   const [showPassword, setShowPassword] = useState(false);
+  const { t } = useLanguage();
 
   const toggleShow = () => setShowPassword((s) => !s);
 
@@ -33,7 +36,9 @@ function AuthForm({
             height={LOGO_COLOR.height}
             className="mx-auto"
           />
-          {variant}
+          {variant === "login"
+            ? t("auth.login.loginTitle")
+            : t("auth.register.registerTitle")}
         </div>
       </div>
 
@@ -93,11 +98,11 @@ function AuthForm({
         >
           {loading
             ? variant === "login"
-              ? "Đang đăng nhập..."
-              : "Đang đăng ký..."
+              ? t("auth.login.loadingLogin")
+              : t("auth.register.loadingRegister")
             : variant === "login"
-              ? "Đăng nhập"
-              : "Đăng ký"}
+              ? t("auth.login.loginButton")
+              : t("auth.register.registerButton")}
         </Button>
       </form>
 
@@ -117,14 +122,13 @@ function AuthForm({
               width={GOOGLE.width}
               height={GOOGLE.height}
             />
-            <p>Đăng nhập bằng Google</p>
+            <p>{t("auth.login.loginWithGoogle")}</p>
           </Button>
           <Button
             type="button"
             variant="outline"
             className="w-full flex justify-center py-2 items-center border space-x-2 rounded cursor-pointer"
-            disabled
-            title="Facebook login not implemented"
+            disabled={loading}
           >
             <img
               src={FACEBOOK.src}
@@ -132,7 +136,7 @@ function AuthForm({
               width={FACEBOOK.width}
               height={FACEBOOK.height}
             />
-            <p>Đăng nhập bằng Facebook</p>
+            <p>{t("auth.login.loginWithFacebook")}</p>
           </Button>
         </div>
       )}
@@ -141,16 +145,16 @@ function AuthForm({
       <div className="mt-4 text-center text-sm">
         {variant === "login" ? (
           <span>
-            Bạn chưa có tài khoản?{" "}
+            {t("auth.login.noAccount")}
             <Link to="/register" className="underline text-blue-600">
-              Đăng ký
+              {t("auth.login.registerLink")}
             </Link>
           </span>
         ) : (
           <span>
-            Bạn đã có tài khoản?{" "}
+            {t("auth.register.haveAccount")}
             <Link to="/login" className="underline text-blue-600">
-              Đăng nhập
+              {t("auth.register.loginLink")}
             </Link>
           </span>
         )}

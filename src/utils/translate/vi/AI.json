@@ -1,0 +1,13 @@
+{
+  "pageTitle": "Trợ lý AI - Spendly",
+  "quickOptions": [
+    "Tại sao chi tiêu của tôi lại tăng trong tháng này?",
+    "Tôi có thể làm gì để giảm chi tiêu không cần thiết?",
+    "Bạn có thể cung cấp cho tôi một số mẹo tiết kiệm tiền không?"
+  ],
+  "budgetPlaceholder": "Ngân sách (VND)",
+  "analyzing": "Đang xử lý...",
+  "analyzeButton": "Phân tích bằng AI",
+  "emptyTransactionsAlert": "Dữ liệu giao dịch đang tải hoặc trống!",
+  "analysisErrorAlert": "Có lỗi xảy ra khi phân tích. Vui lòng thử lại sau."
+}

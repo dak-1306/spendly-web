@@ -145,22 +145,27 @@ const searchTransactions = async (
   const results = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   //  trả về document thật
   const lastDoc = snap.docs[snap.docs.length - 1] || null;
-  
+
   return { results, nextCursor: lastDoc };
 };
 
 // Filter transaction theo thể loại, theo khoảng giá, sort theo ngày tặng dần/giảm dần và pagination (nếu cần)
 const filterTransactions = async (
   userId,
+  type,
   category,
   amountRange,
   sortBy,
   { limit: pageLimit = 5, cursor: cursorValue } = {},
 ) => {
   let q = query(colRef, where("userId", "==", userId));
+   // 1) Lọc theo type trước
+  if (type) q = query(q, where("type", "==", type));
+  // 2) Lọc theo category nếu có
   if (category) q = query(q, where("category", "==", category));
 
   let rangeArr = null;
+// 3) Lọc theo khoảng amount nếu có (dùng map để chuyển từ string sang array nếu cần)
   if (amountRange) {
     if (typeof amountRange === "string") {
       const map = {
@@ -173,6 +178,7 @@ const filterTransactions = async (
     } else if (Array.isArray(amountRange)) rangeArr = amountRange;
   }
 
+  // 4) Sắp xếp theo ngày tạo mới nhất hoặc cũ nhất, nếu có khoảng amount thì ưu tiên sắp xếp theo amount trước
   if (rangeArr) {
     q = query(
       q,

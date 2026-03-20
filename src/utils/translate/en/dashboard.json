@@ -1,0 +1,18 @@
+{
+  "defaultMonth": "2025-12",
+  "pageTitle": "Dashboard",
+  "cardTitles": {
+    "income": "Total income",
+    "expenses": "Total expenses",
+    "balance": "Current balance",
+    "compare": "Expenses vs last month"
+  },
+  "chartTitles": {
+    "expensesByCategory": "Expenses by category",
+    "spendingCardTitle": "Monthly spending",
+    "expensesOverTime": "Expenses over time"
+  },
+  "loading": "Loading data...",
+  "errorPrefix": "Error loading data:",
+  "noData": "No data available"
+}

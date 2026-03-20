@@ -1,0 +1,88 @@
+{
+  "pageTitle": "Quản lý chi tiêu và thu nhập",
+  "defaultMonth": "2025-07",
+  "filters": {
+    "categoryExpenses": {
+      "label": "theo loại",
+      "options": [
+        "Ăn uống",
+        "Di chuyển",
+        "Mua sắm",
+        "Nhà thuê",
+        "Giải trí",
+        "Sức khỏe",
+        "Giáo dục",
+        "Khác"
+      ]
+    },
+    "categoryIncomes": {
+      "label": "theo loại",
+      "options": ["Lương", "Thưởng", "Đầu tư", "Quà tặng", "Khác"]
+    },
+
+    "amountRanges": {
+      "label": "theo khoảng tiền",
+      "options": [
+        { "id": "lt100", "label": "< 100,000", "min": 0, "max": 100000 },
+        {
+          "id": "100-500",
+          "label": "100,000 - 500,000",
+          "min": 100000,
+          "max": 500000
+        },
+        {
+          "id": "500-1M",
+          "label": "500,000 - 1,000,000",
+          "min": 500000,
+          "max": 1000000
+        },
+        { "id": "gt1M", "label": "> 1,000,000", "min": 1000000, "max": null }
+      ]
+    },
+    "dateSort": {
+      "label": "theo ngày",
+      "options": [
+        { "id": "asc", "label": "Tăng dần", "value": "asc" },
+        { "id": "desc", "label": "Giảm dần", "value": "desc" }
+      ]
+    }
+  },
+
+  "fields": {
+    "title": "Tiêu đề",
+    "sourceExpense": "Nguồn chi",
+    "sourceIncome": "Nguồn thu",
+    "amount": "Số tiền",
+    "category": "Danh mục",
+    "date": "Ngày",
+    "type": "Loại",
+    "currency": "Tiền tệ",
+    "month": "Tháng"
+  },
+  "tableHeaders": {
+    "category": "Danh mục",
+    "title": "Tiêu đề",
+    "date": "Ngày",
+    "amount": "Số tiền",
+    "actions": "Hành động"
+  },
+  "buttons": {
+    "addExpense": "Thêm chi tiêu",
+    "addIncome": "Thêm thu nhập",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "refresh": "Làm mới"
+  },
+  "noData": "Không có giao dịch",
+  "loading": "Đang tải giao dịch...",
+  "placeholderSearch": "Tìm kiếm theo tiêu đề",
+  "titleAddExpense": "Thêm chi tiêu",
+  "titleAddIncome": "Thêm thu nhập",
+  "titleEditExpense": "Sửa chi tiêu",
+  "titleEditIncome": "Sửa thu nhập",
+  "formDelete": {
+    "titleIncome": "Xóa thu nhập",
+    "titleExpense": "Xóa chi tiêu",
+    "message": "Bạn có chắc chắn muốn xóa giao dịch này không?"
+  }
+}

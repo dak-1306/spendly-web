@@ -7,6 +7,7 @@ import { useTransaction } from "../hooks/useTransaction";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { Trash2, Edit2, ArrowBigLeft } from "lucide-react";
+import { useLanguage } from "../hooks/useLanguage";
 
 import { useState, useEffect } from "react";
 
@@ -31,21 +32,27 @@ export default function TransactionDetail() {
   }, [transactionId, getTransactionById]);
   console.log("TransactionDetail: transaction =", transaction);
 
+  const { t } = useLanguage();
+
   if (!transaction) {
     return (
       <MainLayout>
         <Card>
-          <p>Loading...</p>
+          <p>{t("common.loading", "Loading...")}</p>
         </Card>
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout title="Transaction Detail" auth={true} navbarBottom={true}>
+    <MainLayout
+      title={t("common.transactionDetailTitle", "Transaction Detail")}
+      auth={true}
+      navbarBottom={true}
+    >
       <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
         <ArrowBigLeft className="mr-2" size={24} />
-        back
+        {t("common.back", "Back")}
       </Button>
       <Card>
         <h2 className="text-xl font-semibold">{transaction.title}</h2>
@@ -53,23 +60,29 @@ export default function TransactionDetail() {
           ${transaction.amount.toFixed(2)}
         </p>
         <p className="text-gray-600 dark:text-gray-400">
-          {transaction.type === "income" ? "Nguồn thu nhập" : "Mô tả chi tiêu"}:{" "}
-          {transaction.source}
+          {transaction.type === "income"
+            ? t("common.sourceIncome", "Nguồn thu nhập")
+            : t("common.expenseDescription", "Mô tả chi tiêu")}
+          : {transaction.source}
         </p>
-        <p className="text-gray-600 dark:text-gray-400">Loại tiền: {transaction.currency}</p>
-        <p className="text-gray-600 dark:text-gray-400">Danh mục: {transaction.category}</p>
         <p className="text-gray-600 dark:text-gray-400">
-          Ngày giao dịch:{" "}
+          {t("common.currencyLabel", "Loại tiền")}: {transaction.currency}
+        </p>
+        <p className="text-gray-600 dark:text-gray-400">
+          {t("common.categoryLabel", "Danh mục")}: {transaction.category}
+        </p>
+        <p className="text-gray-600 dark:text-gray-400">
+          {t("common.transactionDateLabel", "Ngày giao dịch")}:{" "}
           {new Date(transaction.date.seconds * 1000).toLocaleDateString()}
         </p>
         <div className="mt-4 flex space-x-2">
           <Button variant="primary" onClick={() => setEditOpen(true)}>
             <Edit2 className="mr-1" size={16} />
-            Sửa
+            {t("transactions.buttons.edit", "Sửa")}
           </Button>
           <Button variant="danger" onClick={() => setDeleteOpen(true)}>
             <Trash2 className="mr-1" size={16} />
-            Xóa
+            {t("transactions.buttons.delete", "Xóa")}
           </Button>
         </div>
       </Card>
