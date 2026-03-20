@@ -10,7 +10,6 @@ import { useTheme } from "../hooks/useTheme"; // <-- thêm useTheme
 import useUser from "../hooks/useUser"; // <-- thêm useUser
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Key, Trash2, LogOut } from "lucide-react"; // <-- icons
-import { SETTINGS } from "../utils/constants"; // <-- import constants
 import { useLanguage } from "../hooks/useLanguage";
 
 /*

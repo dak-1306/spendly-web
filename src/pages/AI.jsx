@@ -3,7 +3,6 @@ import MainLayout from "../components/layout/MainLayout.jsx";
 import Card from "../components/common/Card.jsx";
 import Button from "../components/common/Button.jsx";
 import Chat from "../components/ai/Chat.jsx";
-import { AI_CONSTANTS } from "../utils/constants.js";
 import { ICONS } from "../assets/index.js";
 import { useFinancialReport } from "../hooks/useFinancialReport";
 import { useTransaction } from "../hooks/useTransaction";
@@ -36,7 +35,7 @@ export default function AI() {
   const { run, loading, error } = useFinancialReport();
   const robotIcon = ICONS.icon_robot_color;
   const { t } = useLanguage();
-  const quickOptions = t("ai.quickOptions") || AI_CONSTANTS.QUICK_OPTIONS;
+  const quickOptions = t("ai.quickOptions");
 
   const handleAnalyze = async () => {
     if (!transactionCurrent?.length) {
@@ -93,11 +92,7 @@ export default function AI() {
   }
 
   return (
-    <MainLayout
-      auth
-      navbarBottom
-      title={t("ai.pageTitle") || AI_CONSTANTS.PAGE_TITLE.vi}
-    >
+    <MainLayout auth navbarBottom title={t("ai.pageTitle")}>
       <div className="space-y-6 mx-10">
         <Card>
           <div className="flex flex-wrap items-center gap-4">

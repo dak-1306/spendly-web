@@ -6,10 +6,13 @@ import SpendingBarChart from "../components/dashboard/SpendingBarChart";
 import SpendingPieChart from "../components/dashboard/SpendingPieChart";
 import Card from "../components/common/Card";
 import ChangeDate from "../components/common/ChangeDate";
-import { DASHBOARD } from "../utils/constants";
 import { useTransaction } from "../hooks/useTransaction";
 import { useAuth } from "../hooks/useAuth";
 import { useLanguage } from "../hooks/useLanguage";
+
+import SkeletonDashboard from "../components/dashboard/SkeletonDashboard";
+
+import { motion } from "framer-motion";
 
 import {
   transactionToMonth,
@@ -92,13 +95,6 @@ export default function Dashboard() {
     [currentData.expenses, normalizeDate],
   );
 
-  // const normalizedMonthIncomes = useMemo(
-  //   () => currentData.incomes.map(normalizeDate),
-  //   [currentData.incomes, normalizeDate],
-  // );
-
-  // phần trăm thay đổi chi tiêu so với tháng trước
-
   const percentChange = useMemo(() => {
     const current = totalExpense({ data: currentData.expenses });
     const prev = prevExpense({ prevDataExpenses: prevData.expenses });
@@ -106,47 +102,50 @@ export default function Dashboard() {
     return ((current - prev) / prev) * 100;
   }, [currentData, prevData]);
 
-  console.log("current data:", currentData);
-  console.log("prev data:", prevData);
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.15 },
+    },
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  };
 
   if (loading) {
     return (
       <MainLayout
         navbarBottom={true}
         auth={true}
-        title={DASHBOARD.PAGE_TITLE.vi}
+        title={t("dashboard.pageTitle") || "Bảng điều khiển"}
+      >
+        <SkeletonDashboard />
+      </MainLayout>
+    );
+  } else if (error) {
+    return (
+      <MainLayout
+        navbarBottom={true}
+        auth={true}
+        title={t("dashboard.pageTitle") || "Bảng điều khiển"}
       >
         <div className="flex items-center justify-center h-64">
-          <Card className="text-center">
-            {t("dashboard.loading") || "Đang tải dữ liệu..."}
+          <Card className="text-center text-red-500">
+            {t("dashboard.error", "Lỗi: ") + error}
           </Card>
         </div>
       </MainLayout>
     );
-  } else {
-    if (error) {
-      return (
-        <MainLayout
-          navbarBottom={true}
-          auth={true}
-          title={DASHBOARD.PAGE_TITLE.vi}
-        >
-          <div className="flex items-center justify-center h-64">
-            <Card className="text-center">
-              {t("dashboard.errorPrefix", "Lỗi tải dữ liệu:")}&nbsp;
-              {error.message}
-            </Card>
-          </div>
-        </MainLayout>
-      );
-    }
   }
 
   return (
     <MainLayout
       navbarBottom={true}
       auth={true}
-      title={t("dashboard.pageTitle") || DASHBOARD.PAGE_TITLE.vi}
+      title={t("dashboard.pageTitle") || "Bảng điều khiển"}
     >
       {/* Header: chọn tháng */}
       <Card className="mb-4 flex items-center gap-3 mx-auto">
@@ -161,44 +160,64 @@ export default function Dashboard() {
       </Card>
 
       {/* Cards tóm tắt (income/expense/balance/compare) */}
-      {currentData.expenses.length === 0 && currentData.incomes.length === 0 ? (
+      {!loading && currentData.expenses.length === 0 && currentData.incomes.length === 0 ? (
         <div className="flex items-center justify-center h-64">
           <Card className="text-center">Không có dữ liệu</Card>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-4 gap-4 mx-auto mb-6">
-            <CardDashboard
-              type="income"
-              title={t("dashboard.cardTitles.income")}
-              amount={totalIncome({ data: currentData.incomes })}
-              currency="VND"
-            />
-            <CardDashboard
-              type="expense"
-              title={t("dashboard.cardTitles.expenses")}
-              amount={totalExpense({ data: currentData.expenses })}
-              currency="VND"
-            />
-            <CardDashboard
-              type="balance"
-              title={t("dashboard.cardTitles.balance")}
-              amount={balance({
-                dataIncome: currentData.incomes,
-                dataExpense: currentData.expenses,
-              })}
-              currency="VND"
-            />
-            <CardDashboard
-              type="compare"
-              title={t("dashboard.cardTitles.compare")}
-              amount={formatPercent(percentChange)}
-              currency="%"
-            />
-          </div>
+          <motion.div
+            key={month}
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-4 gap-4 mx-auto mb-6"
+          >
+            <motion.div variants={item}>
+              <CardDashboard
+                type="income"
+                title={t("dashboard.cardTitles.income")}
+                amount={totalIncome({ data: currentData.incomes })}
+                currency="VND"
+              />
+            </motion.div>
+            <motion.div variants={item}>
+              <CardDashboard
+                type="expense"
+                title={t("dashboard.cardTitles.expenses")}
+                amount={totalExpense({ data: currentData.expenses })}
+                currency="VND"
+              />
+            </motion.div>
+            <motion.div variants={item}>
+              <CardDashboard
+                type="balance"
+                title={t("dashboard.cardTitles.balance")}
+                amount={balance({
+                  dataIncome: currentData.incomes,
+                  dataExpense: currentData.expenses,
+                })}
+                currency="VND"
+              />
+            </motion.div>
+            <motion.div variants={item}>
+              <CardDashboard
+                type="compare"
+                title={t("dashboard.cardTitles.compare")}
+                amount={formatPercent(percentChange)}
+                currency="%"
+              />
+            </motion.div>
+          </motion.div>
 
           {/* Charts: pie + info card */}
-          <div className="mt-8 grid grid-cols-3 gap-4 mx-auto">
+          <motion.div
+            key={month + "-charts"}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="mt-8 grid grid-cols-3 gap-4 mx-auto"
+          >
             <Card className="col-span-2">
               <SpendingPieChart
                 month={month}
@@ -214,16 +233,25 @@ export default function Dashboard() {
                 limit={totalIncome({ data: currentData.incomes })}
               />
             </Card>
-          </div>
+          </motion.div>
 
           {/* Bar chart hiển thị theo thời gian */}
-          <Card className="mx-auto mt-6 mb-8">
-            <SpendingBarChart
-              month={month}
-              title={t("dashboard.chartTitles.expensesOverTime")}
-              expenses={normalizedMonthExpenses}
-            />
-          </Card>
+          <motion.div
+            key={month + "-bar"}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Card className="mx-auto mt-6 mb-8">
+              <SpendingBarChart
+                month={month}
+                title={t("dashboard.chartTitles.expensesOverTime")}
+                expenses={normalizedMonthExpenses}
+              />
+            </Card>
+          </motion.div>
         </>
       )}
     </MainLayout>

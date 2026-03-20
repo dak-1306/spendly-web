@@ -6,6 +6,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 import Card from "../common/Card";
+import CountUp from "react-countup";
 function CardDashboard({ type, title, amount = 0, currency = "VND" }) {
   const baseMap = {
     income: "border-green-600",
@@ -48,19 +49,14 @@ function CardDashboard({ type, title, amount = 0, currency = "VND" }) {
     else borderColor = "bg-gray-600";
   }
 
-  // format số chung; với compare hiển thị dấu +/-
-  const formatted =
-    type === "compare"
-      ? `${amount > 0 ? "+" : amount < 0 ? "-" : ""}${Math.abs(
-          Number(amount),
-        ).toFixed(2)} ${currency}`
-      : new Intl.NumberFormat("vi-VN").format(amount) + " " + currency;
-
   return (
     <Card className={`flex items-center space-x-4 p-4  border ${borderColor}`}>
       {iconColor[type] || <DollarSign className="text-gray-600" />}
 
-      <p className={`text-lg font-semibold ${textColor[type]}`}>{formatted}</p>
+      <p className={`text-lg font-semibold ${textColor[type]}`}>
+        <CountUp end={amount} duration={1.2} separator="," />
+        <span className="text-sm font-normal"> {currency}</span>
+      </p>
       <p className="text-sm ">{title}</p>
     </Card>
   );

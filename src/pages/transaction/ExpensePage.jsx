@@ -14,6 +14,8 @@ import { Edit2, Trash2, Eye } from "lucide-react";
 import { formatForInputDate, formatForDisplay } from "../../utils/financial.js";
 import { Link } from "react-router-dom";
 
+import SkeletonTransaction from "../../components/transaction/SkeletonTransaction.jsx";
+
 export default function ExpensePage() {
   const { expenses, month, GetExpense, loading, error } = useTransaction();
   const { user } = useAuth();
@@ -207,7 +209,14 @@ export default function ExpensePage() {
             </tr>
           </thead>
           <tbody>
-            {!loading &&
+            {loading ? (
+              <tr>
+                <td colSpan="5" className="p-4">
+                  <SkeletonTransaction view="table" />
+                </td>
+              </tr>
+            ) : (
+
               resultExpenses.map((expense) => (
                 <tr
                   key={expense.id}
@@ -234,7 +243,9 @@ export default function ExpensePage() {
                     </Link>
                   </td>
                 </tr>
-              ))}
+              ))
+            )}
+
           </tbody>
         </table>
       </div>

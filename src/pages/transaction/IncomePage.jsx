@@ -12,6 +12,8 @@ import { Edit2, Trash2, Eye } from "lucide-react";
 import { formatForInputDate, formatForDisplay } from "../../utils/financial.js";
 import { Link } from "react-router-dom";
 
+import SkeletonTransaction from "../../components/transaction/SkeletonTransaction.jsx";
+
 export default function IncomePage() {
   const { incomes, month, GetIncome, loading, error } = useTransaction();
   const { user } = useAuth();
@@ -128,9 +130,7 @@ export default function IncomePage() {
       </div>
       <ul>
         {loading && resultIncomes.length === 0 && (
-          <li className="text-gray-500 dark:text-gray-400">
-            {t("transactions.loading", "Đang tải dữ liệu...")}
-          </li>
+          <SkeletonTransaction view="list" rows={2} />
         )}
         {!loading &&
           resultIncomes.map((income) => (
