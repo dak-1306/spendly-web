@@ -15,6 +15,8 @@ import { formatForInputDate, formatForDisplay } from "../../utils/financial.js";
 import { Link } from "react-router-dom";
 
 import SkeletonTransaction from "../../components/transaction/SkeletonTransaction.jsx";
+import { motion as Motion } from "framer-motion";
+import { container, item } from "../../motion.config";
 
 export default function ExpensePage() {
   const { expenses, month, GetExpense, loading, error } = useTransaction();
@@ -187,7 +189,12 @@ export default function ExpensePage() {
         </Button>
       </div>
       <LineColor />
-      <div className="overflow-x-auto">
+      <Motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="overflow-x-auto"
+      >
         <table className="w-full mt-4 table-auto">
           <thead>
             <tr className="text-left border-b border-gray-300">
@@ -216,9 +223,11 @@ export default function ExpensePage() {
                 </td>
               </tr>
             ) : (
-
               resultExpenses.map((expense) => (
-                <tr
+                <Motion.tr
+                  variants={item}
+                  initial="hidden"
+                  animate="show"
                   key={expense.id}
                   className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
                 >
@@ -242,13 +251,12 @@ export default function ExpensePage() {
                       <Button variant="ghost">{eyeIcon}</Button>
                     </Link>
                   </td>
-                </tr>
+                </Motion.tr>
               ))
             )}
-
           </tbody>
         </table>
-      </div>
+      </Motion.div>
       <Pagination
         onPrev={onPrev}
         onNext={onNext}

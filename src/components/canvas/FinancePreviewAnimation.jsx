@@ -29,7 +29,7 @@ export default function FinanceRobotAnimation() {
       if (eyesOpen) {
         const glow = ctx.createRadialGradient(cx, cy, 10, cx, cy, 120);
 
-        glow.addColorStop(0, "rgba(57,255,20,0.25)");
+        glow.addColorStop(0, "rgba(20, 231, 255, 0.25)");
         glow.addColorStop(1, "rgba(57,255,20,0)");
 
         ctx.fillStyle = glow;
@@ -38,8 +38,8 @@ export default function FinanceRobotAnimation() {
         ctx.fill();
       }
 
-      ctx.strokeStyle = "#39ff14";
-      ctx.fillStyle = "rgba(57,255,20,0.05)";
+      ctx.strokeStyle = "#14fffb";
+      ctx.fillStyle = "rgba(20, 255, 235, 0.05)";
       ctx.lineWidth = 2;
 
       // head
@@ -56,7 +56,7 @@ export default function FinanceRobotAnimation() {
 
       ctx.beginPath();
       ctx.arc(cx, cy - 70, 4, 0, Math.PI * 2);
-      ctx.fillStyle = "#39ff14";
+      ctx.fillStyle = "#14fffb";
       ctx.fill();
 
       // side panels
@@ -67,16 +67,16 @@ export default function FinanceRobotAnimation() {
          EYES
       ===================== */
       if (eyesOpen) {
-        ctx.shadowColor = "#39ff14";
+        ctx.shadowColor = "#14fbff";
         ctx.shadowBlur = 25;
 
-        ctx.fillStyle = "#39ff14";
+        ctx.fillStyle = "#14fbff";
         ctx.fillRect(cx - 30, cy - 10, 18, 10);
         ctx.fillRect(cx + 12, cy - 10, 18, 10);
 
         ctx.shadowBlur = 0;
       } else {
-        ctx.fillStyle = "#14532d";
+        ctx.fillStyle = "#145350";
         ctx.fillRect(cx - 30, cy - 5, 18, 2);
         ctx.fillRect(cx + 12, cy - 5, 18, 2);
       }

@@ -9,6 +9,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Trash2, Edit2, ArrowBigLeft } from "lucide-react";
 import { useLanguage } from "../hooks/useLanguage";
 
+import { motion as Motion } from "framer-motion";
+import { container } from "../motion.config";
+
 import { useState, useEffect } from "react";
 
 export default function TransactionDetail() {
@@ -54,38 +57,40 @@ export default function TransactionDetail() {
         <ArrowBigLeft className="mr-2" size={24} />
         {t("common.back", "Back")}
       </Button>
-      <Card>
-        <h2 className="text-xl font-semibold">{transaction.title}</h2>
-        <p className="text-lg text-yellow-500 font-bold">
-          ${transaction.amount.toFixed(2)}
-        </p>
-        <p className="text-gray-600 dark:text-gray-400">
-          {transaction.type === "income"
-            ? t("common.sourceIncome", "Nguồn thu nhập")
-            : t("common.expenseDescription", "Mô tả chi tiêu")}
-          : {transaction.source}
-        </p>
-        <p className="text-gray-600 dark:text-gray-400">
-          {t("common.currencyLabel", "Loại tiền")}: {transaction.currency}
-        </p>
-        <p className="text-gray-600 dark:text-gray-400">
-          {t("common.categoryLabel", "Danh mục")}: {transaction.category}
-        </p>
-        <p className="text-gray-600 dark:text-gray-400">
-          {t("common.transactionDateLabel", "Ngày giao dịch")}:{" "}
-          {new Date(transaction.date.seconds * 1000).toLocaleDateString()}
-        </p>
-        <div className="mt-4 flex space-x-2">
-          <Button variant="primary" onClick={() => setEditOpen(true)}>
-            <Edit2 className="mr-1" size={16} />
-            {t("transactions.buttons.edit", "Sửa")}
-          </Button>
-          <Button variant="danger" onClick={() => setDeleteOpen(true)}>
-            <Trash2 className="mr-1" size={16} />
-            {t("transactions.buttons.delete", "Xóa")}
-          </Button>
-        </div>
-      </Card>
+      <Motion.div variants={container} initial="hidden" animate="show">
+        <Card>
+          <h2 className="text-xl font-semibold">{transaction.title}</h2>
+          <p className="text-lg text-yellow-500 font-bold">
+            ${transaction.amount.toFixed(2)}
+          </p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {transaction.type === "income"
+              ? t("common.sourceIncome", "Nguồn thu nhập")
+              : t("common.expenseDescription", "Mô tả chi tiêu")}
+            : {transaction.source}
+          </p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("common.currencyLabel", "Loại tiền")}: {transaction.currency}
+          </p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("common.categoryLabel", "Danh mục")}: {transaction.category}
+          </p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("common.transactionDateLabel", "Ngày giao dịch")}:{" "}
+            {new Date(transaction.date.seconds * 1000).toLocaleDateString()}
+          </p>
+          <div className="mt-4 flex space-x-2">
+            <Button variant="primary" onClick={() => setEditOpen(true)}>
+              <Edit2 className="mr-1" size={16} />
+              {t("transactions.buttons.edit", "Sửa")}
+            </Button>
+            <Button variant="danger" onClick={() => setDeleteOpen(true)}>
+              <Trash2 className="mr-1" size={16} />
+              {t("transactions.buttons.delete", "Xóa")}
+            </Button>
+          </div>
+        </Card>
+      </Motion.div>
       <EditTransaction
         open={editOpen}
         onClose={() => setEditOpen(false)}

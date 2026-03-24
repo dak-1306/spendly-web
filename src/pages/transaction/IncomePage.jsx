@@ -13,6 +13,8 @@ import { formatForInputDate, formatForDisplay } from "../../utils/financial.js";
 import { Link } from "react-router-dom";
 
 import SkeletonTransaction from "../../components/transaction/SkeletonTransaction.jsx";
+import { motion as Motion } from "framer-motion";
+import { container, item } from "../../motion.config";
 
 export default function IncomePage() {
   const { incomes, month, GetIncome, loading, error } = useTransaction();
@@ -128,45 +130,55 @@ export default function IncomePage() {
           {t("transactions.buttons.addIncome", "Thêm thu nhập")}
         </Button>
       </div>
-      <ul>
-        {loading && resultIncomes.length === 0 && (
-          <SkeletonTransaction view="list" rows={2} />
-        )}
-        {!loading &&
-          resultIncomes.map((income) => (
-            <li
-              key={income.id}
-              className="py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center"
-            >
-              <p className="flex items-center gap-4">
-                <span className="text-gray-700 font-medium dark:text-gray-300">
-                  {income.source ?? "Thu nhập"}
+      <Motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="overflow-x-auto"
+      >
+        <ul>
+          {loading && resultIncomes.length === 0 && (
+            <SkeletonTransaction view="list" rows={2} />
+          )}
+          {!loading &&
+            resultIncomes.map((income) => (
+              <Motion.li
+                variants={item}
+                initial="hidden"
+                animate="show"
+                key={income.id}
+                className="py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center"
+              >
+                <p className="flex items-center gap-4">
+                  <span className="text-gray-700 font-medium dark:text-gray-300">
+                    {income.source ?? "Thu nhập"}
+                  </span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {income.title ?? ""}
+                  </span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {formatForDisplay(income.date) ?? ""}
+                  </span>
+                </p>
+                <span className="font-semibold text-green-600">
+                  {income.amount?.toLocaleString() ?? 0}{" "}
+                  {income.currency ?? "VND"}
                 </span>
-                <span className="text-gray-500 dark:text-gray-400">
-                  {income.title ?? ""}
-                </span>
-                <span className="text-gray-500 dark:text-gray-400">
-                  {formatForDisplay(income.date) ?? ""}
-                </span>
-              </p>
-              <span className="font-semibold text-green-600">
-                {income.amount?.toLocaleString() ?? 0}{" "}
-                {income.currency ?? "VND"}
-              </span>
-              <div className="flex gap-2">
-                <Button variant="ghost" onClick={() => openEditIncome(income)}>
-                  {editIcon}
-                </Button>
-                <Button variant="ghost" onClick={() => openDelete(income)}>
-                  {trashIcon}
-                </Button>
-                <Link to={`/transaction/${income.id}`}>
-                  <Button variant="ghost">{eyeIcon}</Button>
-                </Link>
-              </div>
-            </li>
-          ))}
-      </ul>
+                <div className="flex gap-2">
+                  <Button variant="ghost" onClick={() => openEditIncome(income)}>
+                    {editIcon}
+                  </Button>
+                  <Button variant="ghost" onClick={() => openDelete(income)}>
+                    {trashIcon}
+                  </Button>
+                  <Link to={`/transaction/${income.id}`}>
+                    <Button variant="ghost">{eyeIcon}</Button>
+                  </Link>
+                </div>
+              </Motion.li>
+            ))}
+        </ul>
+     </Motion.div>
       <Pagination
         onPrev={onPrev}
         onNext={onNext}

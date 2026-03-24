@@ -12,7 +12,8 @@ import { useLanguage } from "../hooks/useLanguage";
 
 import SkeletonDashboard from "../components/dashboard/SkeletonDashboard";
 
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
+import { container, item } from "../motion.config";
 
 import {
   transactionToMonth,
@@ -102,18 +103,7 @@ export default function Dashboard() {
     return ((current - prev) / prev) * 100;
   }, [currentData, prevData]);
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15 },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-  };
+  // Using shared motion variants from src/motion.config.js
 
   if (loading) {
     return (
@@ -160,36 +150,38 @@ export default function Dashboard() {
       </Card>
 
       {/* Cards tóm tắt (income/expense/balance/compare) */}
-      {!loading && currentData.expenses.length === 0 && currentData.incomes.length === 0 ? (
+      {!loading &&
+      currentData.expenses.length === 0 &&
+      currentData.incomes.length === 0 ? (
         <div className="flex items-center justify-center h-64">
           <Card className="text-center">Không có dữ liệu</Card>
         </div>
       ) : (
         <>
-          <motion.div
+          <Motion.div
             key={month}
             variants={container}
             initial="hidden"
             animate="show"
             className="grid grid-cols-4 gap-4 mx-auto mb-6"
           >
-            <motion.div variants={item}>
+            <Motion.div variants={item}>
               <CardDashboard
                 type="income"
                 title={t("dashboard.cardTitles.income")}
                 amount={totalIncome({ data: currentData.incomes })}
                 currency="VND"
               />
-            </motion.div>
-            <motion.div variants={item}>
+            </Motion.div>
+            <Motion.div variants={item}>
               <CardDashboard
                 type="expense"
                 title={t("dashboard.cardTitles.expenses")}
                 amount={totalExpense({ data: currentData.expenses })}
                 currency="VND"
               />
-            </motion.div>
-            <motion.div variants={item}>
+            </Motion.div>
+            <Motion.div variants={item}>
               <CardDashboard
                 type="balance"
                 title={t("dashboard.cardTitles.balance")}
@@ -199,19 +191,19 @@ export default function Dashboard() {
                 })}
                 currency="VND"
               />
-            </motion.div>
-            <motion.div variants={item}>
+            </Motion.div>
+            <Motion.div variants={item}>
               <CardDashboard
                 type="compare"
                 title={t("dashboard.cardTitles.compare")}
                 amount={formatPercent(percentChange)}
                 currency="%"
               />
-            </motion.div>
-          </motion.div>
+            </Motion.div>
+          </Motion.div>
 
           {/* Charts: pie + info card */}
-          <motion.div
+          <Motion.div
             key={month + "-charts"}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -233,10 +225,10 @@ export default function Dashboard() {
                 limit={totalIncome({ data: currentData.incomes })}
               />
             </Card>
-          </motion.div>
+          </Motion.div>
 
           {/* Bar chart hiển thị theo thời gian */}
-          <motion.div
+          <Motion.div
             key={month + "-bar"}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1 }}
@@ -251,7 +243,7 @@ export default function Dashboard() {
                 expenses={normalizedMonthExpenses}
               />
             </Card>
-          </motion.div>
+          </Motion.div>
         </>
       )}
     </MainLayout>

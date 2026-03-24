@@ -8,15 +8,15 @@ import {
 export function useFirebaseAI() {
   async function fetchOrCompute(payload, computeFn) {
     const auth = getAuth();
-    const uid = auth.currentUser?.uid;
-    if (!uid) throw new Error("Vui lòng đăng nhập");
+    const userId = auth.currentUser?.uid;
+    if (!userId) throw new Error("Vui lòng đăng nhập");
     const { key, snapshot } = await generateKey(payload);
-    const cached = await getCachedAnalysis(key, uid);
+    const cached = await getCachedAnalysis(key, userId);
     console.log(
       "Cache check for key:",
       key,
       "and uid:",
-      uid,
+      userId,
       "result:",
       cached,
     );
@@ -26,11 +26,11 @@ export function useFirebaseAI() {
       "Computed new result for key:",
       key,
       "and uid:",
-      uid,
+      userId,
       "result:",
       result,
     );
-    await saveAnalysis(key, uid, snapshot, result);
+    await saveAnalysis(key, userId, snapshot, result);
     return result;
   }
   return { fetchOrCompute, generateKey, getCachedAnalysis, saveAnalysis };

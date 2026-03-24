@@ -14,6 +14,8 @@ import { useFirebaseAI } from "../hooks/useFirebaseAI.js";
 
 import FinancePreviewAnimation from "../components/canvas/FinancePreviewAnimation.jsx";
 import AILoadingAnimation from "../components/canvas/AILoadingAnimation.jsx";
+import { motion as Motion } from "framer-motion";
+import { container, item } from "../motion.config";
 
 export default function AI() {
   const { transactionCurrent, month, setMonth, fetchTransactionCurrent } =
@@ -94,61 +96,74 @@ export default function AI() {
   return (
     <MainLayout auth navbarBottom title={t("ai.pageTitle")}>
       <div className="space-y-6 mx-10">
-        <Card>
-          <div className="flex flex-wrap items-center gap-4">
-            <input
-              type="month"
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
-              className="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-            <input
-              type="number"
-              placeholder={t("ai.budgetPlaceholder", "Ngân sách (VND)")}
-              value={monthlyBudget}
-              onChange={(e) => setMonthlyBudget(e.target.value)}
-              className="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none flex-1"
-            />
-            <Button
-              onClick={handleAnalyze}
-              disabled={loading}
-              variant="primary"
+        <Motion.div variants={container} initial="hidden" animate="show">
+          <Card>
+            <Motion.div
+              variants={item}
+              initial="hidden"
+              animate="show"
+              className="flex flex-wrap items-center gap-4"
             >
-              {loading
-                ? t("ai.analyzing", "Đang xử lý...")
-                : t("ai.analyzeButton", "Phân tích bằng AI")}
-            </Button>
-          </div>
-          {error && (
-            <div className="text-red-500 mt-4 text-sm">
-              Lỗi: {error.message}
-            </div>
-          )}
+              <input
+                type="month"
+                value={month}
+                onChange={(e) => setMonth(e.target.value)}
+                className="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+              <input
+                type="number"
+                placeholder={t("ai.budgetPlaceholder", "Ngân sách (VND)")}
+                value={monthlyBudget}
+                onChange={(e) => setMonthlyBudget(e.target.value)}
+                className="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none flex-1"
+              />
+              <Button
+                onClick={handleAnalyze}
+                disabled={loading}
+                variant="primary"
+              >
+                {loading
+                  ? t("ai.analyzing", "Đang xử lý...")
+                  : t("ai.analyzeButton", "Phân tích bằng AI")}
+              </Button>
+            </Motion.div>
+          </Card>
+        </Motion.div>
+        {error && (
+          <div className="text-red-500 mt-4 text-sm">Lỗi: {error.message}</div>
+        )}
 
-          {loading && (
-            <div className="mt-8">
-              <AILoadingAnimation />
-            </div>
-          )}
-          {finalResult && (
-            <div className="mt-8 space-y-6 animate-in fade-in duration-500">
-              {parseAIResult(finalResult).map((sec, idx) => (
-                <div
-                  key={idx}
-                  className="border-l-4 border-blue-500 shadow-sm pl-4 py-1"
-                >
-                  <h3 className="font-bold text-xl text-gray-800 dark:text-gray-300 mb-2">
-                    {sec.heading}
-                  </h3>
-                  <div className="prose prose-slate max-w-none">
-                    <ReactMarkdown>{sec.body}</ReactMarkdown>
-                  </div>
+        {loading && (
+          <div className="mt-8">
+            <AILoadingAnimation />
+          </div>
+        )}
+        {finalResult && (
+          <Motion.div
+            variant={container}
+            initial="hidden"
+            animate="show"
+            className="mt-8 space-y-6"
+          >
+            {parseAIResult(finalResult).map((sec, idx) => (
+              <Motion.div
+                variants={item}
+                initial="hidden"
+                animate="show"
+                key={idx}
+                className="border-l-4 border-blue-500 shadow-sm pl-4 py-1"
+              >
+                <h3 className="font-bold text-xl text-gray-800 dark:text-gray-300 mb-2">
+                  {sec.heading}
+                </h3>
+                <div className="prose prose-slate max-w-none">
+                  <ReactMarkdown>{sec.body}</ReactMarkdown>
                 </div>
-              ))}
-            </div>
-          )}
-        </Card>
-        {!finalResult && <FinancePreviewAnimation />}
+              </Motion.div>
+            ))}
+          </Motion.div>
+        )}
+        {!finalResult && !loading && <FinancePreviewAnimation />}
       </div>
 
       <button

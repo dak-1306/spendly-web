@@ -22,7 +22,7 @@ export default function AILoadingAnimation() {
     const particles = Array.from({ length: 40 }).map(() => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      speed: 0.5 + Math.random()
+      speed: 0.5 + Math.random(),
     }));
 
     const draw = () => {
@@ -74,14 +74,7 @@ export default function AILoadingAnimation() {
       ===================== */
       const pulse = 6 + Math.sin(time * 2) * 2;
 
-      const gradient = ctx.createRadialGradient(
-        cx,
-        cy,
-        2,
-        cx,
-        cy,
-        20
-      );
+      const gradient = ctx.createRadialGradient(cx, cy, 2, cx, cy, 20);
 
       gradient.addColorStop(0, "rgba(56,189,248,1)");
       gradient.addColorStop(1, "rgba(56,189,248,0)");
@@ -119,7 +112,7 @@ export default function AILoadingAnimation() {
   }, []);
 
   return (
-    <div className="w-80 h-64 rounded-xl border border-sky-400/30 bg-slate-900/40">
+    <div className="w-80 h-64 mx-auto rounded-xl border border-sky-400/30">
       <canvas ref={canvasRef} className="w-full h-full" />
     </div>
   );

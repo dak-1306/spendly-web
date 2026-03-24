@@ -7,7 +7,8 @@ import { IMAGES } from "../assets/index.js";
 import { useLanguage } from "../hooks/useLanguage";
 import { useAuth } from "../hooks/useAuth.js";
 
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
+import { container, item } from "../motion.config";
 
 export default function Home() {
   const { user, checkAuth } = useAuth();
@@ -45,27 +46,13 @@ export default function Home() {
     }
   }, [user, navigate]);
 
-  // animation config
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-  };
+  // Using shared motion variants from src/motion.config.js
 
   return (
     <MainLayout title={false}>
       <div className="grid grid-cols-2 gap-4">
         {/* Left */}
-        <motion.div variants={item} initial="hidden" animate="show">
+        <Motion.div variants={item} initial="hidden" animate="show">
           <div className="h-full my-auto flex items-center justify-center">
             <div className="relative w-full p-2 overflow-hidden">
               <div
@@ -90,30 +77,30 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </Motion.div>
 
         {/* Right */}
-        <motion.div
+        <Motion.div
           className="flex flex-col justify-center items-center p-8 space-y-4"
           variants={container}
           initial="hidden"
           animate="show"
         >
-          <motion.h2
+          <Motion.h2
             variants={item}
             className="text-blue-600 dark:text-blue-400 text-3xl font-bold"
           >
             {t("home.welcomeMessage")}
-          </motion.h2>
+          </Motion.h2>
 
-          <motion.p
+          <Motion.p
             variants={item}
             className="text-lg text-orange-600 dark:text-orange-400"
           >
             {t("home.text")}
-          </motion.p>
+          </Motion.p>
 
-          <motion.div variants={item}>
+          <Motion.div variants={item}>
             <Card className="flex flex-col items-start space-y-4 ">
               {t("home.description").map((desc, index) => (
                 <p key={index} className="text-lg">
@@ -121,10 +108,10 @@ export default function Home() {
                 </p>
               ))}
             </Card>
-          </motion.div>
+          </Motion.div>
 
           <div className="grid grid-cols-2 gap-4 w-full">
-            <motion.div variants={item}>
+            <Motion.div variants={item}>
               <Card>
                 <h2 className="text-blue-600 dark:text-blue-400 text-xl font-semibold mb-2">
                   {t("home.featureHighlightsTitle")}
@@ -135,9 +122,9 @@ export default function Home() {
                   ))}
                 </ul>
               </Card>
-            </motion.div>
+            </Motion.div>
 
-            <motion.div variants={item}>
+            <Motion.div variants={item}>
               <Card>
                 <h2 className="text-orange-600 dark:text-orange-400 text-xl font-semibold mb-2">
                   {t("home.howItWorksTitle")}
@@ -148,17 +135,17 @@ export default function Home() {
                   ))}
                 </ol>
               </Card>
-            </motion.div>
+            </Motion.div>
           </div>
 
-          <motion.div variants={item}>
+          <Motion.div variants={item}>
             <Link to="/register">
               <Button variant="primary" size="lg">
                 {t("home.textButton")}
               </Button>
             </Link>
-          </motion.div>
-        </motion.div>
+          </Motion.div>
+        </Motion.div>
       </div>
     </MainLayout>
   );
