@@ -5,19 +5,64 @@
     "categoryExpenses": {
       "label": "theo loại",
       "options": [
-        "Ăn uống",
-        "Di chuyển",
-        "Mua sắm",
-        "Nhà thuê",
-        "Giải trí",
-        "Sức khỏe",
-        "Giáo dục",
-        "Khác"
+        {
+          "value": "Ăn uống",
+          "label": "Ăn uống"
+        },
+        {
+          "value": "Di chuyển",
+          "label": "Di chuyển"
+        },
+        {
+          "value": "Mua sắm",
+          "label": "Mua sắm"
+        },
+        {
+          "value": "Nhà thuê",
+          "label": "Nhà thuê"
+        },
+        {
+          "value": "Giải trí",
+          "label": "Giải trí"
+        },
+        {
+          "value": "Sức khỏe",
+          "label": "Sức khỏe"
+        },
+        {
+          "value": "Giáo dục",
+          "label": "Giáo dục"
+        },
+        {
+          "value": "Khác",
+          "label": "Khác"
+        }
       ]
     },
     "categoryIncomes": {
       "label": "theo loại",
-      "options": ["Lương", "Thưởng", "Đầu tư", "Quà tặng", "Khác"]
+      "options": [
+        {
+          "value": "Lương",
+          "label": "Lương"
+        },
+        {
+          "value": "Thưởng",
+          "label": "Thưởng"
+        },
+        {
+          "value": "Đầu tư",
+          "label": "Đầu tư"
+        },
+        {
+          "value": "Quà tặng",
+          "label": "Quà tặng"
+        },
+        {
+          "value": "Khác",
+          "label": "Khác"
+        }
+      ]
     },
 
     "amountRanges": {

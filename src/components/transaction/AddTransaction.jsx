@@ -1,9 +1,8 @@
 import TransactionForm from "./TransactionForm";
 import { useTransaction } from "../../hooks/useTransaction";
 import { useLanguage } from "../../hooks/useLanguage";
-import {useAuth} from "../../hooks/useAuth.js";
+import { useAuth } from "../../hooks/useAuth.js";
 import { useCallback, useState } from "react";
-
 
 export default function AddTransaction({
   open = false,

@@ -29,6 +29,7 @@ export const TransactionProvider = ({ children }) => {
   const GetExpense = useCallback(
     async (
       userId,
+
       { category, amountRange, sortBy, searchTerm },
       { limit: pageLimit = 5, cursor: cursorValue } = {},
     ) => {
@@ -53,6 +54,7 @@ export const TransactionProvider = ({ children }) => {
             category,
             amountRange,
             sortBy,
+            month,
             { limit: pageLimit, cursor: cursorValue },
           );
         } else {

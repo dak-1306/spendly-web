@@ -5,19 +5,64 @@
     "categoryExpenses": {
       "label": "Filter by category",
       "options": [
-        "Food & Dining",
-        "Transportation",
-        "Shopping",
-        "Rent",
-        "Entertainment",
-        "Health",
-        "Education",
-        "Other"
+        {
+          "value": "Ăn uống",
+          "label": "Food"
+        },
+        {
+          "value": "Di chuyển",
+          "label": "Transportation"
+        },
+        {
+          "value": "Mua sắm",
+          "label": "Shopping"
+        },
+        {
+          "value": "Nhà thuê",
+          "label": "Rent"
+        },
+        {
+          "value": "Giải trí",
+          "label": "Entertainment"
+        },
+        {
+          "value": "Sức khỏe",
+          "label": "Health"
+        },
+        {
+          "value": "Giáo dục",
+          "label": "Education"
+        },
+        {
+          "value": "Khác",
+          "label": "Other"
+        }
       ]
     },
     "categoryIncomes": {
       "label": "Filter by category",
-      "options": ["Salary", "Business", "Investment", "Gift", "Other"]
+      "options": [
+        {
+          "value": "Lương",
+          "label": "Salary"
+        },
+        {
+          "value": "Thưởng",
+          "label": "Bonus"
+        },
+        {
+          "value": "Đầu tư",
+          "label": "Investment"
+        },
+        {
+          "value": "Quà tặng",
+          "label": "Gift"
+        },
+        {
+          "value": "Khác",
+          "label": "Other"
+        }
+      ]
     },
     "amountRanges": {
       "label": "Amount range",

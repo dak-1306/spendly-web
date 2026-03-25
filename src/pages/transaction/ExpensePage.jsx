@@ -13,89 +13,79 @@ import DeleteTransaction from "../../components/transaction/DeleteTransaction.js
 import { Edit2, Trash2, Eye } from "lucide-react";
 import { formatForInputDate, formatForDisplay } from "../../utils/financial.js";
 import { Link } from "react-router-dom";
-
-import SkeletonTransaction from "../../components/transaction/SkeletonTransaction.jsx";
+import SkeletonExpense from "../../components/transaction/SkeletonExpense.jsx";
 import { motion as Motion } from "framer-motion";
 import { container, item } from "../../motion.config";
 
 export default function ExpensePage() {
   const { expenses, month, GetExpense, loading, error } = useTransaction();
   const { user } = useAuth();
-  const userId = user?.uid;
   const { t } = useLanguage();
 
-  const expenseCategories = t("transactions.filters.categoryExpenses.options");
-  const amountRanges = t("transactions.filters.amountRanges.options");
-  const dateSortOptions = t("transactions.filters.dateSort.options");
+  const userId = user?.uid;
+  const itemsPerPage = 5;
 
+  // Filters
   const [selectedCategory, setSelectedCategory] = useState("");
   const [dateSort, setDateSort] = useState("");
   const [selectedAmountRange, setSelectedAmountRange] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Pagination cursor
   const [cursorExpense, setCursorExpense] = useState(null);
   const [cursorStackExpense, setCursorStackExpense] = useState([]);
-  const itemsPerPage = 5;
 
+  // Modal states
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
 
-  useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      const { nextCursor } = await GetExpense(
-        userId,
-        {
-          category: selectedCategory || null,
-          amountRange: selectedAmountRange || null,
-          sortBy: dateSort || null,
-          searchTerm: searchTerm || null,
-        },
-        {
-          limit: itemsPerPage,
-          cursor: null,
-        },
-      );
-      if (!mounted) return;
-      setCursorExpense(nextCursor);
-      setCursorStackExpense([]);
-    };
-    load();
-    return () => (mounted = false);
-  }, [
-    userId,
-    month,
-    selectedCategory,
-    selectedAmountRange,
-    dateSort,
-    searchTerm,
-    GetExpense,
-  ]);
-
-  const resultExpenses = useMemo(() => {
-    if (expenses?.results) {
-      return expenses.results.map((expense) => ({
-        ...expense,
-        date: formatForInputDate(expense.date),
-      }));
-    }
-    return [];
-  }, [expenses]);
-
-  const onNext = async () => {
-    const filters = {
+  // Filter object memo
+  const filters = useMemo(
+    () => ({
       category: selectedCategory || null,
       amountRange: selectedAmountRange || null,
       sortBy: dateSort || null,
       searchTerm: searchTerm || null,
+    }),
+    [selectedCategory, selectedAmountRange, dateSort, searchTerm],
+  );
+
+  // Fetch expenses
+  useEffect(() => {
+    if (!userId) return;
+
+    const load = async () => {
+      const { nextCursor } = await GetExpense(userId, filters, {
+        limit: itemsPerPage,
+        cursor: null,
+      });
+
+      setCursorExpense(nextCursor);
+      setCursorStackExpense([]);
     };
+
+    load();
+  }, [userId, month, filters, GetExpense]);
+
+  // Format results
+  const resultExpenses = useMemo(() => {
+    if (!expenses?.results) return [];
+    return expenses.results.map((expense) => ({
+      ...expense,
+      date: formatForInputDate(expense.date),
+    }));
+  }, [expenses]);
+
+  // Pagination
+  const onNext = async () => {
     const res = await GetExpense(userId, filters, {
       limit: itemsPerPage,
       cursor: cursorExpense,
     });
+
     if (res?.nextCursor) {
       setCursorStackExpense((prev) => [...prev, cursorExpense]);
       setCursorExpense(res.nextCursor);
@@ -103,31 +93,31 @@ export default function ExpensePage() {
   };
 
   const onPrev = async () => {
-    const filters = {
-      category: selectedCategory || null,
-      amountRange: selectedAmountRange || null,
-      sortBy: dateSort || null,
-      searchTerm: searchTerm || null,
-    };
     if (cursorStackExpense.length === 0) {
       const res = await GetExpense(userId, filters, {
         limit: itemsPerPage,
         cursor: null,
       });
+
       setCursorStackExpense([]);
       setCursorExpense(res?.nextCursor ?? null);
       return;
     }
+
     const newStack = cursorStackExpense.slice(0, -1);
     const newTop = newStack.length ? newStack[newStack.length - 1] : null;
+
     setCursorStackExpense(newStack);
+
     const res = await GetExpense(userId, filters, {
       limit: itemsPerPage,
       cursor: newTop,
     });
+
     setCursorExpense(res?.nextCursor ?? null);
   };
 
+  // Handlers
   const openEdit = useCallback((expense) => {
     setEditingExpense(expense);
     setIsEditOpen(true);
@@ -145,15 +135,8 @@ export default function ExpensePage() {
     setSearchTerm("");
   }, []);
 
-  const editIcon = (
-    <Edit2 className="text-blue-600 dark:text-blue-400" size={16} />
-  );
-  const trashIcon = (
-    <Trash2 className="text-red-600 dark:text-red-400" size={16} />
-  );
-  const eyeIcon = (
-    <Eye className="text-gray-600 dark:text-gray-400" size={16} />
-  );
+  // Loading & Error
+  if (loading && !expenses) return <SkeletonExpense />;
 
   if (error) {
     return (
@@ -167,9 +150,9 @@ export default function ExpensePage() {
     <Card>
       <div className="flex justify-between items-center mb-4 space-x-4">
         <FilterExpense
-          expenseCategories={expenseCategories}
-          amountRanges={amountRanges}
-          dateSortOptions={dateSortOptions}
+          expenseCategories={t("transactions.filters.categoryExpenses.options")}
+          amountRanges={t("transactions.filters.amountRanges.options")}
+          dateSortOptions={t("transactions.filters.dateSort.options")}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
           dateSort={dateSort}
@@ -180,15 +163,14 @@ export default function ExpensePage() {
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
-        <Button
-          size="md"
-          variant="primary"
-          onClick={() => setIsAddExpenseOpen(true)}
-        >
+
+        <Button onClick={() => setIsAddExpenseOpen(true)}>
           {t("transactions.buttons.addExpense")}
         </Button>
       </div>
+
       <LineColor />
+
       <Motion.div
         variants={container}
         initial="hidden"
@@ -198,65 +180,57 @@ export default function ExpensePage() {
         <table className="w-full mt-4 table-auto">
           <thead>
             <tr className="text-left border-b border-gray-300">
-              <th className="px-4 py-2">
-                {t("transactions.tableHeaders.category", "Danh mục")}
-              </th>
-              <th className="px-4 py-2">
-                {t("transactions.tableHeaders.title", "Tiêu đề")}
-              </th>
-              <th className="px-4 py-2">
-                {t("transactions.tableHeaders.date", "Ngày")}
-              </th>
-              <th className="px-4 py-2">
-                {t("transactions.tableHeaders.amount", "Số tiền")}
-              </th>
-              <th className="px-4 py-2">
-                {t("transactions.tableHeaders.actions", "Hành động")}
-              </th>
+              <th className="px-4 py-2">Category</th>
+              <th className="px-4 py-2">Title</th>
+              <th className="px-4 py-2">Date</th>
+              <th className="px-4 py-2">Amount</th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
+
           <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="5" className="p-4">
-                  <SkeletonTransaction view="table" />
+            {resultExpenses.map((expense) => (
+              <Motion.tr
+                variants={item}
+                key={expense.id}
+                className="border-b border-gray-200 hover:bg-gray-100 transition-colors"
+              >
+                <td className="px-4 py-4">{expense.category}</td>
+                <td className="px-4 py-4">{expense.title}</td>
+                <td className="px-4 py-4">{formatForDisplay(expense.date)}</td>
+                <td className="px-4 py-4 font-semibold text-red-600">
+                  {expense.amount?.toLocaleString()} {expense.currency ?? "VND"}
                 </td>
-              </tr>
-            ) : (
-              resultExpenses.map((expense) => (
-                <Motion.tr
-                  variants={item}
-                  initial="hidden"
-                  animate="show"
-                  key={expense.id}
-                  className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
-                >
-                  <td className="px-4 py-4">{expense.category}</td>
-                  <td className="px-4 py-4">{expense.title}</td>
-                  <td className="px-4 py-4">
-                    {formatForDisplay(expense.date)}
-                  </td>
-                  <td className="px-4 py-4 font-semibold text-red-600">
-                    {expense.amount?.toLocaleString() ?? 0}{" "}
-                    {expense.currency ?? "VND"}
-                  </td>
-                  <td className="px-4 py-4 flex gap-2">
-                    <Button variant="ghost" onClick={() => openEdit(expense)}>
-                      {editIcon}
+                <td className="px-4 py-4 flex gap-2">
+                  <Button variant="ghost" onClick={() => openEdit(expense)}>
+                    <Edit2
+                      size={16}
+                      className="text-blue-600 dark:text-blue-400"
+                    />
+                  </Button>
+
+                  <Button variant="ghost" onClick={() => openDelete(expense)}>
+                    <Trash2
+                      size={16}
+                      className="text-red-600 dark:text-red-400"
+                    />
+                  </Button>
+
+                  <Link to={`/transaction/${expense.id}`}>
+                    <Button variant="ghost">
+                      <Eye
+                        size={16}
+                        className="text-gray-600 dark:text-gray-400"
+                      />
                     </Button>
-                    <Button variant="ghost" onClick={() => openDelete(expense)}>
-                      {trashIcon}
-                    </Button>
-                    <Link to={`/transaction/${expense.id}`}>
-                      <Button variant="ghost">{eyeIcon}</Button>
-                    </Link>
-                  </td>
-                </Motion.tr>
-              ))
-            )}
+                  </Link>
+                </td>
+              </Motion.tr>
+            ))}
           </tbody>
         </table>
       </Motion.div>
+
       <Pagination
         onPrev={onPrev}
         onNext={onNext}
@@ -270,6 +244,7 @@ export default function ExpensePage() {
           role="expense"
         />
       )}
+
       {isEditOpen && editingExpense && (
         <EditTransaction
           open={isEditOpen}
@@ -281,6 +256,7 @@ export default function ExpensePage() {
           data={editingExpense}
         />
       )}
+
       {isDeleteOpen && deletingItem && (
         <DeleteTransaction
           open={isDeleteOpen}

@@ -1,159 +1,97 @@
 import { useMemo } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 import { useTheme } from "../../hooks/useTheme";
 
-/**
- * Props:
- * - month: "YYYY-MM"
- * - expenses: array of expense items with { amount, date } (date ISO string)
- *
- * Simple SVG bar chart showing total expense per day in the given month.
- */
-const BAR_CHART_CONFIG = { WIDTH: 1000, HEIGHT: 240 };
+const formatMoney = (v) =>
+  new Intl.NumberFormat("vi-VN", {
+    maximumFractionDigits: 0,
+  }).format(v);
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div
+        style={{
+          background: "#111",
+          color: "#fff",
+          padding: "6px 10px",
+          borderRadius: "6px",
+          fontSize: "12px",
+        }}
+      >
+        Day {label}: {formatMoney(payload[0].value)}
+      </div>
+    );
+  }
+  return null;
+};
+
 function SpendingBarChart({ month, title, expenses = [] }) {
   const theme = useTheme();
-  const { days, dailyTotals, max, tickVals } = useMemo(() => {
+
+  const data = useMemo(() => {
     const [year, monthNum] = month.split("-").map(Number);
-    const daysCount = new Date(year, monthNum, 0).getDate(); // days in month
-    const totals = Array.from({ length: daysCount }, () => 0);
+    const daysCount = new Date(year, monthNum, 0).getDate();
+
+    const totals = Array.from({ length: daysCount }, (_, i) => ({
+      day: i + 1,
+      amount: 0,
+    }));
 
     expenses.forEach((e) => {
       const d = new Date(e.date);
       if (d.getFullYear() === year && d.getMonth() + 1 === monthNum) {
-        const day = d.getDate();
-        totals[day - 1] += Number(e.amount) || 0;
+        totals[d.getDate() - 1].amount += Number(e.amount) || 0;
       }
     });
 
-    const rawMax = Math.max(...totals, 0);
-    const actualMax = rawMax === 0 ? 0 : rawMax;
-
-    // generate reasonable ticks (avoid duplicates from rounding)
-    const yTicks = 4;
-    let vals;
-    if (actualMax === 0) {
-      vals = [0];
-    } else {
-      const step = Math.ceil(actualMax / yTicks);
-      vals = Array.from({ length: yTicks + 1 }, (_, i) => {
-        const v = step * i;
-        return i === yTicks ? actualMax : v;
-      });
-      // ensure uniqueness and ascending
-      vals = Array.from(new Set(vals)).sort((a, b) => a - b);
-      if (vals[vals.length - 1] !== actualMax) vals.push(actualMax);
-    }
-
-    return {
-      days: daysCount,
-      dailyTotals: totals,
-      max: actualMax === 0 ? 1 : actualMax, // used for scaling; keep 1 to avoid div0
-      tickVals: vals,
-    };
+    return totals;
   }, [month, expenses]);
 
-  const margin = { top: 16, right: 12, bottom: 28, left: 80 }; // tăng lề trái để chứa nhãn lớn
-  const chartW = BAR_CHART_CONFIG.WIDTH - margin.left - margin.right;
-  const chartH = BAR_CHART_CONFIG.HEIGHT - margin.top - margin.bottom;
-  const barSlot = chartW / days;
-  const barW = Math.max(2, barSlot - 6);
-
-  const fmt = (v) =>
-    new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(v);
-
   return (
-    <div className="w-full overflow-auto">
+    <div className="w-full h-[350px] pb-8">
       <h2 className="text-xl font-semibold mb-4 text-blue-600 dark:text-blue-400">
         {title}
       </h2>
-      <svg
-        viewBox={`0 0 ${BAR_CHART_CONFIG.WIDTH} ${BAR_CHART_CONFIG.HEIGHT}`}
-        width="100%"
-        height={BAR_CHART_CONFIG.HEIGHT}
-        preserveAspectRatio="xMinYMin meet"
-        role="img"
-        aria-label="Spending per day"
-      >
-        <g transform={`translate(${margin.left},${margin.top})`}>
-          {/* Y axis ticks & labels (compute y from value) */}
-          {tickVals.map((t) => {
-            const y = chartH - (t / max) * chartH; // 0 => bottom, max => top
-            return (
-              <g key={t}>
-                <line
-                  x1={-8}
-                  x2={chartW}
-                  y1={y}
-                  y2={y}
-                  stroke="#e6e6e6"
-                  strokeWidth={1}
-                />
-                {theme === "light" ? (
-                  <text
-                    x={-12}
-                    y={y + 4}
-                    textAnchor="end"
-                    fontSize={11}
-                    fill="#666"
-                  >
-                    {fmt(t)}
-                  </text>
-                ) : (
-                  <text
-                    x={-12}
-                    y={y + 4}
-                    textAnchor="end"
-                    fontSize={11}
-                    fill="#ccc"
-                  >
-                    {fmt(t)}
-                  </text>
-                )}
-              </g>
-            );
-          })}
 
-          {/* Bars */}
-          {dailyTotals.map((val, i) => {
-            const x = i * barSlot + (barSlot - barW) / 2;
-            const h = (val / max) * chartH;
-            const y = chartH - h;
-            return (
-              <g key={i} transform={`translate(${x},0)`}>
-                <rect
-                  x={0}
-                  y={y}
-                  width={barW}
-                  height={h}
-                  fill={val > 0 ? "#3b82f6" : "#e5e7eb"}
-                  rx={2}
-                />
-                {/* show day label only if this day has expense */}
-                {val > 0 && (
-                  <text
-                    x={barW / 2}
-                    y={chartH + 14}
-                    textAnchor="middle"
-                    fontSize={10}
-                    fill="#444"
-                  >
-                    {i + 1}
-                  </text>
-                )}
-              </g>
-            );
-          })}
-
-          {/* bottom axis line */}
-          <line
-            x1={0}
-            x2={chartW}
-            y1={chartH}
-            y2={chartH}
-            stroke="#000"
-            strokeOpacity={0.08}
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data}>
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke={theme === "light" ? "#eee" : "#333"}
           />
-        </g>
-      </svg>
+
+          <XAxis
+            dataKey="day"
+            tick={{ fill: theme === "light" ? "#555" : "#aaa" }}
+          />
+
+          <YAxis
+            tickFormatter={formatMoney}
+            tick={{ fill: theme === "light" ? "#555" : "#aaa" }}
+            width={80}
+          />
+
+          <Tooltip content={CustomTooltip} />
+          <Legend />
+
+          <Bar
+            dataKey="amount"
+            name="Expense"
+            fill="#3b82f6"
+            radius={[4, 4, 0, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 }

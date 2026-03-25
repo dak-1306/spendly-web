@@ -14,6 +14,7 @@ import {
   limit,
   startAfter,
 } from "firebase/firestore";
+
 import app from "../firebase";
 
 const db = getFirestore(app);
@@ -156,16 +157,33 @@ const filterTransactions = async (
   category,
   amountRange,
   sortBy,
+  month, // thêm month: ví dụ "2026-03"
   { limit: pageLimit = 5, cursor: cursorValue } = {},
 ) => {
   let q = query(colRef, where("userId", "==", userId));
-   // 1) Lọc theo type trước
+
+  // ===== 0) Filter theo month trước =====
+  if (month) {
+    const [year, m] = month.split("-");
+
+    const startOfMonth = new Date(year, m - 1, 1);
+    const endOfMonth = new Date(year, m, 1);
+
+    q = query(
+      q,
+      where("createdAt", ">=", startOfMonth),
+      where("createdAt", "<", endOfMonth),
+    );
+  }
+
+  // ===== 1) Filter type =====
   if (type) q = query(q, where("type", "==", type));
-  // 2) Lọc theo category nếu có
+
+  // ===== 2) Filter category =====
   if (category) q = query(q, where("category", "==", category));
 
+  // ===== 3) Filter amount range =====
   let rangeArr = null;
-// 3) Lọc theo khoảng amount nếu có (dùng map để chuyển từ string sang array nếu cần)
   if (amountRange) {
     if (typeof amountRange === "string") {
       const map = {
@@ -175,18 +193,17 @@ const filterTransactions = async (
         gt1M: [1000000, Infinity],
       };
       rangeArr = map[amountRange] ?? null;
-    } else if (Array.isArray(amountRange)) rangeArr = amountRange;
+    } else if (Array.isArray(amountRange)) {
+      rangeArr = amountRange;
+    }
   }
 
-  // 4) Sắp xếp theo ngày tạo mới nhất hoặc cũ nhất, nếu có khoảng amount thì ưu tiên sắp xếp theo amount trước
+  // ===== 4) Order =====
   if (rangeArr) {
     q = query(
       q,
       where("amount", ">=", rangeArr[0]),
       where("amount", "<=", rangeArr[1]),
-    );
-    q = query(
-      q,
       orderBy("amount", "desc"),
       orderBy("createdAt", sortBy === "newest" ? "desc" : "asc"),
     );
@@ -194,15 +211,15 @@ const filterTransactions = async (
     q = query(q, orderBy("createdAt", sortBy === "newest" ? "desc" : "asc"));
   }
 
+  // ===== 5) Pagination =====
   if (cursorValue) {
     q = query(q, startAfter(cursorValue));
   }
 
   q = query(q, limit(pageLimit));
+
   const snap = await getDocs(q);
   const results = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
-  //  trả về document thật
   const lastDoc = snap.docs[snap.docs.length - 1] || null;
 
   return { results, nextCursor: lastDoc };

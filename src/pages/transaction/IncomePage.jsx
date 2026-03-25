@@ -12,7 +12,7 @@ import { Edit2, Trash2, Eye } from "lucide-react";
 import { formatForInputDate, formatForDisplay } from "../../utils/financial.js";
 import { Link } from "react-router-dom";
 
-import SkeletonTransaction from "../../components/transaction/SkeletonTransaction.jsx";
+import SkeletonIncome from "../../components/transaction/SkeletonIncome.jsx";
 import { motion as Motion } from "framer-motion";
 import { container, item } from "../../motion.config";
 
@@ -33,18 +33,19 @@ export default function IncomePage() {
   const [deletingItem, setDeletingItem] = useState(null);
 
   useEffect(() => {
-    let mounted = true;
+    if (!userId) return;
+
     const load = async () => {
       const { nextCursor } = await GetIncome(userId, {
         limit: itemsPerPage,
         cursor: null,
       });
-      if (!mounted) return;
+
       setCursorIncome(nextCursor);
       setCursorStackIncome([]);
     };
+
     load();
-    return () => (mounted = false);
   }, [userId, month, GetIncome]);
 
   const resultIncomes = useMemo(() => {
@@ -98,16 +99,9 @@ export default function IncomePage() {
     setIsDeleteOpen(true);
   }, []);
 
-  const editIcon = (
-    <Edit2 className="text-blue-600 dark:text-blue-400" size={16} />
-  );
-  const trashIcon = (
-    <Trash2 className="text-red-600 dark:text-red-400" size={16} />
-  );
-  const eyeIcon = (
-    <Eye className="text-gray-600 dark:text-gray-400" size={16} />
-  );
-
+  if (loading && !incomes) {
+    return <SkeletonIncome />;
+  }
   if (error) {
     return (
       <Card className="border-l-4 border-red-500 bg-red-50 text-red-700">
@@ -137,48 +131,55 @@ export default function IncomePage() {
         className="overflow-x-auto"
       >
         <ul>
-          {loading && resultIncomes.length === 0 && (
-            <SkeletonTransaction view="list" rows={2} />
-          )}
-          {!loading &&
-            resultIncomes.map((income) => (
-              <Motion.li
-                variants={item}
-                initial="hidden"
-                animate="show"
-                key={income.id}
-                className="py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center"
-              >
-                <p className="flex items-center gap-4">
-                  <span className="text-gray-700 font-medium dark:text-gray-300">
-                    {income.source ?? "Thu nhập"}
-                  </span>
-                  <span className="text-gray-500 dark:text-gray-400">
-                    {income.title ?? ""}
-                  </span>
-                  <span className="text-gray-500 dark:text-gray-400">
-                    {formatForDisplay(income.date) ?? ""}
-                  </span>
-                </p>
-                <span className="font-semibold text-green-600">
-                  {income.amount?.toLocaleString() ?? 0}{" "}
-                  {income.currency ?? "VND"}
+          {resultIncomes.map((income) => (
+            <Motion.li
+              variants={item}
+              initial="hidden"
+              animate="show"
+              key={income.id}
+              className="py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center"
+            >
+              <p className="flex items-center gap-4">
+                <span className="text-gray-700 font-medium dark:text-gray-300">
+                  {income.source ?? "Thu nhập"}
                 </span>
-                <div className="flex gap-2">
-                  <Button variant="ghost" onClick={() => openEditIncome(income)}>
-                    {editIcon}
+                <span className="text-gray-500 dark:text-gray-400">
+                  {income.title ?? ""}
+                </span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  {formatForDisplay(income.date) ?? ""}
+                </span>
+              </p>
+              <span className="font-semibold text-green-600">
+                {income.amount?.toLocaleString() ?? 0}{" "}
+                {income.currency ?? "VND"}
+              </span>
+              <div className="flex gap-2">
+                <Button variant="ghost" onClick={() => openEditIncome(income)}>
+                  <Edit2
+                    size={16}
+                    className="text-blue-600 dark:text-blue-400"
+                  />
+                </Button>
+                <Button variant="ghost" onClick={() => openDelete(income)}>
+                  <Trash2
+                    size={16}
+                    className="text-red-600 dark:text-red-400"
+                  />
+                </Button>
+                <Link to={`/transaction/${income.id}`}>
+                  <Button variant="ghost">
+                    <Eye
+                      size={16}
+                      className="text-gray-600 dark:text-gray-400"
+                    />
                   </Button>
-                  <Button variant="ghost" onClick={() => openDelete(income)}>
-                    {trashIcon}
-                  </Button>
-                  <Link to={`/transaction/${income.id}`}>
-                    <Button variant="ghost">{eyeIcon}</Button>
-                  </Link>
-                </div>
-              </Motion.li>
-            ))}
+                </Link>
+              </div>
+            </Motion.li>
+          ))}
         </ul>
-     </Motion.div>
+      </Motion.div>
       <Pagination
         onPrev={onPrev}
         onNext={onNext}

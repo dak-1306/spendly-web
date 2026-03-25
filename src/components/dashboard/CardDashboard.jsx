@@ -50,7 +50,10 @@ function CardDashboard({ type, title, amount = 0, currency = "VND" }) {
   }
 
   return (
-    <Card className={`flex items-center space-x-4 p-4  border ${borderColor}`}>
+    <Card
+      animation={true}
+      className={`flex items-center space-x-4 p-4  border ${borderColor}`}
+    >
       {iconColor[type] || <DollarSign className="text-gray-600" />}
 
       <p className={`text-lg font-semibold ${textColor[type]}`}>

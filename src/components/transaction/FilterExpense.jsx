@@ -29,10 +29,12 @@ export default function FilterExpense({
         onChange={(e) => setSelectedCategory(e.target.value)}
         className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-md px-3 py-2"
       >
-        <option value="">{t("transactions.filters.categoryExpenses.label")}</option>
+        <option value="">
+          {t("transactions.filters.categoryExpenses.label")}
+        </option>
         {expenseCategories.map((c) => (
-          <option key={c} value={c}>
-            {c}
+          <option key={c.value} value={c.value}>
+            {c.label}
           </option>
         ))}
       </select>

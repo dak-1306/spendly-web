@@ -11,6 +11,7 @@ import { useAuth } from "../hooks/useAuth.js";
 import { useLanguage } from "../hooks/useLanguage";
 import ReactMarkdown from "react-markdown";
 import { useFirebaseAI } from "../hooks/useFirebaseAI.js";
+import Accordion from "../components/common/Accordion.jsx";
 
 import FinancePreviewAnimation from "../components/canvas/FinancePreviewAnimation.jsx";
 import AILoadingAnimation from "../components/canvas/AILoadingAnimation.jsx";
@@ -73,14 +74,38 @@ export default function AI() {
     }
   };
 
-  // Hàm parse được cải tiến: linh hoạt hơn với format của AI
+  // Parse AI result into top-level numbered sections.
+  // Prefer headings that include markdown header markers (e.g., "#### 1. ...")
+  // so nested numbered lists inside a section are not split out. If no
+  // hash-headings are present, fall back to splitting at blank-line + number.
   function parseAIResult(text) {
     if (!text) return [];
     const normalized = text.replace(/\r\n/g, "\n").trim();
 
-    // Split trước vị trí của "1. " / "2. " ... cho cả trường hợp có hoặc không có newline trước
+    // Regex to detect markdown headings like "# 1. Title" or "#### 3. Title"
+    const hashHeadingRegex = /^#{1,6}\s*\d+\.\s.*$/gm;
+    if (hashHeadingRegex.test(normalized)) {
+      // Collect heading line match indices
+      const matches = [...normalized.matchAll(/^#{1,6}\s*\d+\.\s.*$/gm)];
+      const sections = [];
+      for (let i = 0; i < matches.length; i++) {
+        const match = matches[i];
+        const start = match.index;
+        const end =
+          i + 1 < matches.length ? matches[i + 1].index : normalized.length;
+        const block = normalized.slice(start, end).trim();
+        const lines = block.split("\n");
+        const headingLine = lines[0].replace(/^#{1,6}\s*/, "").trim();
+        const heading = headingLine;
+        const body = lines.slice(1).join("\n").trim();
+        sections.push({ heading, body });
+      }
+      return sections;
+    }
+
+    // Fallback: split at start or blank line followed by a numbered heading.
     const parts = normalized
-      .split(/(?=\n?\d+\.\s)/g)
+      .split(/(?=(?:^|\n\n)\d+\.\s)/g)
       .map((p) => p.trim())
       .filter(Boolean);
 
@@ -93,6 +118,7 @@ export default function AI() {
     });
   }
 
+  console.log("finalResult =", finalResult);
   return (
     <MainLayout auth navbarBottom title={t("ai.pageTitle")}>
       <div className="space-y-6 mx-10">
@@ -140,27 +166,18 @@ export default function AI() {
         )}
         {finalResult && (
           <Motion.div
-            variant={container}
+            variants={container}
             initial="hidden"
             animate="show"
-            className="mt-8 space-y-6"
+            className="mt-8"
           >
-            {parseAIResult(finalResult).map((sec, idx) => (
-              <Motion.div
-                variants={item}
-                initial="hidden"
-                animate="show"
-                key={idx}
-                className="border-l-4 border-blue-500 shadow-sm pl-4 py-1"
-              >
-                <h3 className="font-bold text-xl text-gray-800 dark:text-gray-300 mb-2">
-                  {sec.heading}
-                </h3>
-                <div className="prose prose-slate max-w-none">
-                  <ReactMarkdown>{sec.body}</ReactMarkdown>
-                </div>
-              </Motion.div>
-            ))}
+            <Accordion
+              items={parseAIResult(finalResult).map((sec, idx) => ({
+                id: idx,
+                title: sec.heading,
+                content: sec.body,
+              }))}
+            />
           </Motion.div>
         )}
         {!finalResult && !loading && <FinancePreviewAnimation />}

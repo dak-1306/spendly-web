@@ -115,20 +115,6 @@ export default function Dashboard() {
         <SkeletonDashboard />
       </MainLayout>
     );
-  } else if (error) {
-    return (
-      <MainLayout
-        navbarBottom={true}
-        auth={true}
-        title={t("dashboard.pageTitle") || "Bảng điều khiển"}
-      >
-        <div className="flex items-center justify-center h-64">
-          <Card className="text-center text-red-500">
-            {t("dashboard.error", "Lỗi: ") + error}
-          </Card>
-        </div>
-      </MainLayout>
-    );
   }
 
   return (
@@ -137,115 +123,125 @@ export default function Dashboard() {
       auth={true}
       title={t("dashboard.pageTitle") || "Bảng điều khiển"}
     >
-      {/* Header: chọn tháng */}
-      <Card className="mb-4 flex items-center gap-3 mx-auto">
-        <ChangeDate month={month} setMonth={setMonth} />
-        {/* aria-live để thông báo thay đổi tháng cho assistive tech */}
-        <div
-          className="ml-auto font-semibold text-lg text-blue-500 dark:text-blue-400"
-          aria-live="polite"
-        >
-          {month}
+      {!loading && error && (
+        <div className="flex items-center justify-center h-64">
+          <Card className="text-center text-red-500">
+            {t("dashboard.error", "Lỗi: ") + error}
+          </Card>
         </div>
-      </Card>
-
+      )}
       {/* Cards tóm tắt (income/expense/balance/compare) */}
       {!loading &&
-      currentData.expenses.length === 0 &&
-      currentData.incomes.length === 0 ? (
-        <div className="flex items-center justify-center h-64">
-          <Card className="text-center">Không có dữ liệu</Card>
-        </div>
-      ) : (
-        <>
-          <Motion.div
-            key={month}
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-4 gap-4 mx-auto mb-6"
-          >
-            <Motion.div variants={item}>
-              <CardDashboard
-                type="income"
-                title={t("dashboard.cardTitles.income")}
-                amount={totalIncome({ data: currentData.incomes })}
-                currency="VND"
-              />
+        currentData.expenses.length > 0 &&
+        currentData.incomes.length > 0 && (
+          <>
+            {/* Header: chọn tháng */}
+            <Motion.div
+              variants={container}
+              initial="hidden"
+              animate="show"
+              className="mb-4 flex items-center gap-3 mx-auto"
+            >
+              <Motion.div variants={item}>
+                <ChangeDate month={month} setMonth={setMonth} />
+              </Motion.div>
+              {/* aria-live để thông báo thay đổi tháng cho assistive tech */}
+              <Motion.div
+                variants={item}
+                className="ml-auto font-semibold text-lg text-blue-500 dark:text-blue-400"
+                aria-live="polite"
+              >
+                {month}
+              </Motion.div>
             </Motion.div>
-            <Motion.div variants={item}>
-              <CardDashboard
-                type="expense"
-                title={t("dashboard.cardTitles.expenses")}
-                amount={totalExpense({ data: currentData.expenses })}
-                currency="VND"
-              />
+            <Motion.div
+              key={month}
+              variants={container}
+              initial="hidden"
+              animate="show"
+              className="grid grid-cols-4 gap-4 mx-auto mb-6"
+            >
+              <Motion.div variants={item}>
+                <CardDashboard
+                  type="income"
+                  title={t("dashboard.cardTitles.income")}
+                  amount={totalIncome({ data: currentData.incomes })}
+                  currency="VND"
+                />
+              </Motion.div>
+              <Motion.div variants={item}>
+                <CardDashboard
+                  type="expense"
+                  title={t("dashboard.cardTitles.expenses")}
+                  amount={totalExpense({ data: currentData.expenses })}
+                  currency="VND"
+                />
+              </Motion.div>
+              <Motion.div variants={item}>
+                <CardDashboard
+                  type="balance"
+                  title={t("dashboard.cardTitles.balance")}
+                  amount={balance({
+                    dataIncome: currentData.incomes,
+                    dataExpense: currentData.expenses,
+                  })}
+                  currency="VND"
+                />
+              </Motion.div>
+              <Motion.div variants={item}>
+                <CardDashboard
+                  type="compare"
+                  title={t("dashboard.cardTitles.compare")}
+                  amount={formatPercent(percentChange)}
+                  currency="%"
+                />
+              </Motion.div>
             </Motion.div>
-            <Motion.div variants={item}>
-              <CardDashboard
-                type="balance"
-                title={t("dashboard.cardTitles.balance")}
-                amount={balance({
-                  dataIncome: currentData.incomes,
-                  dataExpense: currentData.expenses,
-                })}
-                currency="VND"
-              />
-            </Motion.div>
-            <Motion.div variants={item}>
-              <CardDashboard
-                type="compare"
-                title={t("dashboard.cardTitles.compare")}
-                amount={formatPercent(percentChange)}
-                currency="%"
-              />
-            </Motion.div>
-          </Motion.div>
 
-          {/* Charts: pie + info card */}
-          <Motion.div
-            key={month + "-charts"}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="mt-8 grid grid-cols-3 gap-4 mx-auto"
-          >
-            <Card className="col-span-2">
-              <SpendingPieChart
-                month={month}
-                title={t("dashboard.chartTitles.expensesByCategory")}
-                expenses={normalizedMonthExpenses}
-              />
-            </Card>
+            {/* Charts: pie + info card */}
+            <Motion.div
+              key={month + "-charts"}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="mt-8 grid grid-cols-3 gap-4 mx-auto"
+            >
+              <Card className="col-span-2">
+                <SpendingPieChart
+                  month={month}
+                  title={t("dashboard.chartTitles.expensesByCategory")}
+                  expenses={normalizedMonthExpenses}
+                />
+              </Card>
 
-            <Card className="col-span-1">
-              <SpendingCard
-                title={t("dashboard.chartTitles.spendingCardTitle")}
-                current={totalExpense({ data: currentData.expenses })}
-                limit={totalIncome({ data: currentData.incomes })}
-              />
-            </Card>
-          </Motion.div>
+              <Card className="col-span-1">
+                <SpendingCard
+                  title={t("dashboard.chartTitles.spendingCardTitle")}
+                  current={totalExpense({ data: currentData.expenses })}
+                  limit={totalIncome({ data: currentData.incomes })}
+                />
+              </Card>
+            </Motion.div>
 
-          {/* Bar chart hiển thị theo thời gian */}
-          <Motion.div
-            key={month + "-bar"}
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <Card className="mx-auto mt-6 mb-8">
-              <SpendingBarChart
-                month={month}
-                title={t("dashboard.chartTitles.expensesOverTime")}
-                expenses={normalizedMonthExpenses}
-              />
-            </Card>
-          </Motion.div>
-        </>
-      )}
+            {/* Bar chart hiển thị theo thời gian */}
+            <Motion.div
+              key={month + "-bar"}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <Card className="mx-auto mt-6 mb-8">
+                <SpendingBarChart
+                  month={month}
+                  title={t("dashboard.chartTitles.expensesOverTime")}
+                  expenses={normalizedMonthExpenses}
+                />
+              </Card>
+            </Motion.div>
+          </>
+        )}
     </MainLayout>
   );
 }
