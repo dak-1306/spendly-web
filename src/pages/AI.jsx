@@ -11,7 +11,9 @@ import { useAuth } from "../hooks/useAuth.js";
 import { useLanguage } from "../hooks/useLanguage";
 import ReactMarkdown from "react-markdown";
 import { useFirebaseAI } from "../hooks/useFirebaseAI.js";
-import Accordion from "../components/common/Accordion.jsx";
+import AICardGrid from "../components/ai/AICardGrid.jsx";
+import AICardDetail from "../components/ai/AICardDetail.jsx";
+import AILoader from "../components/ai/AILoader.jsx";
 
 import FinancePreviewAnimation from "../components/canvas/FinancePreviewAnimation.jsx";
 import AILoadingAnimation from "../components/canvas/AILoadingAnimation.jsx";
@@ -34,6 +36,7 @@ export default function AI() {
 
   // State duy nhất quản lý nội dung hiển thị (từ cache hoặc từ AI mới)
   const [finalResult, setFinalResult] = useState("");
+  const [openCard, setOpenCard] = useState(null);
 
   const { run, loading, error } = useFinancialReport();
   const robotIcon = ICONS.icon_robot_color;
@@ -154,6 +157,63 @@ export default function AI() {
     return [{ heading: "Báo cáo", body: normalized }];
   }
 
+  // Map parsed sections into 4-card layout (overview, hotspots, advice, message)
+  function buildCardsFromResult(text) {
+    const parsed = parseAIResult(text);
+    const map = { overview: null, hotspots: null, advice: null, message: null };
+
+    parsed.forEach((p) => {
+      const key = p.heading.toLowerCase();
+      if (key.includes("tổng quan") || key.includes("tổng quan"))
+        map.overview = p;
+      else if (key.includes("điểm nóng") || key.includes("điểm"))
+        map.hotspots = p;
+      else if (key.includes("lời khuyên") || key.includes("lời"))
+        map.advice = p;
+      else if (key.includes("thông điệp") || key.includes("thông"))
+        map.message = p;
+    });
+
+    // Fallback: distribute if some are missing
+    const defaults =
+      Object.values(map).filter(Boolean).length === 0
+        ? [{ heading: "Báo cáo", body: text }]
+        : parsed;
+
+    const cards = [
+      {
+        id: "overview",
+        title: "Tổng quan",
+        color: "bg-gradient-to-tr from-blue-500 to-indigo-500",
+        summary: (map.overview || defaults[0]).heading,
+        content: (map.overview || defaults[0]).body,
+      },
+      {
+        id: "hotspots",
+        title: "Điểm nóng",
+        color: "bg-gradient-to-tr from-red-500 to-orange-500",
+        summary: (map.hotspots || defaults[1] || defaults[0]).heading,
+        content: (map.hotspots || defaults[1] || defaults[0]).body,
+      },
+      {
+        id: "advice",
+        title: "Lời khuyên",
+        color: "bg-gradient-to-tr from-yellow-500 to-amber-500",
+        summary: (map.advice || defaults[2] || defaults[0]).heading,
+        content: (map.advice || defaults[2] || defaults[0]).body,
+      },
+      {
+        id: "message",
+        title: "Thông điệp",
+        color: "bg-gradient-to-tr from-green-500 to-emerald-500",
+        summary: (map.message || defaults[3] || defaults[0]).heading,
+        content: (map.message || defaults[3] || defaults[0]).body,
+      },
+    ];
+
+    return cards;
+  }
+
   // Automatic monthly AI analysis on page open (or when transactions load)
   useEffect(() => {
     let mounted = true;
@@ -230,7 +290,7 @@ export default function AI() {
 
         {loading && (
           <div className="mt-8">
-            <AILoadingAnimation />
+            <AILoader />
           </div>
         )}
         {finalResult && (
@@ -240,28 +300,29 @@ export default function AI() {
             animate="show"
             className="mt-8"
           >
-            {(() => {
-              const sections = parseAIResult(finalResult);
-              console.log("Parsed sections:", sections);
-              if (sections && sections.length > 0) {
-                return (
-                  <Accordion
-                    items={sections.map((sec, idx) => ({
-                      id: idx,
-                      title: sec.heading,
-                      content: sec.body,
-                    }))}
-                  />
-                );
+            <AICardGrid
+              items={buildCardsFromResult(finalResult)}
+              onOpen={(id) => setOpenCard(id)}
+            />
+            <AICardDetail
+              open={Boolean(openCard)}
+              onClose={() => setOpenCard(null)}
+              title={openCard}
+              color={
+                (
+                  buildCardsFromResult(finalResult).find(
+                    (c) => c.id === openCard,
+                  ) || {}
+                ).color || "bg-white"
               }
-
-              // Fallback: render raw markdown when parsing yields no structured sections
-              // return (
-              //   <div className="prose max-w-full dark:prose-invert">
-              //     <ReactMarkdown>{finalResult}</ReactMarkdown>
-              //   </div>
-              // );
-            })()}
+              content={
+                (
+                  buildCardsFromResult(finalResult).find(
+                    (c) => c.id === openCard,
+                  ) || {}
+                ).content || finalResult
+              }
+            />
           </Motion.div>
         )}
         {!finalResult && !loading && <FinancePreviewAnimation />}
@@ -281,6 +342,7 @@ export default function AI() {
         onClose={() => setChatOpen(false)}
         option={quickOptions}
       />
+      
     </MainLayout>
   );
 }

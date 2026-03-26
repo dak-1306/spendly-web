@@ -17,7 +17,7 @@ import { useState, useEffect } from "react";
 export default function TransactionDetail() {
   const { transactionId } = useParams();
   const navigate = useNavigate();
-  const { getTransactionById } = useTransaction();
+  const { getTransactionById, loading } = useTransaction();
   const [transaction, setTransaction] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -37,12 +37,18 @@ export default function TransactionDetail() {
 
   const { t } = useLanguage();
 
-  if (!transaction) {
+  if (loading || !transaction) {
     return (
-      <MainLayout>
-        <Card>
-          <p>{t("common.loading", "Loading...")}</p>
-        </Card>
+      <MainLayout
+        title={t("common.transactionDetailTitle", "Transaction Detail")}
+        auth={true}
+        navbarBottom={true}
+      >
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-500 dark:text-gray-400">
+            {t("common.loading", "Loading...")}
+          </p>
+        </div>
       </MainLayout>
     );
   }

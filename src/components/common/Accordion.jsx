@@ -21,7 +21,7 @@ export default function Accordion({ items = [] }) {
             layout
           >
             <Motion.button
-            variants={item}
+              variants={item}
               initial="hidden"
               animate="show"
               type="button"
