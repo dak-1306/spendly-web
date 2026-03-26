@@ -6,3 +6,4 @@ setGlobalOptions({
 });
 
 export { getFinancialReport } from "./financial";
+export { chat } from "./chat";

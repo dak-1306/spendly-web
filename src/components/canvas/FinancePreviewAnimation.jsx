@@ -19,36 +19,50 @@ export default function FinanceRobotAnimation() {
     let animationId;
     let time = 0;
 
-    const drawRobot = (eyesOpen) => {
+    const drawGrid = () => {
+      ctx.strokeStyle = "rgba(99,102,241,0.15)";
+      ctx.lineWidth = 1;
+
+      for (let x = 0; x < canvas.width; x += 30) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y < canvas.height; y += 30) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+    };
+
+    const drawRobot = () => {
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
 
-      /* =====================
-         GLOW AROUND ROBOT
-      ===================== */
-      if (eyesOpen) {
-        const glow = ctx.createRadialGradient(cx, cy, 10, cx, cy, 120);
+      const offsetY = Math.sin(time) * 4;
+      ctx.save();
+      ctx.translate(0, offsetY);
 
-        glow.addColorStop(0, "rgba(20, 231, 255, 0.25)");
-        glow.addColorStop(1, "rgba(57,255,20,0)");
+      /* SHADOW */
+      ctx.fillStyle = "rgba(0,0,0,0.2)";
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 55, 40, 10, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(cx, cy, 120, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      ctx.strokeStyle = "#14fffb";
-      ctx.fillStyle = "rgba(20, 255, 235, 0.05)";
+      /* HEAD */
+      ctx.strokeStyle = "#4f46e5";
+      ctx.fillStyle = "rgba(37,99,235,0.08)";
       ctx.lineWidth = 2;
 
-      // head
       ctx.beginPath();
-      ctx.roundRect(cx - 55, cy - 45, 110, 90, 10);
+      ctx.roundRect(cx - 55, cy - 45, 110, 90, 12);
       ctx.fill();
       ctx.stroke();
 
-      // antenna
+      /* ANTENNA */
       ctx.beginPath();
       ctx.moveTo(cx, cy - 45);
       ctx.lineTo(cx, cy - 65);
@@ -56,34 +70,22 @@ export default function FinanceRobotAnimation() {
 
       ctx.beginPath();
       ctx.arc(cx, cy - 70, 4, 0, Math.PI * 2);
-      ctx.fillStyle = "#14fffb";
+      ctx.fillStyle = "#2563eb";
       ctx.fill();
 
-      // side panels
-      ctx.strokeRect(cx - 65, cy - 20, 10, 30);
-      ctx.strokeRect(cx + 55, cy - 20, 10, 30);
+      /* EYES */
+      ctx.fillStyle = "#1e3a8a";
+      ctx.fillRect(cx - 30, cy - 10, 18, 10);
+      ctx.fillRect(cx + 12, cy - 10, 18, 10);
 
-      /* =====================
-         EYES
-      ===================== */
-      if (eyesOpen) {
-        ctx.shadowColor = "#14fbff";
-        ctx.shadowBlur = 25;
+      /* SCAN LINE IN EYES */
+      const scan = (Math.sin(time * 2) * 4) + 4;
 
-        ctx.fillStyle = "#14fbff";
-        ctx.fillRect(cx - 30, cy - 10, 18, 10);
-        ctx.fillRect(cx + 12, cy - 10, 18, 10);
+      ctx.fillStyle = "#60a5fa";
+      ctx.fillRect(cx - 30, cy - 10 + scan, 18, 2);
+      ctx.fillRect(cx + 12, cy - 10 + scan, 18, 2);
 
-        ctx.shadowBlur = 0;
-      } else {
-        ctx.fillStyle = "#145350";
-        ctx.fillRect(cx - 30, cy - 5, 18, 2);
-        ctx.fillRect(cx + 12, cy - 5, 18, 2);
-      }
-
-      /* =====================
-         MOUTH
-      ===================== */
+      /* MOUTH */
       ctx.strokeRect(cx - 20, cy + 10, 40, 10);
 
       for (let i = 0; i < 4; i++) {
@@ -92,18 +94,17 @@ export default function FinanceRobotAnimation() {
         ctx.lineTo(cx - 15 + i * 10, cy + 20);
         ctx.stroke();
       }
+
+      ctx.restore();
     };
 
     const animate = () => {
-      // clear canvas (KHÔNG vẽ background → trong suốt)
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const eyesOpen = Math.sin(time) > 0;
-
-      drawRobot(eyesOpen);
+      drawGrid();
+      drawRobot();
 
       time += 0.05;
-
       animationId = requestAnimationFrame(animate);
     };
 
@@ -116,8 +117,22 @@ export default function FinanceRobotAnimation() {
   }, []);
 
   return (
-    <div className="w-80 h-64 mx-auto">
+    <div
+      className="w-80 h-64 mx-auto rounded-2xl 
+      bg-gradient-to-br from-blue-600/10 to-indigo-600/10
+      backdrop-blur-xl 
+      border border-indigo-400/30 
+      shadow-lg relative overflow-hidden"
+    >
+      <div className="absolute top-3 left-4 text-xs text-blue-300">
+        Finance AI Assistant
+      </div>
+
       <canvas ref={canvasRef} className="w-full h-full" />
+
+      <div className="absolute bottom-3 right-4 text-xs text-indigo-300">
+        AI Ready
+      </div>
     </div>
   );
 }

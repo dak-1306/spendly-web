@@ -4,25 +4,34 @@ import LineColor from "../common/LineColor.jsx";
 import Input from "../common/Input.jsx";
 import { X } from "lucide-react";
 import { useState } from "react";
+import { useChat } from "../../hooks/useChat";
+
 function Chat({ open, onClose, option }) {
   const ROBOT_ICON = ICONS.icon_robot_color;
   const SUBMIT_ICON = ICONS.icon_submit;
   const CLOSE_ICON = <X className="w-5 h-5 text-white" />;
   const [inputValue, setInputValue] = useState("");
-  const [answerList, setAnswerList] = useState([]);
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-  };
-  const handleSubmit = () => {
+  const { messages, sendMessage, loading, error } = useChat();
+
+  const handleInputChange = (e) => setInputValue(e.target.value);
+
+  const handleSubmit = async () => {
     if (inputValue.trim() === "") return;
-    // Xử lý gửi câu hỏi đến AI ở đây
-    console.log("Câu hỏi đã gửi:", inputValue);
-    // Thêm câu hỏi và câu trả lời giả lập vào danh sách
-    setAnswerList([
-      ...answerList,
-      { question: inputValue, answer: "Đây là câu trả lời giả lập từ AI." },
-    ]);
-    setInputValue("");
+    try {
+      await sendMessage(inputValue);
+      setInputValue("");
+    } catch (err) {
+      console.error("Chat send error:", err);
+      alert("Không thể gửi tin nhắn. Vui lòng thử lại.");
+    }
+  };
+
+  const handleOptionClick = async (text) => {
+    try {
+      await sendMessage(text);
+    } catch (err) {
+      console.error("Option send error:", err);
+    }
   };
   if (!open) return null;
   return (
@@ -52,7 +61,8 @@ function Chat({ open, onClose, option }) {
             {option.map((item, index) => (
               <li
                 key={index}
-                className="text-sm p-2 mb-2 border border-blue-500 rounded-md"
+                onClick={() => handleOptionClick(item)}
+                className="text-sm p-2 mb-2 border border-blue-500 rounded-md cursor-pointer hover:bg-blue-50"
               >
                 {item}
               </li>
@@ -60,18 +70,29 @@ function Chat({ open, onClose, option }) {
           </ol>
           <LineColor />
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {answerList.map((item, index) => (
+            {messages.map((m, index) => (
               <div className="w-full space-y-2" key={index}>
-                <p className="font-semibold flex justify-end p-1">
-                  <span className="p-2 border border-blue-500 rounded-md">
-                    Bạn: {item.question}
-                  </span>
-                </p>
-                <p className="font-semibold flex justify-start p-2 border border-blue-500 rounded-md">
-                  AI: {item.answer}
-                </p>
+                {m.role === "user" ? (
+                  <p className="font-semibold flex justify-end p-1">
+                    <span className="p-2 border border-blue-500 rounded-md">
+                      Bạn: {m.text}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="font-semibold flex justify-start p-2 border border-blue-500 rounded-md">
+                    AI: {m.text}
+                  </p>
+                )}
               </div>
             ))}
+
+            {loading && (
+              <div className="w-full space-y-2">
+                <p className="font-semibold flex justify-start p-2 border border-blue-500 rounded-md">
+                  AI đang trả lời...
+                </p>
+              </div>
+            )}
           </div>
         </div>
         <LineColor />
@@ -86,6 +107,7 @@ function Chat({ open, onClose, option }) {
                 handleSubmit();
               }
             }}
+            disabled={loading}
           />
           <Button variant="primary" size="sm" onClick={handleSubmit}>
             <img
