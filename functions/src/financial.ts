@@ -25,7 +25,11 @@ const financeAnalysisFlow = ai.defineFlow(
       totalIncome: z.number(),
       totalExpense: z.number(),
       categoryBreakdown: z.string(),
-      monthlyBudget: z.number(),
+      monthlyBudget: z.number().optional(),
+      // Optional metadata fields passed from client (ignored by AI generation)
+      analysisType: z.string().optional(),
+      month: z.string().optional(),
+      year: z.number().optional(),
     }),
     outputSchema: z.string(),
   },
@@ -36,16 +40,18 @@ const financeAnalysisFlow = ai.defineFlow(
     }
 
     try {
+      const budgetLabel =
+        input.monthlyBudget === undefined || input.monthlyBudget === null
+          ? "(Không cung cấp ngân sách)"
+          : input.monthlyBudget.toLocaleString("vi-VN");
+
       const prompt = FINANCIAL_REPORT_PROMPT.replace(
         "{{totalIncome}}",
         input.totalIncome.toLocaleString("vi-VN"),
       )
         .replace("{{totalExpense}}", input.totalExpense.toLocaleString("vi-VN"))
         .replace("{{categoryBreakdown}}", input.categoryBreakdown)
-        .replace(
-          "{{monthlyBudget}}",
-          input.monthlyBudget.toLocaleString("vi-VN"),
-        );
+        .replace("{{monthlyBudget}}", budgetLabel);
 
       const { text } = await ai.generate({
         model: MODEL_2026,

@@ -55,12 +55,21 @@ export default function AI() {
     setFinalResult("");
 
     try {
-      const payload = buildFinancialPayload({
+      const base = buildFinancialPayload({
         monthlyBudget,
         monthFilter: month,
         transactions: transactionCurrent,
       });
-      const res = await fetchOrCompute(payload, run);
+
+      const [yearStr, _MONTH_STR] = (month || "").split("-");
+      const metaPayload = {
+        ...base,
+        analysisType: "BUDGET_ANALYSIS",
+        month,
+        year: yearStr ? Number(yearStr) : null,
+      };
+
+      const res = await fetchOrCompute(metaPayload, run);
       setFinalResult(res);
     } catch (err) {
       console.error("Lỗi khi phân tích tài chính:", err);
@@ -103,20 +112,80 @@ export default function AI() {
       return sections;
     }
 
-    // Fallback: split at start or blank line followed by a numbered heading.
-    const parts = normalized
-      .split(/(?=(?:^|\n\n)\d+\.\s)/g)
-      .map((p) => p.trim())
-      .filter(Boolean);
+    // Detect numbered headings that may be wrapped in bold/italic markers
+    // e.g. "**1. Tổng quan:**" or "1. Tổng quan:"
+    const lines = normalized.split("\n");
+    const headingLineIndices = [];
+    for (let i = 0; i < lines.length; i++) {
+      const raw = lines[i].trim();
+      if (!raw) continue;
+      // Strip wrapping bold/italic markers from both ends
+      const stripped = raw
+        .replace(/^([*_\s])+/, "")
+        .replace(/([*_\s])+$/, "")
+        .trim();
+      if (/^\d+\.\s+/.test(stripped)) {
+        headingLineIndices.push(i);
+      }
+    }
 
-    const sections = parts.filter((p) => /^\d+\.\s/.test(p));
-    return sections.map((s) => {
-      const lines = s.split("\n");
-      const heading = lines[0].trim();
-      const body = lines.slice(1).join("\n").trim();
-      return { heading, body };
-    });
+    if (headingLineIndices.length > 0) {
+      const sections = [];
+      for (let idx = 0; idx < headingLineIndices.length; idx++) {
+        const start = headingLineIndices[idx];
+        const end =
+          idx + 1 < headingLineIndices.length
+            ? headingLineIndices[idx + 1]
+            : lines.length;
+        const blockLines = lines.slice(start, end);
+        const headingRaw = blockLines[0].trim();
+        const heading = headingRaw
+          .replace(/^([*_\s])+/, "")
+          .replace(/([*_\s])+$/, "")
+          .replace(/^#{1,6}\s*/, "")
+          .trim();
+        const body = blockLines.slice(1).join("\n").trim();
+        sections.push({ heading, body });
+      }
+      return sections;
+    }
+
+    // Last-resort fallback: return the whole text as a single section (no heading)
+    return [{ heading: "Báo cáo", body: normalized }];
   }
+
+  // Automatic monthly AI analysis on page open (or when transactions load)
+  useEffect(() => {
+    let mounted = true;
+    async function autoAnalyze() {
+      try {
+        if (!transactionCurrent || !transactionCurrent.length) return;
+        // If already have a result (from cache or manual), skip
+        if (finalResult) return;
+
+        const base = buildFinancialPayload({
+          transactions: transactionCurrent,
+        });
+        const [yearStr, _MONTH_STR] = (month || "").split("-");
+        const metaPayload = {
+          ...base,
+          analysisType: "AUTO_MONTHLY_ANALYSIS",
+          month,
+          year: yearStr ? Number(yearStr) : null,
+        };
+
+        const res = await fetchOrCompute(metaPayload, run);
+        if (mounted) setFinalResult(res);
+      } catch (err) {
+        console.error("Auto analysis failed:", err);
+      }
+    }
+
+    autoAnalyze();
+    return () => {
+      mounted = false;
+    };
+  }, [transactionCurrent, month, fetchOrCompute, run, finalResult]);
 
   console.log("finalResult =", finalResult);
   return (
@@ -171,13 +240,28 @@ export default function AI() {
             animate="show"
             className="mt-8"
           >
-            <Accordion
-              items={parseAIResult(finalResult).map((sec, idx) => ({
-                id: idx,
-                title: sec.heading,
-                content: sec.body,
-              }))}
-            />
+            {(() => {
+              const sections = parseAIResult(finalResult);
+              console.log("Parsed sections:", sections);
+              if (sections && sections.length > 0) {
+                return (
+                  <Accordion
+                    items={sections.map((sec, idx) => ({
+                      id: idx,
+                      title: sec.heading,
+                      content: sec.body,
+                    }))}
+                  />
+                );
+              }
+
+              // Fallback: render raw markdown when parsing yields no structured sections
+              // return (
+              //   <div className="prose max-w-full dark:prose-invert">
+              //     <ReactMarkdown>{finalResult}</ReactMarkdown>
+              //   </div>
+              // );
+            })()}
           </Motion.div>
         )}
         {!finalResult && !loading && <FinancePreviewAnimation />}

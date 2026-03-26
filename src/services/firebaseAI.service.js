@@ -61,12 +61,23 @@ export async function saveAnalysis(key, userId, snapshot, result) {
   try {
     const ref = doc(db, "aiAnalysis", key);
 
+    // Derive metadata for easier querying
+    const analysisType = snapshot.analysisType || "BUDGET_ANALYSIS";
+    const month = snapshot.month || null;
+    const year = snapshot.year || null;
+    const analysisText =
+      typeof result === "string" ? result : JSON.stringify(result);
+
     await setDoc(
       ref,
       {
         key,
         userId,
+        type: analysisType,
+        month,
+        year,
         payloadSnapshot: snapshot,
+        analysisText,
         result,
         updatedAt: serverTimestamp(),
         createdAt: serverTimestamp(),
@@ -77,73 +88,3 @@ export async function saveAnalysis(key, userId, snapshot, result) {
     console.error("Lỗi khi lưu cache:", error);
   }
 }
-// export async function saveAnalysis(key, userId, snapshot, result) {
-//   console.log(
-//     "Lưu cache với key:",
-//     key,
-//     "và userId:",
-//     userId,
-//     "payloadSnapshot:",
-//     snapshot,
-//     "result:",
-//     result,
-//   );
-//   const ref = doc(db, "aiAnalysis", key);
-//   const snap = await getDoc(ref);
-//   console.log("ref:", ref);
-//   console.log("snap:", snap);
-
-//   try {
-//     const ref = doc(db, "aiAnalysis", key);
-
-//     const snap = await getDoc(ref);
-//     if (snap.exists()) {
-//       console.log(
-//         "cập nhật document với key:",
-//         key,
-//         "userId:",
-//         userId,
-//         "payloadSnapshot:",
-//         snapshot,
-//         "result:",
-//         result,
-//       );
-//       // Cập nhật fields cần thay đổi, giữ nguyên `createdAt`
-//       await setDoc(
-//         ref,
-//         {
-//           result,
-//           payloadSnapshot: snapshot,
-//           updatedAt: serverTimestamp(),
-//         },
-//         { merge: true },
-//       );
-//     } else {
-//       console.log(
-//         "tạo mới document với key:",
-//         key,
-//         "userId:",
-//         userId,
-//         "payloadSnapshot:",
-//         snapshot,
-//         "result:",
-//         result,
-//       );
-//       // Tạo mới document với createdAt
-//       await setDoc(
-//         ref,
-//         {
-//           key,
-//           userId,
-//           payloadSnapshot: snapshot,
-//           result,
-//           createdAt: serverTimestamp(),
-//           updatedAt: serverTimestamp(),
-//         },
-//         { merge: true },
-//       );
-//     }
-//   } catch (error) {
-//     console.error("Lỗi khi lưu cache:", error);
-//   }
-// }
