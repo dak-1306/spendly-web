@@ -3,11 +3,12 @@ import ChangeDate from "../../components/common/ChangeDate.jsx";
 import IncomePage from "./IncomePage.jsx";
 import ExpensePage from "./ExpensePage.jsx";
 
-import { useTransaction } from "../../hooks/useTransaction.js";
+import { useTransactionStore } from "../../stores/transaction";
 import { useLanguage } from "../../hooks/useLanguage";
 
 export default function Transaction() {
-  const { month, setMonth } = useTransaction();
+  const month = useTransactionStore((s) => s.month);
+  const setMonth = useTransactionStore((s) => s.setMonth);
   const { t } = useLanguage();
 
   return (

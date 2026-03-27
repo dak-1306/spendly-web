@@ -1,5 +1,5 @@
 import DeleteConfirm from "../common/DeleteConfirm.jsx";
-import { useTransaction } from "../../hooks/useTransaction.js";
+import { useTransactionStore } from "../../stores/transaction";
 import { useCallback } from "react";
 import { useLanguage } from "../../hooks/useLanguage.js";
 
@@ -9,7 +9,8 @@ export default function DeleteTransaction({
   role = "expense", // "expense" | "income"
   item = null,
 }) {
-  const { deleteTransaction } = useTransaction();
+  const deleteTransaction = (...args) =>
+    useTransactionStore.getState().deleteTransaction(...args);
   const isIncome = role === "income";
   const title = item?.title ?? item?.source ?? item?.category ?? "Mục";
   const amount = item?.amount ?? 0;
@@ -17,13 +18,13 @@ export default function DeleteTransaction({
 
   const handleDeleteConfirm = useCallback(async () => {
     try {
-      await deleteTransaction(item.id);
+      await deleteTransaction(item.id, undefined, role);
       onClose();
     } catch (e) {
       alert("Xóa thất bại.");
       console.error(e);
     }
-  }, [deleteTransaction, item, onClose]);
+  }, [item, onClose, role]);
 
   return (
     <DeleteConfirm

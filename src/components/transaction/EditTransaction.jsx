@@ -1,6 +1,6 @@
 import TransactionForm from "./TransactionForm";
-import { useTransaction } from "../../hooks/useTransaction";
-import {useLanguage} from "../../hooks/useLanguage";
+import { useTransactionStore } from "../../stores/transaction";
+import { useLanguage } from "../../hooks/useLanguage";
 import { useState, useEffect } from "react";
 export default function EditTransaction({
   open = false,
@@ -18,7 +18,7 @@ export default function EditTransaction({
     date: "",
     month: "",
   });
-    const { t } = useLanguage();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (data) {
@@ -51,16 +51,13 @@ export default function EditTransaction({
       [field]: value,
     }));
   };
-  const { updateTransaction } = useTransaction();
+  const updateTransaction = (...args) =>
+    useTransactionStore.getState().updateTransaction(...args);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const formPayload = {
-        ...field,
-        type: role,
-      };
-
+      const formPayload = { ...field, type: role };
       await updateTransaction(data.id, formPayload);
       onClose();
     } catch (e) {
@@ -82,7 +79,9 @@ export default function EditTransaction({
   const fields = [
     {
       name: "title",
-      label: isIncome ? t("transactions.fields.sourceIncome") : t("transactions.fields.sourceExpense"),
+      label: isIncome
+        ? t("transactions.fields.sourceIncome")
+        : t("transactions.fields.sourceExpense"),
       type: "text",
       value: field.title,
       onChange: handleFieldChange("title"),
@@ -96,7 +95,10 @@ export default function EditTransaction({
     },
     {
       name: "source",
-      label: t("transactions.fields.source"),
+      label:
+        role === "income"
+          ? t("transactions.fields.sourceIncome")
+          : t("transactions.fields.sourceExpense"),
       type: "text",
       value: field.source,
       onChange: handleFieldChange("source"),

@@ -1,9 +1,15 @@
-import { createContext, useContext } from "react";
+import {
+  useTransactionStore,
+  useTransactionStoreSelector,
+} from "../stores/transaction";
 
-export const TransactionContext = createContext(null);
-export function useTransaction() {
-  const ctx = useContext(TransactionContext);
-  if (!ctx)
-    throw new Error("useTransaction must be used within a TransactionProvider");
-  return ctx;
+// Compatibility wrapper: keep previous `useTransaction` hook name but
+// delegate to the zustand store selector. Components can continue using
+// `useTransaction(selector)` or import `useTransactionStore` directly.
+export function useTransaction(selector = (s) => s, equalityFn) {
+  return useTransactionStore(selector, equalityFn);
 }
+
+export { useTransactionStore, useTransactionStoreSelector };
+
+export default useTransaction;

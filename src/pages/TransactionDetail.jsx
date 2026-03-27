@@ -3,7 +3,7 @@ import Button from "../components/common/Button";
 import Card from "../components/common/Card";
 import EditTransaction from "../components/transaction/EditTransaction.jsx";
 import DeleteTransaction from "../components/transaction/DeleteTransaction.jsx";
-import { useTransaction } from "../hooks/useTransaction";
+import { useTransactionStore } from "../stores/transaction";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { Trash2, Edit2, ArrowBigLeft } from "lucide-react";
@@ -17,7 +17,7 @@ import { useState, useEffect } from "react";
 export default function TransactionDetail() {
   const { transactionId } = useParams();
   const navigate = useNavigate();
-  const { getTransactionById, loading } = useTransaction();
+  const loading = useTransactionStore((s) => s.loading);
   const [transaction, setTransaction] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -25,14 +25,16 @@ export default function TransactionDetail() {
   useEffect(() => {
     const fetchTransaction = async () => {
       try {
-        const data = await getTransactionById(transactionId);
+        const data = await useTransactionStore
+          .getState()
+          .getTransactionById(transactionId);
         setTransaction(data);
       } catch (e) {
         console.error("Failed to fetch transaction:", e);
       }
     };
-    fetchTransaction();
-  }, [transactionId, getTransactionById]);
+    if (transactionId) fetchTransaction();
+  }, [transactionId]);
   console.log("TransactionDetail: transaction =", transaction);
 
   const { t } = useLanguage();

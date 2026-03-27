@@ -5,7 +5,7 @@ import Button from "../components/common/Button.jsx";
 import Chat from "../components/ai/Chat.jsx";
 import { ICONS } from "../assets/index.js";
 import { useFinancialReport } from "../hooks/useFinancialReport";
-import { useTransaction } from "../hooks/useTransaction";
+import { useTransactionStore } from "../stores/transaction";
 import { buildFinancialPayload } from "../utils/ai.transform.js";
 import { useAuth } from "../hooks/useAuth.js";
 import { useLanguage } from "../hooks/useLanguage";
@@ -21,8 +21,9 @@ import { motion as Motion } from "framer-motion";
 import { container, item } from "../motion.config";
 
 export default function AI() {
-  const { transactionCurrent, month, setMonth, fetchTransactionCurrent } =
-    useTransaction();
+  const transactionCurrent = useTransactionStore((s) => s.transactionCurrent);
+  const month = useTransactionStore((s) => s.month);
+  const setMonth = useTransactionStore((s) => s.setMonth);
   const { fetchOrCompute } = useFirebaseAI();
   const [chatOpen, setChatOpen] = useState(false);
   const [monthlyBudget, setMonthlyBudget] = useState(0);
@@ -31,8 +32,12 @@ export default function AI() {
   const userId = user?.uid;
 
   useEffect(() => {
-    fetchTransactionCurrent(userId, month);
-  }, [fetchTransactionCurrent, userId, month]);
+    if (!userId) return;
+    useTransactionStore
+      .getState()
+      .fetchTransactionCurrent(userId, month)
+      .catch(() => {});
+  }, [userId, month]);
 
   // State duy nhất quản lý nội dung hiển thị (từ cache hoặc từ AI mới)
   const [finalResult, setFinalResult] = useState("");
@@ -342,7 +347,6 @@ export default function AI() {
         onClose={() => setChatOpen(false)}
         option={quickOptions}
       />
-      
     </MainLayout>
   );
 }

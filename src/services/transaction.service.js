@@ -22,17 +22,37 @@ const colRef = collection(db, "transactions");
 
 // Lấy dữ liệu cho dashboard
 const getDashboardData = async (userId, month) => {
+  // Return dashboard data for current month and previous month so callers
+  // can render comparisons without issuing multiple requests.
+  const toResults = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
   const start = new Date(month + "-01");
   const end = new Date(start.getFullYear(), start.getMonth() + 1, 1);
-  const q = query(
+  const qCurrent = query(
     colRef,
     where("userId", "==", userId),
     where("createdAt", ">=", start),
     where("createdAt", "<", end),
     orderBy("createdAt", "desc"),
   );
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const snapCurrent = await getDocs(qCurrent);
+
+  // previous month
+  const prevStart = new Date(start.getFullYear(), start.getMonth() - 1, 1);
+  const prevEnd = new Date(start.getFullYear(), start.getMonth(), 1);
+  const qPrev = query(
+    colRef,
+    where("userId", "==", userId),
+    where("createdAt", ">=", prevStart),
+    where("createdAt", "<", prevEnd),
+    orderBy("createdAt", "desc"),
+  );
+  const snapPrev = await getDocs(qPrev);
+
+  return {
+    current: toResults(snapCurrent),
+    prev: toResults(snapPrev),
+  };
 };
 
 // Lấy tất cả transaction của user, sort theo ngày tạo mới nhất
@@ -52,10 +72,10 @@ const getAllTransactions = async (
   q = query(q, limit(pageLimit));
   const snap = await getDocs(q);
   const results = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-  const nextCursor = snap.docs.length
-    ? snap.docs[snap.docs.length - 1].id
-    : null;
-  return { results, nextCursor };
+  // Return the last DocumentSnapshot as cursor for consistency with other
+  // filtering functions (avoids extra getDoc calls).
+  const lastDoc = snap.docs[snap.docs.length - 1] || null;
+  return { results, nextCursor: lastDoc };
 };
 
 const getTransactionById = async (id) => {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useTransaction } from "../../hooks/useTransaction.js";
+import { useTransactionStore } from "../../stores/transaction";
 import { useLanguage } from "../../hooks/useLanguage.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import Card from "../../components/common/Card.jsx";
@@ -18,7 +18,10 @@ import { motion as Motion } from "framer-motion";
 import { container, item } from "../../motion.config";
 
 export default function ExpensePage() {
-  const { expenses, month, GetExpense, loading, error } = useTransaction();
+  const expenses = useTransactionStore((s) => s.expenses);
+  const month = useTransactionStore((s) => s.month);
+  const loading = useTransactionStore((s) => s.loadingFlags.fetchExpenses);
+  const error = useTransactionStore((s) => s.error);
   const { user } = useAuth();
   const { t } = useLanguage();
 
@@ -58,7 +61,8 @@ export default function ExpensePage() {
     if (!userId) return;
 
     const load = async () => {
-      const { nextCursor } = await GetExpense(userId, filters, {
+      const { fetchExpenses } = useTransactionStore.getState();
+      const { nextCursor } = await fetchExpenses(userId, filters, {
         limit: itemsPerPage,
         cursor: null,
       });
@@ -68,7 +72,7 @@ export default function ExpensePage() {
     };
 
     load();
-  }, [userId, month, filters, GetExpense]);
+  }, [userId, month, filters]);
 
   // Format results
   const resultExpenses = useMemo(() => {
@@ -81,7 +85,8 @@ export default function ExpensePage() {
 
   // Pagination
   const onNext = async () => {
-    const res = await GetExpense(userId, filters, {
+    const { fetchExpenses } = useTransactionStore.getState();
+    const res = await fetchExpenses(userId, filters, {
       limit: itemsPerPage,
       cursor: cursorExpense,
     });
@@ -94,7 +99,8 @@ export default function ExpensePage() {
 
   const onPrev = async () => {
     if (cursorStackExpense.length === 0) {
-      const res = await GetExpense(userId, filters, {
+      const { fetchExpenses } = useTransactionStore.getState();
+      const res = await fetchExpenses(userId, filters, {
         limit: itemsPerPage,
         cursor: null,
       });
@@ -108,8 +114,8 @@ export default function ExpensePage() {
     const newTop = newStack.length ? newStack[newStack.length - 1] : null;
 
     setCursorStackExpense(newStack);
-
-    const res = await GetExpense(userId, filters, {
+    const { fetchExpenses } = useTransactionStore.getState();
+    const res = await fetchExpenses(userId, filters, {
       limit: itemsPerPage,
       cursor: newTop,
     });

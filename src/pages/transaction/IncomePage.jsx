@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useTransaction } from "../../hooks/useTransaction.js";
+import { useTransactionStore } from "../../stores/transaction";
 import { useAuth } from "../../hooks/useAuth.js";
 import Card from "../../components/common/Card.jsx";
 import Button from "../../components/common/Button.jsx";
@@ -17,7 +17,10 @@ import { motion as Motion } from "framer-motion";
 import { container, item } from "../../motion.config";
 
 export default function IncomePage() {
-  const { incomes, month, GetIncome, loading, error } = useTransaction();
+  const incomes = useTransactionStore((s) => s.incomes);
+  const month = useTransactionStore((s) => s.month);
+  const loading = useTransactionStore((s) => s.loadingFlags.fetchIncomes);
+  const error = useTransactionStore((s) => s.error);
   const { user } = useAuth();
   const userId = user?.uid;
   const { t } = useLanguage();
@@ -36,7 +39,8 @@ export default function IncomePage() {
     if (!userId) return;
 
     const load = async () => {
-      const { nextCursor } = await GetIncome(userId, {
+      const { fetchIncomes } = useTransactionStore.getState();
+      const { nextCursor } = await fetchIncomes(userId, {
         limit: itemsPerPage,
         cursor: null,
       });
@@ -46,7 +50,7 @@ export default function IncomePage() {
     };
 
     load();
-  }, [userId, month, GetIncome]);
+  }, [userId, month]);
 
   const resultIncomes = useMemo(() => {
     if (incomes?.results) {
@@ -59,7 +63,8 @@ export default function IncomePage() {
   }, [incomes]);
 
   const onNext = async () => {
-    const res = await GetIncome(userId, {
+    const { fetchIncomes } = useTransactionStore.getState();
+    const res = await fetchIncomes(userId, {
       limit: itemsPerPage,
       cursor: cursorIncome,
     });
@@ -71,7 +76,8 @@ export default function IncomePage() {
 
   const onPrev = async () => {
     if (cursorStackIncome.length === 0) {
-      const res = await GetIncome(userId, {
+      const { fetchIncomes } = useTransactionStore.getState();
+      const res = await fetchIncomes(userId, {
         limit: itemsPerPage,
         cursor: null,
       });
@@ -82,7 +88,8 @@ export default function IncomePage() {
     const newStack = cursorStackIncome.slice(0, -1);
     const newTop = newStack.length ? newStack[newStack.length - 1] : null;
     setCursorStackIncome(newStack);
-    const res = await GetIncome(userId, {
+    const { fetchIncomes } = useTransactionStore.getState();
+    const res = await fetchIncomes(userId, {
       limit: itemsPerPage,
       cursor: newTop,
     });

@@ -1,5 +1,5 @@
 import TransactionForm from "./TransactionForm";
-import { useTransaction } from "../../hooks/useTransaction";
+import { useTransactionStore } from "../../stores/transaction";
 import { useLanguage } from "../../hooks/useLanguage";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useCallback, useState } from "react";
@@ -9,7 +9,10 @@ export default function AddTransaction({
   onClose = () => {},
   role,
 }) {
-  const { addTransaction } = useTransaction();
+  // don't subscribe to store for actions — call getState in handlers
+  const { t } = useLanguage();
+  const addTransaction = (...args) =>
+    useTransactionStore.getState().addTransaction(...args);
   const { user } = useAuth();
   const userId = user?.uid;
   const [field, setField] = useState({
@@ -22,7 +25,6 @@ export default function AddTransaction({
     month: "",
   });
   const { title, amount, source, currency, category, date, month } = field;
-  const { t } = useLanguage();
 
   // Hàm xử lý thay đổi giá trị của các trường input
   const handleFieldChange = (field) => (e) => {

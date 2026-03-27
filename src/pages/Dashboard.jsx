@@ -6,7 +6,7 @@ import SpendingBarChart from "../components/dashboard/SpendingBarChart";
 import SpendingPieChart from "../components/dashboard/SpendingPieChart";
 import Card from "../components/common/Card";
 import ChangeDate from "../components/common/ChangeDate";
-import { useTransaction } from "../hooks/useTransaction";
+import { useTransactionStore } from "../stores/transaction";
 import { useAuth } from "../hooks/useAuth";
 import { useLanguage } from "../hooks/useLanguage";
 
@@ -30,28 +30,32 @@ import {
 export default function Dashboard() {
   const { t } = useLanguage();
   // transactions từ context (dữ liệu thật)
-  const {
-    loading,
-    month,
-    setMonth,
-    error,
-    transactionCurrent,
-    transactionPrev,
-    fetchTransactionCurrent,
-    fetchTransactionPrev,
-  } = useTransaction();
+  const loading = useTransactionStore((s) => s.loading);
+  const month = useTransactionStore((s) => s.month);
+  const setMonth = useTransactionStore((s) => s.setMonth);
+  const error = useTransactionStore((s) => s.error);
+  const transactionCurrent = useTransactionStore((s) => s.transactionCurrent);
+  const transactionPrev = useTransactionStore((s) => s.transactionPrev);
   const { user } = useAuth();
   const userId = user?.uid;
 
   // Lấy dữ liệu cho tháng hiện tại
   useEffect(() => {
-    fetchTransactionCurrent(userId);
-  }, [fetchTransactionCurrent, userId]);
+    if (!userId) return;
+    useTransactionStore
+      .getState()
+      .fetchTransactionCurrent(userId)
+      .catch(() => {});
+  }, [userId]);
 
   // Lấy dữ liệu cho tháng trước
   useEffect(() => {
-    fetchTransactionPrev(userId, month);
-  }, [fetchTransactionPrev, userId, month]);
+    if (!userId) return;
+    useTransactionStore
+      .getState()
+      .fetchTransactionPrev(userId, month)
+      .catch(() => {});
+  }, [userId, month]);
 
   // lấy dữ liệu cho tháng đang chọn từ transactions
   const currentData = useMemo(() => {
