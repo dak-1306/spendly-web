@@ -27,6 +27,7 @@ export const expenseSlice = (set, get, transactionService) => ({
           items = await transactionService.searchTransactions(
             userId,
             searchTerm,
+            get().month,
             pageOptions,
           );
         } else if (category || amountRange || sortBy) {

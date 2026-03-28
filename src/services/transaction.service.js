@@ -26,25 +26,28 @@ const getDashboardData = async (userId, month) => {
   // can render comparisons without issuing multiple requests.
   const toResults = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-  const start = new Date(month + "-01");
-  const end = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+  // Prefer using the `month` string field (YYYY-MM) to avoid range queries
+  // on `createdAt` which can lead to multiple-range queries requiring
+  // composite indexes. Documents are expected to include a `month` field.
   const qCurrent = query(
     colRef,
     where("userId", "==", userId),
-    where("createdAt", ">=", start),
-    where("createdAt", "<", end),
+    where("month", "==", month),
     orderBy("createdAt", "desc"),
   );
   const snapCurrent = await getDocs(qCurrent);
 
   // previous month
-  const prevStart = new Date(start.getFullYear(), start.getMonth() - 1, 1);
-  const prevEnd = new Date(start.getFullYear(), start.getMonth(), 1);
+  const prevMonth = new Date(month + "-01");
+  prevMonth.setMonth(prevMonth.getMonth() - 1);
+  const prevMonthStr = `${prevMonth.getFullYear()}-${String(
+    prevMonth.getMonth() + 1,
+  ).padStart(2, "0")}`;
+
   const qPrev = query(
     colRef,
     where("userId", "==", userId),
-    where("createdAt", ">=", prevStart),
-    where("createdAt", "<", prevEnd),
+    where("month", "==", prevMonthStr),
     orderBy("createdAt", "desc"),
   );
   const snapPrev = await getDocs(qPrev);
@@ -86,7 +89,37 @@ const getTransactionById = async (id) => {
 };
 
 const addTransaction = async (data) => {
-  const payload = { ...data, createdAt: serverTimestamp() };
+  // Ensure `month` field exists (format YYYY-MM). Prefer provided `data.month`,
+  // otherwise derive from `data.date` when possible or use current month.
+  let monthField = data.month;
+  if (!monthField) {
+    const d =
+      data.date && typeof data.date.toDate === "function"
+        ? data.date.toDate()
+        : data.date instanceof Date
+          ? data.date
+          : data.date
+            ? new Date(data.date)
+            : new Date();
+    monthField = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  }
+  // Ensure `amount` is stored as a number. Client inputs (type=number) may
+  // still arrive as strings; normalize here.
+  let amountNum = data.amount;
+  if (typeof amountNum === "string") {
+    // remove thousand separators if present
+    amountNum = Number(amountNum.replace(/,/g, ""));
+  } else if (amountNum == null) {
+    amountNum = 0;
+  }
+  if (Number.isNaN(amountNum)) amountNum = 0;
+
+  const payload = {
+    ...data,
+    amount: amountNum,
+    month: monthField,
+    createdAt: serverTimestamp(),
+  };
   const ref = await addDoc(colRef, payload);
   return ref.id;
 };
@@ -94,7 +127,15 @@ const addTransaction = async (data) => {
 const updateTransaction = async (id, data) => {
   console.log("updateTransaction called with id:", id, "and data:", data);
   const ref = doc(db, "transactions", id);
-  await updateDoc(ref, { ...data, updatedAt: serverTimestamp() });
+  // Normalize amount if provided
+  const cleaned = { ...data };
+  if (cleaned.amount !== undefined) {
+    if (typeof cleaned.amount === "string") {
+      cleaned.amount = Number(cleaned.amount.replace(/,/g, ""));
+    }
+    if (Number.isNaN(cleaned.amount)) cleaned.amount = 0;
+  }
+  await updateDoc(ref, { ...cleaned, updatedAt: serverTimestamp() });
 };
 
 const deleteTransaction = async (id) => {
@@ -108,14 +149,11 @@ const filterTransactionsByMonth = async (
   type,
   { limit: pageLimit = 5, cursor: cursorValue } = {},
 ) => {
-  const start = new Date(month + "-01");
-  const end = new Date(start.getFullYear(), start.getMonth() + 1, 1);
-
+  // Use `month` equality to avoid range queries on `createdAt`.
   let q = query(
     colRef,
     where("userId", "==", userId),
-    where("createdAt", ">=", start),
-    where("createdAt", "<", end),
+    where("month", "==", month),
     where("type", "==", type),
     orderBy("createdAt", "desc"),
     limit(pageLimit),
@@ -146,14 +184,17 @@ const filterTransactionsByMonth = async (
 const searchTransactions = async (
   userId,
   searchTerm,
+  month,
   { limit: pageLimit = 5, cursor: cursorValue } = {},
 ) => {
   if (!searchTerm || !searchTerm.trim())
     return { results: [], nextCursor: null };
   const term = searchTerm;
+  // Apply month equality when provided so searches are scoped to the selected month
   let q = query(
     colRef,
     where("userId", "==", userId),
+    ...(month ? [where("month", "==", month)] : []),
     where("title", ">=", term),
     where("title", "<=", term + "\uf8ff"),
     orderBy("title"),
@@ -180,20 +221,23 @@ const filterTransactions = async (
   month, // thêm month: ví dụ "2026-03"
   { limit: pageLimit = 5, cursor: cursorValue } = {},
 ) => {
+  console.log("filterTransactions called with:", {
+    userId,
+    type,
+    category,
+    amountRange,
+    sortBy,
+    month,
+    pageLimit,
+    cursorValue,
+  });
   let q = query(colRef, where("userId", "==", userId));
 
   // ===== 0) Filter theo month trước =====
+  // If `month` was provided, filter by the `month` field (YYYY-MM) to ensure
+  // all filter paths are scoped to the selected month.
   if (month) {
-    const [year, m] = month.split("-");
-
-    const startOfMonth = new Date(year, m - 1, 1);
-    const endOfMonth = new Date(year, m, 1);
-
-    q = query(
-      q,
-      where("createdAt", ">=", startOfMonth),
-      where("createdAt", "<", endOfMonth),
-    );
+    q = query(q, where("month", "==", month));
   }
 
   // ===== 1) Filter type =====
@@ -219,16 +263,32 @@ const filterTransactions = async (
   }
 
   // ===== 4) Order =====
+  // Normalize sortBy into createdAt order direction. Accept UI values like
+  // 'asc' / 'desc' (or legacy 'newest'). Default to 'desc' when not provided.
+  const createdAtOrder =
+    sortBy === "desc" || sortBy === "newest" ? "desc" : "asc";
+
   if (rangeArr) {
-    q = query(
-      q,
-      where("amount", ">=", rangeArr[0]),
-      where("amount", "<=", rangeArr[1]),
-      orderBy("amount", "desc"),
-      orderBy("createdAt", sortBy === "newest" ? "desc" : "asc"),
-    );
+    // If user specifically requested a date sort, honor it (order by createdAt).
+    // Otherwise, default to ordering by amount (desc) then createdAt (desc).
+    if (sortBy) {
+      q = query(
+        q,
+        where("amount", ">=", rangeArr[0]),
+        where("amount", "<=", rangeArr[1]),
+        orderBy("createdAt", createdAtOrder),
+      );
+    } else {
+      q = query(
+        q,
+        where("amount", ">=", rangeArr[0]),
+        where("amount", "<=", rangeArr[1]),
+        orderBy("amount", "desc"),
+        orderBy("createdAt", "desc"),
+      );
+    }
   } else {
-    q = query(q, orderBy("createdAt", sortBy === "newest" ? "desc" : "asc"));
+    q = query(q, orderBy("createdAt", createdAtOrder));
   }
 
   // ===== 5) Pagination =====
