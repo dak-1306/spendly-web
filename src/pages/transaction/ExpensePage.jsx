@@ -195,53 +195,66 @@ export default function ExpensePage() {
           </thead>
 
           <tbody>
-            {resultExpenses.map((expense) => (
-              <Motion.tr
-                variants={item}
-                key={expense.id}
-                className="border-b border-gray-200 hover:bg-gray-100 transition-colors"
-              >
-                <td className="px-4 py-4">{expense.category}</td>
-                <td className="px-4 py-4">{expense.title}</td>
-                <td className="px-4 py-4">{formatForDisplay(expense.date)}</td>
-                <td className="px-4 py-4 font-semibold text-red-600">
-                  {expense.amount?.toLocaleString()} {expense.currency ?? "VND"}
-                </td>
-                <td className="px-4 py-4 flex gap-2">
-                  <Button variant="ghost" onClick={() => openEdit(expense)}>
-                    <Edit2
-                      size={16}
-                      className="text-blue-600 dark:text-blue-400"
-                    />
-                  </Button>
-
-                  <Button variant="ghost" onClick={() => openDelete(expense)}>
-                    <Trash2
-                      size={16}
-                      className="text-red-600 dark:text-red-400"
-                    />
-                  </Button>
-
-                  <Link to={`/transaction/${expense.id}`}>
-                    <Button variant="ghost">
-                      <Eye
+            {resultExpenses &&
+              resultExpenses.map((expense) => (
+                <Motion.tr
+                  variants={item}
+                  key={expense.id}
+                  className="border-b border-gray-200 hover:bg-gray-100 transition-colors"
+                >
+                  <td className="px-4 py-4">{expense.category}</td>
+                  <td className="px-4 py-4">{expense.title}</td>
+                  <td className="px-4 py-4">
+                    {formatForDisplay(expense.date)}
+                  </td>
+                  <td className="px-4 py-4 font-semibold text-red-600">
+                    {expense.amount?.toLocaleString()}{" "}
+                    {expense.currency ?? "VND"}
+                  </td>
+                  <td className="px-4 py-4 flex gap-2">
+                    <Button variant="ghost" onClick={() => openEdit(expense)}>
+                      <Edit2
                         size={16}
-                        className="text-gray-600 dark:text-gray-400"
+                        className="text-blue-600 dark:text-blue-400"
                       />
                     </Button>
-                  </Link>
+
+                    <Button variant="ghost" onClick={() => openDelete(expense)}>
+                      <Trash2
+                        size={16}
+                        className="text-red-600 dark:text-red-400"
+                      />
+                    </Button>
+
+                    <Link to={`/transaction/${expense.id}`}>
+                      <Button variant="ghost">
+                        <Eye
+                          size={16}
+                          className="text-gray-600 dark:text-gray-400"
+                        />
+                      </Button>
+                    </Link>
+                  </td>
+                </Motion.tr>
+              ))}
+            {resultExpenses.length === 0 && (
+              <tr>
+                <td colSpan="5" className="text-center py-6 text-gray-500">
+                  {t("transactions.noDataExpense", "Không có chi tiêu nào")}
                 </td>
-              </Motion.tr>
-            ))}
+              </tr>
+            )}
           </tbody>
         </table>
       </Motion.div>
 
-      <Pagination
-        onPrev={onPrev}
-        onNext={onNext}
-        hasNext={resultExpenses.length === itemsPerPage}
-      />
+      {resultExpenses.length > 0 && (
+        <Pagination
+          onPrev={onPrev}
+          onNext={onNext}
+          hasNext={resultExpenses.length === itemsPerPage}
+        />
+      )}
 
       {isAddExpenseOpen && (
         <AddTransaction

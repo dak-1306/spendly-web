@@ -11,6 +11,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useLanguage } from "../hooks/useLanguage";
 
 import SkeletonDashboard from "../components/dashboard/SkeletonDashboard";
+import EmptyDashboard from "../components/canvas/EmptyDashboard";
 
 import { motion as Motion } from "framer-motion";
 import { container, item } from "../motion.config";
@@ -117,6 +118,21 @@ export default function Dashboard() {
         title={t("dashboard.pageTitle") || "Bảng điều khiển"}
       >
         <SkeletonDashboard />
+      </MainLayout>
+    );
+  }
+  if (
+    !loading &&
+    currentData.expenses.length === 0 &&
+    currentData.incomes.length === 0
+  ) {
+    return (
+      <MainLayout
+        navbarBottom={true}
+        auth={true}
+        title={t("dashboard.pageTitle") || "Bảng điều khiển"}
+      >
+        <EmptyDashboard />
       </MainLayout>
     );
   }

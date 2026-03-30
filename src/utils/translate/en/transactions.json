@@ -116,7 +116,8 @@
     "delete": "Delete",
     "refresh": "Refresh"
   },
-  "noData": "No transactions found",
+  "noDataExpense": "No expenses found",
+  "noDataIncome": "No incomes found",
   "loading": "Loading transactions...",
   "placeholderSearch": "Search by title",
   "titleAddExpense": "Add Expense",

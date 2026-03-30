@@ -138,60 +138,74 @@ export default function IncomePage() {
         className="overflow-x-auto"
       >
         <ul>
-          {resultIncomes.map((income) => (
-            <Motion.li
-              variants={item}
-              initial="hidden"
-              animate="show"
-              key={income.id}
-              className="py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center"
-            >
-              <p className="flex items-center gap-4">
-                <span className="text-gray-700 font-medium dark:text-gray-300">
-                  {income.source ?? "Thu nhập"}
+          {resultIncomes &&
+            resultIncomes.map((income) => (
+              <Motion.li
+                variants={item}
+                initial="hidden"
+                animate="show"
+                key={income.id}
+                className="py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center"
+              >
+                <p className="flex items-center gap-4">
+                  <span className="text-gray-700 font-medium dark:text-gray-300">
+                    {income.source ?? "Thu nhập"}
+                  </span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {income.title ?? ""}
+                  </span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {formatForDisplay(income.date) ?? ""}
+                  </span>
+                </p>
+                <span className="font-semibold text-green-600">
+                  {income.amount?.toLocaleString() ?? 0}{" "}
+                  {income.currency ?? "VND"}
                 </span>
-                <span className="text-gray-500 dark:text-gray-400">
-                  {income.title ?? ""}
-                </span>
-                <span className="text-gray-500 dark:text-gray-400">
-                  {formatForDisplay(income.date) ?? ""}
-                </span>
-              </p>
-              <span className="font-semibold text-green-600">
-                {income.amount?.toLocaleString() ?? 0}{" "}
-                {income.currency ?? "VND"}
-              </span>
-              <div className="flex gap-2">
-                <Button variant="ghost" onClick={() => openEditIncome(income)}>
-                  <Edit2
-                    size={16}
-                    className="text-blue-600 dark:text-blue-400"
-                  />
-                </Button>
-                <Button variant="ghost" onClick={() => openDelete(income)}>
-                  <Trash2
-                    size={16}
-                    className="text-red-600 dark:text-red-400"
-                  />
-                </Button>
-                <Link to={`/transaction/${income.id}`}>
-                  <Button variant="ghost">
-                    <Eye
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => openEditIncome(income)}
+                  >
+                    <Edit2
                       size={16}
-                      className="text-gray-600 dark:text-gray-400"
+                      className="text-blue-600 dark:text-blue-400"
                     />
                   </Button>
-                </Link>
-              </div>
-            </Motion.li>
-          ))}
+                  <Button variant="ghost" onClick={() => openDelete(income)}>
+                    <Trash2
+                      size={16}
+                      className="text-red-600 dark:text-red-400"
+                    />
+                  </Button>
+                  <Link to={`/transaction/${income.id}`}>
+                    <Button variant="ghost">
+                      <Eye
+                        size={16}
+                        className="text-gray-600 dark:text-gray-400"
+                      />
+                    </Button>
+                  </Link>
+                </div>
+              </Motion.li>
+            ))}
+          {resultIncomes.length === 0 && (
+            <li className="py-4 text-center border-t border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400">
+              {t(
+                "transactions.noDataIncome",
+                "Không có thu nhập nào trong tháng này.",
+              )}
+            </li>
+          )}
         </ul>
       </Motion.div>
-      <Pagination
-        onPrev={onPrev}
-        onNext={onNext}
-        hasNext={resultIncomes.length === itemsPerPage}
-      />
+      {resultIncomes.length > 0 && (
+        <Pagination
+          onPrev={onPrev}
+          onNext={onNext}
+          hasNext={resultIncomes.length === itemsPerPage}
+        />
+      )}
 
       {isAddIncomeOpen && (
         <AddTransaction

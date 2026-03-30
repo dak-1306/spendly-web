@@ -118,7 +118,8 @@
     "delete": "Xóa",
     "refresh": "Làm mới"
   },
-  "noData": "Không có giao dịch",
+  "noDataExpense": "Không có chi tiêu nào",
+  "noDataIncome": "Không có thu nhập nào",
   "loading": "Đang tải giao dịch...",
   "placeholderSearch": "Tìm kiếm theo tiêu đề",
   "titleAddExpense": "Thêm chi tiêu",
